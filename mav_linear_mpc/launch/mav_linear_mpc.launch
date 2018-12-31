@@ -8,6 +8,7 @@
       <rosparam file="$(find mav_linear_mpc)/resources/linear_mpc_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <param name="use_rc_teleop" value="true" />
+      <remap from="odometry" to="ground_truth/odometry" />
     </node>
   </group>
 </launch>

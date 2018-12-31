@@ -33,24 +33,31 @@
 #
 # Revision $Id$
 
-## Simple talker demo that published std_msgs/Strings messages
+## Simple talker demo that listens to std_msgs/Strings published 
 ## to the 'chatter' topic
 
 import rospy
-from std_msgs.msg import String
+from std_msgs import Float32MultiArray
+from mav_msgs.msg import Actuators
 
-def talker():
-    pub = rospy.Publisher('chatter', String, queue_size=10)
-    rospy.init_node('talker', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
-    while not rospy.is_shutdown():
-        hello_str = "hello world %s" % rospy.get_time()
-        rospy.loginfo(hello_str)
-        pub.publish(hello_str)
-        rate.sleep()
+mav_name = 'ardrone'
+#mav_name = 'firefly'
+
+quad_num = 1
+
+# TODO Insert argument code for mav_name
+
+rospy.init_node('ActuatorsToFloat64Pub', anonymous=True)
+
+pub = rospy.Publisher("/simulation/quad" + str(quad_num) + "/command/motor_speed", queue_size=1)
+
+def callback(data):
+    pub.publish(data.angular_velocities)
+    
+def listener():
+    rospy.Subscriber('/' + mav_name + '/command/motor_speed', Actuators, callback)
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
 
 if __name__ == '__main__':
-    try:
-        talker()
-    except rospy.ROSInterruptException:
-        pass
+    listener()

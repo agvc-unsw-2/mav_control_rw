@@ -14,8 +14,8 @@
 mass: 1.52
 roll_time_constant: 0.25
 pitch_time_constant: 0.255
-roll_gain: 0.9
-pitch_gain: 0.9
+roll_gain: 1.5
+pitch_gain: 1.5
 drag_coefficients: [ 0.010000 , 0.010000, 0.0000]
 
 q_x: 40
@@ -37,9 +37,9 @@ r_droll: 0.3
 r_dpitch: 0.3
 r_dthrust: 0.0025
 
-roll_max: deg(10.0)
-pitch_max: deg(10.0)
-yaw_rate_max: deg(90)
+roll_max: deg(25.0)
+pitch_max: deg(25.0)
+yaw_rate_max: deg(0)
 thrust_min: 5
 thrust_max: 20
 

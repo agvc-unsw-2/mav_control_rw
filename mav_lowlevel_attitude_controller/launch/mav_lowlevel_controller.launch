@@ -1,5 +1,6 @@
 <launch>
-  <arg name="namespace" default="firefly" />
+  <arg name="mav_name" default="firefly" />
+  <arg name="namespace" default="$(arg mav_name)" />
   <group ns="$(arg namespace)">
     <node name="mav_lowlevel_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen" >
       <remap from="odometry" to="ground_truth/odometry" />

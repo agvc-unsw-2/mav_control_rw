@@ -36,12 +36,15 @@
 ## Simple talker demo that listens to std_msgs/Strings published 
 ## to the 'chatter' topic
 
+import sys
+
 import rospy
 from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import MultiArrayDimension
 from mav_msgs.msg import Actuators
 
-mav_name = 'ardrone'
+mav_name = sys.argv[1]
+#mav_name = 'ardrone'
 #mav_name = 'firefly'
 
 quad_num = 1

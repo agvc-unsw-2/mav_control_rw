@@ -1,5 +1,5 @@
 <launch>
-  <arg name="mav_name" default="firefly" />
+  <arg name="mav_name" default="aero" />
   <arg name="namespace" default="$(arg mav_name)"/>
   
   <group ns="$(arg namespace)">
@@ -8,6 +8,9 @@
       <rosparam file="$(find mav_linear_mpc)/resources/linear_mpc_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <param name="use_rc_teleop" value="true" />
+      <remap from="/$(arg mav_name)/rc" to="/$(arg mav_name)/joy" />
+      <remap from="/$(arg mav_name)/command/roll_pitch_yawrate_thrust" to="/mavros/setpoint_raw/roll_pitch_yawrate_thrust" />
     </node>
+    <node name="joy_node" pkg="joy" type="joy_node" />
   </group>
 </launch>

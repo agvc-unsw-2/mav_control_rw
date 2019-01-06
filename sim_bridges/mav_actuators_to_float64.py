@@ -43,17 +43,19 @@ from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import MultiArrayDimension
 from mav_msgs.msg import Actuators
 
+if len(sys.argv) != 3:
+    print("USAGE: " + sys.argv[0] + " MAV_NAME UAV_NUM")
 mav_name = sys.argv[1]
 #mav_name = 'ardrone'
 #mav_name = 'firefly'
 
-quad_num = 1
+uav_num = sys.argv[2]
 
 # TODO Insert argument code for mav_name
 
 rospy.init_node('ActuatorsToFloat64Pub', anonymous=True)
 
-pub = rospy.Publisher("/simulation/quad" + str(quad_num) + "/command/motor_speed", Float64MultiArray, queue_size=1)
+pub = rospy.Publisher("/simulation/uav" + str(uav_num) + "/command/motor_speed", Float64MultiArray, queue_size=1)
 
 def callback(data):
     #print(data.angular_velocities)

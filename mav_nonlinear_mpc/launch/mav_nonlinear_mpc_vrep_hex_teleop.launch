@@ -2,29 +2,19 @@
   <arg name="mav_name" default="vrep_hex" />
   <arg name="namespace" default="$(arg mav_name)"/>
   <arg name="uav_num" default="1"/>
-  
+  <param name="use_sim_time" value="true" />
   <group ns="$(arg namespace)">
     <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node"  respawn="true" clear_params="true" output="screen">
       <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <param name="use_rc_teleop" value="true" />
 
-      <remap from="/$(arg mav_name)/rc" to="/$(arg mav_name)/joy_remapped" />
+      <remap from="/$(arg mav_name)/rc" to="/$(arg mav_name)/joy" />
       <remap from="odometry" to="/simulation/uav$(arg uav_num)/ground_truth/mavros/position/local" />
     </node>
 
     <node name="joy_node" pkg="joy" type="joy_node" />
-    <node pkg="joy" type="joy_node" name="second_joy" >
-        <remap from="joy" to="second_joy" />
-    </node>
-
-    <node pkg="joystick_remapper" type="joystick_remapper.py" name="remapper" >
-        <remap from="joy_source" to="second_joy" /> <!-- Set input correctly -->
-        <remap from="joy_dest" to="joy" /> <!-- Republish on "joy" -->
-        <param name="button_mapping" type="string" value="8 11 12 9 15" />
-        <param name="axis_mapping" type="string" value="=" /> <!-- No changes -->
-    </node>
-        <!-- Don't need joy interface as function is fulfilled by rc_teleop -->
+    <!-- Don't need joy interface as function is fulfilled by rc_teleop -->
     <!-- <node name="rotors_joy_interface" pkg="rotors_joy_interface" type="rotors_joy_interface" /> -->
 
 

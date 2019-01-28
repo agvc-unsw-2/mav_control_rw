@@ -8,7 +8,9 @@ from mav_msgs.msg import RollPitchYawrateThrust
 import std_msgs.msg
 
 class Echo_From_Vrep(object):
-    def __init__(self, mav_name, uav_num):
+    def __init__(self, mav_name, uav_num, add_input_delay, input_delay):
+        self.add_input_delay = add_input_delay
+        self.input_delay = rospy.Duration(input_delay)
         self.updated = False
         self.msg_to_publish = RollPitchYawrateThrust()
         self.pub = rospy.Publisher("/simulation/uav" + uav_num + "/command/roll_pitch_yawrate_thrust", RollPitchYawrateThrust, queue_size=1)
@@ -24,6 +26,9 @@ class Echo_From_Vrep(object):
     def write_callback(self, msg):
         if self.updated == True:
             self.msg_to_publish.header.stamp = msg.data
+            if self.add_input_delay:
+                self.msg_to_publish.header.stamp += self.input_delay
+
             self.pub.publish(self.msg_to_publish)
             self.updated = False
 
@@ -36,7 +41,10 @@ mav_name = myargs[1]
 uav_num = str(myargs[2])
 
 if __name__ == '__main__':
-    print("Starting...")
+    print('-----------------------')
+    print("Launching " + myargs[0] + '...')
+    add_input_delay = False
+    input_delay = 0.15
     rospy.init_node('attitude_cmd_echo_' + uav_num, anonymous=False)
-    echo_node = Echo_From_Vrep(mav_name, uav_num)
+    echo_node = Echo_From_Vrep(mav_name, uav_num, add_input_delay, input_delay)
     rospy.spin()

@@ -46,7 +46,7 @@ NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::Node
       mpc_queue_(nh, private_nh, ACADO_N+1),
       command_roll_pitch_yaw_thrust_(0, 0, 0, 0),
       disturbance_observer_(nh, private_nh),
-      verbose_(false),
+      verbose_(true),
       solve_time_average_(0),
       received_first_odometry_(false)
 {
@@ -87,7 +87,7 @@ void NonlinearModelPredictiveControl::initializeParameters()
   std::vector<double> drag_coefficients;
 
   //Get parameters from RosParam server
-  private_nh_.param<bool>("verbose", verbose_, false);
+  private_nh_.param<bool>("verbose", verbose_, true);
 
   if (!private_nh_.getParam("mass", mass_)) {
     ROS_ERROR("mass in nonlinear MPC controller is not loaded from ros parameter "

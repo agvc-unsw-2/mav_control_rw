@@ -51,7 +51,7 @@ LinearModelPredictiveController::LinearModelPredictiveController(const ros::Node
       linearized_command_roll_pitch_thrust_(0, 0, 0),
       mpc_queue_(nh, private_nh, kPredictionHorizonSteps),
       disturbance_observer_(nh, private_nh),
-      verbose_(false),
+      verbose_(true),
       solve_time_average_(0),
       steady_state_calculation_(nh, private_nh),
       received_first_odometry_(false)
@@ -81,7 +81,7 @@ void LinearModelPredictiveController::initializeParameters()
   std::vector<double> drag_coefficients;
 
   //Get parameters from RosParam server
-  private_nh_.param<bool>("verbose", verbose_, false);
+  private_nh_.param<bool>("verbose", verbose_, true);
 
   if (!private_nh_.getParam("mass", mass_)) {
     ROS_ERROR("mass in MPC is not loaded from ros parameter server");

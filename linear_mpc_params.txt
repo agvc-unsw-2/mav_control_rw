@@ -1,0 +1,171 @@
+PARAMETERS
+ * /rosdistro: kinetic
+ * /rosversion: 1.12.14
+ * /vrep_hex/PID_attitude_controller/allocation_matrix: [0.5, -0.866025, ...
+ * /vrep_hex/PID_attitude_controller/arm_length: 0.3
+ * /vrep_hex/PID_attitude_controller/inertia: [0.034756, 0.0, 0...
+ * /vrep_hex/PID_attitude_controller/max_integrator_error: 0.6
+ * /vrep_hex/PID_attitude_controller/n_rotors: 6
+ * /vrep_hex/PID_attitude_controller/p_gain: 25
+ * /vrep_hex/PID_attitude_controller/pitch_gain: 50
+ * /vrep_hex/PID_attitude_controller/pitch_int_gain: 2.0
+ * /vrep_hex/PID_attitude_controller/q_gain: 22
+ * /vrep_hex/PID_attitude_controller/r_gain: 1.0
+ * /vrep_hex/PID_attitude_controller/roll_gain: 50
+ * /vrep_hex/PID_attitude_controller/roll_int_gain: 2.0
+ * /vrep_hex/PID_attitude_controller/rotor_force_constant: 8.54858e-06
+ * /vrep_hex/PID_attitude_controller/rotor_moment_constant: 0.009
+ * /vrep_hex/mav_linear_mpc/KF_observer/P0_angular_velocity: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/P0_attitude: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/P0_force: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/P0_position: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/P0_torque: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/P0_velocity: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/calibration_duration: 5
+ * /vrep_hex/mav_linear_mpc/KF_observer/drag_coefficients: [0.02, 0.02, 0.0]
+ * /vrep_hex/mav_linear_mpc/KF_observer/external_forces_limit: [5.0, 5.0, 3.0]
+ * /vrep_hex/mav_linear_mpc/KF_observer/external_moments_limit: [20.0, 20.0, 20.0]
+ * /vrep_hex/mav_linear_mpc/KF_observer/omega_limit: [3.0, 3.0, 2.0]
+ * /vrep_hex/mav_linear_mpc/KF_observer/pitch_damping: 1.0
+ * /vrep_hex/mav_linear_mpc/KF_observer/pitch_gain: 0.989065
+ * /vrep_hex/mav_linear_mpc/KF_observer/pitch_omega: 3.580602
+ * /vrep_hex/mav_linear_mpc/KF_observer/q_angular_velocity: 0.02
+ * /vrep_hex/mav_linear_mpc/KF_observer/q_attitude: 0.015
+ * /vrep_hex/mav_linear_mpc/KF_observer/q_force: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/q_position: 0.01
+ * /vrep_hex/mav_linear_mpc/KF_observer/q_torque: 0.1
+ * /vrep_hex/mav_linear_mpc/KF_observer/q_velocity: 0.025
+ * /vrep_hex/mav_linear_mpc/KF_observer/r_attitude: 0.01
+ * /vrep_hex/mav_linear_mpc/KF_observer/r_position: 0.001
+ * /vrep_hex/mav_linear_mpc/KF_observer/r_velocity: 0.0012
+ * /vrep_hex/mav_linear_mpc/KF_observer/roll_damping: 0.99977
+ * /vrep_hex/mav_linear_mpc/KF_observer/roll_gain: 0.991811
+ * /vrep_hex/mav_linear_mpc/KF_observer/roll_omega: 4.039406
+ * /vrep_hex/mav_linear_mpc/KF_observer/yaw_damping: 0.95
+ * /vrep_hex/mav_linear_mpc/KF_observer/yaw_gain: 1.0
+ * /vrep_hex/mav_linear_mpc/KF_observer/yaw_omega: 5.0
+ * /vrep_hex/mav_linear_mpc/K_yaw: 1.8
+ * /vrep_hex/mav_linear_mpc/Ki_xy: 0.2
+ * /vrep_hex/mav_linear_mpc/Ki_z: 0.3
+ * /vrep_hex/mav_linear_mpc/antiwindup_ball: 0.4
+ * /vrep_hex/mav_linear_mpc/drag_coefficients: [0.02, 0.02, 0.0]
+ * /vrep_hex/mav_linear_mpc/enable_integrator: True
+ * /vrep_hex/mav_linear_mpc/enable_offset_free: True
+ * /vrep_hex/mav_linear_mpc/mass: 1.65
+ * /vrep_hex/mav_linear_mpc/pitch_gain: 1.136624
+ * /vrep_hex/mav_linear_mpc/pitch_max: 0.436332312999
+ * /vrep_hex/mav_linear_mpc/pitch_time_constant: 0.549053
+ * /vrep_hex/mav_linear_mpc/position_error_integration_limit: 2
+ * /vrep_hex/mav_linear_mpc/prediction_sampling_time: 0.1
+ * /vrep_hex/mav_linear_mpc/q_pitch: 20
+ * /vrep_hex/mav_linear_mpc/q_roll: 20
+ * /vrep_hex/mav_linear_mpc/q_vx: 20
+ * /vrep_hex/mav_linear_mpc/q_vy: 20
+ * /vrep_hex/mav_linear_mpc/q_vz: 25
+ * /vrep_hex/mav_linear_mpc/q_x: 40
+ * /vrep_hex/mav_linear_mpc/q_y: 40
+ * /vrep_hex/mav_linear_mpc/q_z: 60
+ * /vrep_hex/mav_linear_mpc/r_dpitch: 0.3
+ * /vrep_hex/mav_linear_mpc/r_droll: 0.3
+ * /vrep_hex/mav_linear_mpc/r_dthrust: 0.0025
+ * /vrep_hex/mav_linear_mpc/r_pitch: 35
+ * /vrep_hex/mav_linear_mpc/r_roll: 35
+ * /vrep_hex/mav_linear_mpc/r_thrust: 2
+ * /vrep_hex/mav_linear_mpc/roll_gain: 1.173807
+ * /vrep_hex/mav_linear_mpc/roll_max: 0.436332312999
+ * /vrep_hex/mav_linear_mpc/roll_time_constant: 0.624196
+ * /vrep_hex/mav_linear_mpc/sampling_time: 0.0166667
+ * /vrep_hex/mav_linear_mpc/thrust_max: 20
+ * /vrep_hex/mav_linear_mpc/thrust_min: 5
+ * /vrep_hex/mav_linear_mpc/use_rc_teleop: False
+ * /vrep_hex/mav_linear_mpc/yaw_rate_max: 1.57079632679
+
+NODES
+  /vrep_hex/
+    PID_attitude_controller (mav_lowlevel_attitude_controller/mav_pid_attitude_controller_node)
+    mav_actuators_to_float64 (mav_linear_mpc/mav_actuators_to_float64.py)
+    mav_linear_mpc (mav_linear_mpc/mav_linear_mpc_node)
+
+ROS_MASTER_URI=http://localhost:11311
+
+process[vrep_hex/mav_linear_mpc-1]: started with pid [21248]
+process[vrep_hex/PID_attitude_controller-2]: started with pid [21249]
+process[vrep_hex/mav_actuators_to_float64-3]: started with pid [21251]
+[ INFO] [1549271763.610843659]: start initializing mav_disturbance_observer:KF
+[ INFO] [1549271763.614087677]: mav_disturbance_observer:KF dynamic config is called successfully
+[ INFO] [1549271763.644628467]: KF parameters loaded successfully
+[ INFO] [1549271763.645099040]: state_covariance_: 
+0.1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  0 0.1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  0   0 0.1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  0   0   0 0.1   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+  0   0   0   0 0.1   0   0   0   0   0   0   0   0   0   0   0   0   0
+  0   0   0   0   0 0.1   0   0   0   0   0   0   0   0   0   0   0   0
+  0   0   0   0   0   0 0.1   0   0   0   0   0   0   0   0   0   0   0
+  0   0   0   0   0   0   0 0.1   0   0   0   0   0   0   0   0   0   0
+  0   0   0   0   0   0   0   0 0.1   0   0   0   0   0   0   0   0   0
+  0   0   0   0   0   0   0   0   0 0.1   0   0   0   0   0   0   0   0
+  0   0   0   0   0   0   0   0   0   0 0.1   0   0   0   0   0   0   0
+  0   0   0   0   0   0   0   0   0   0   0 0.1   0   0   0   0   0   0
+  0   0   0   0   0   0   0   0   0   0   0   0 0.1   0   0   0   0   0
+  0   0   0   0   0   0   0   0   0   0   0   0   0 0.1   0   0   0   0
+  0   0   0   0   0   0   0   0   0   0   0   0   0   0 0.1   0   0   0
+  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0 0.1   0   0
+  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0 0.1   0
+  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0 0.1
+[ INFO] [1549271763.645138192]: Kalman Filter Initialized!
+[ INFO] [1549271763.660192915]: Linear MPC: Steady State calculation is initialized correctly
+[ INFO] [1549271763.660394297]: A: 
+         1          0          0  0.0999001          0          0          0  0.0461557
+         0          1          0          0  0.0999001          0 -0.0464847          0
+         0          0          1          0          0        0.1          0          0
+         0          0          0   0.998002          0          0          0   0.895616
+         0          0          0          0   0.998002          0  -0.905209          0
+         0          0          0          0          0          1          0          0
+         0          0          0          0          0          0   0.851968          0
+         0          0          0          0          0          0          0   0.833491
+[ INFO] [1549271763.660472176]: B: 
+          0  0.00318566           0
+-0.00290926           0           0
+          0           0     0.00495
+          0   0.0946221           0
+ -0.0865637           0           0
+          0           0         0.1
+     0.1739           0           0
+          0     0.18943           0
+[ INFO] [1549271763.660541247]: B_d: 
+0.00494672          0          0
+         0 0.00494672          0
+         0          0    0.00495
+ 0.0999011          0          0
+         0  0.0999011          0
+         0          0        0.1
+         0          0          0
+         0          0          0
+[ INFO] [1549271763.660593332]: Linear MPC: initialized correctly
+[ INFO] [1549271763.687452698]: Linear MPC: Tuning parameters updated...
+[ INFO] [1549271763.687508756]: diag(Q) = 
+40 40 60 20 20 25 20 20
+[ INFO] [1549271763.687542722]: diag(R) = 
+35 35  2
+[ INFO] [1549271763.687566174]: diag(R_delta) = 
+    0.3    0.3 0.0025
+[ INFO] [1549271763.687674287]: Q_final = 
+ 454.103        0        0  134.681        0        0        0   183.81
+       0  460.033        0        0  141.123        0 -202.155        0
+       0        0  563.584        0        0   111.51        0        0
+ 134.681        0        0  136.911        0        0        0  195.714
+       0  141.123        0        0  144.082        0 -218.361        0
+       0        0   111.51        0        0  111.486        0        0
+       0 -202.155        0        0 -218.361        0  541.686        0
+  183.81        0        0  195.714        0        0        0  459.791
+[ INFO] [1549271763.716024798]: Created control interface for controller linear_model_predictive_controller and RC ACI rc interface
+Starting...
+^C[vrep_hex/mav_actuators_to_float64-3] killing on exit
+[vrep_hex/PID_attitude_controller-2] killing on exit
+[vrep_hex/mav_linear_mpc-1] killing on exit
+shutting down processing monitor...
+... shutting down processing monitor complete
+done
+mbzirc@mtrnlab4:~/catkin_ws_mav_control_rw$ 
+

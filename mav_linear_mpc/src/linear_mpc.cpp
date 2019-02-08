@@ -180,6 +180,9 @@ void LinearModelPredictiveController::initializeParameters()
   steady_state_calculation_.initialize(model_A_, model_B_, model_Bd_);
 
   if (verbose_) {
+    ROS_INFO_STREAM("A_continuous_time: \n" << A_continous_time);
+    ROS_INFO_STREAM("B_continuous_time: \n" << B_continous_time);
+    ROS_INFO_STREAM("Bd_continuous_time: \n" << Bd_continous_time);
     ROS_INFO_STREAM("A: \n" << model_A_);
     ROS_INFO_STREAM("B: \n" << model_B_);
     ROS_INFO_STREAM("B_d: \n" << model_Bd_);

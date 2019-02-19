@@ -147,7 +147,15 @@ void NonlinearModelPredictiveControl::initializeParameters()
     ROS_ERROR("prediction_sampling_time in nonlinear MPC is not loaded from ros parameter server");
     abort();
   }
+  
+  constructModelMatrices();
+  initialized_parameters_ = true;
 
+  ROS_INFO("Nonlinear MPC: initialized correctly");
+}
+
+void NonlinearModelPredictiveControl::constructModelMatrices()
+{
   for (int i = 0; i < ACADO_N + 1; i++) {
     acado_online_data_.block(i, 0, 1, ACADO_NOD) << roll_time_constant_, roll_gain_, pitch_time_constant_, pitch_gain_, drag_coefficients_(
         0), drag_coefficients_(1), 0, 0, 0;
@@ -159,9 +167,7 @@ void NonlinearModelPredictiveControl::initializeParameters()
   if (verbose_) {
     std::cout << "acado online data: " << std::endl << acado_online_data_ << std::endl;
   }
-
-  initialized_parameters_ = true;
-  ROS_INFO("Nonlinear MPC: initialized correctly");
+  ROS_INFO("Updated acado online data");
 }
 
 void NonlinearModelPredictiveControl::applyParameters()

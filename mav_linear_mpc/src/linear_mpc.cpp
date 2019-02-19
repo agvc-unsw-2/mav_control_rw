@@ -209,7 +209,7 @@ void LinearModelPredictiveController::constructModelMatrices()
   Eigen::Map<Eigen::MatrixXd>(const_cast<double*>(params.Bd), kStateSize, kDisturbanceSize) =
       model_Bd_;
 
-  ROS_INFO("Linear MPC: State Matrices and Solver initialized correctly");
+  ROS_INFO("Linear MPC: State Matrices and Solver Updated correctly");
 }
 
 void LinearModelPredictiveController::applyParameters()

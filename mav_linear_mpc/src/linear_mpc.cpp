@@ -135,7 +135,16 @@ void LinearModelPredictiveController::initializeParameters()
     ROS_ERROR("prediction_sampling_time in MPC is not loaded from ros parameter server");
     abort();
   }
+  ROS_INFO("Linear MPC: Parameters initialized correctly");
 
+  constructModelMatrices();
+
+  initialized_parameters_ = true;
+}
+
+
+void LinearModelPredictiveController::constructModelMatrices()
+{
   //construct model matrices
   Eigen::MatrixXd A_continous_time(kStateSize, kStateSize);
   A_continous_time = Eigen::MatrixXd::Zero(kStateSize, kStateSize);
@@ -147,11 +156,11 @@ void LinearModelPredictiveController::initializeParameters()
   A_continous_time(0, 3) = 1;
   A_continous_time(1, 4) = 1;
   A_continous_time(2, 5) = 1;
-  A_continous_time(3, 3) = -drag_coefficients.at(0);
+  A_continous_time(3, 3) = -drag_coefficients_(0);
   A_continous_time(3, 7) = kGravity;
-  A_continous_time(4, 4) = -drag_coefficients.at(1);
+  A_continous_time(4, 4) = -drag_coefficients_(1);
   A_continous_time(4, 6) = -kGravity;
-  A_continous_time(5, 5) = -drag_coefficients.at(2);
+  A_continous_time(5, 5) = -drag_coefficients_(2);
   A_continous_time(6, 6) = -1.0 / roll_time_constant_;
   A_continous_time(7, 7) = -1.0 / pitch_time_constant_;
 
@@ -200,9 +209,7 @@ void LinearModelPredictiveController::initializeParameters()
   Eigen::Map<Eigen::MatrixXd>(const_cast<double*>(params.Bd), kStateSize, kDisturbanceSize) =
       model_Bd_;
 
-  initialized_parameters_ = true;
-
-  ROS_INFO("Linear MPC: initialized correctly");
+  ROS_INFO("Linear MPC: State Matrices and Solver initialized correctly");
 }
 
 void LinearModelPredictiveController::applyParameters()

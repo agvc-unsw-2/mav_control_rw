@@ -156,6 +156,7 @@ class LinearModelPredictiveController
 
   //initialize parameters
   void initializeParameters();
+  void constructModelMatrices();
   bool initialized_parameters_;
 
   // sampling time parameters

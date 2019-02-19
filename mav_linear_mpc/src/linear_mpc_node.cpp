@@ -57,6 +57,13 @@ LinearModelPredictiveControllerNode::~LinearModelPredictiveControllerNode()
 void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::LinearMPCConfig &config,
                                                             uint32_t level)
 {
+  ROS_INFO(
+    "Reconfigure Request: %f, %f, %f",
+    config.q_x,
+    config.q_y,
+    config.q_z
+  );
+
   Eigen::Vector3d q_position;
   Eigen::Vector3d q_velocity;
   Eigen::Vector2d q_attitude;

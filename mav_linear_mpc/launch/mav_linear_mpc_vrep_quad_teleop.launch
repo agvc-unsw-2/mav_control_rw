@@ -1,5 +1,5 @@
 <launch>
-  <arg name="mav_name" default="vrep_hex" />
+  <arg name="mav_name" default="vrep_quad" />
   <arg name="namespace" default="$(arg mav_name)"/>
   <arg name="uav_num" default="1"/>
   <arg name="verbose" default="true"/>

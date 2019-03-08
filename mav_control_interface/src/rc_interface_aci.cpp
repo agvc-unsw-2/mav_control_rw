@@ -101,8 +101,8 @@ float RcInterfaceAci::getStickDeadzone() const
 
 bool RcInterfaceAci::isRcOn(const sensor_msgs::JoyConstPtr& msg) const
 {
-  return (msg->buttons[0] == 1);
-  // return (1 == 1);
+  // return (msg->buttons[0] == 1);
+  return (1 == 1);
 }
 
 }  // end namespace mav_control_interface

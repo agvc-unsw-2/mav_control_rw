@@ -14,13 +14,8 @@ roll_gain: 70
 pitch_gain: 70
 #roll_int_gain: 0
 #pitch_int_gain: 0
-<<<<<<< HEAD
 roll_int_gain: 2.0
 pitch_int_gain: 2.0
-=======
-roll_int_gain: 10.0
-pitch_int_gain: 10.0
->>>>>>> parent of 4847176... Seems to be working
 #p_gain: 0
 #q_gain: 0
 #r_gain: 0

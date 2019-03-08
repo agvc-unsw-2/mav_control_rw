@@ -99,18 +99,27 @@ void KFDisturbanceObserver::initialize()
 
   ROS_INFO("start initializing mav_disturbance_observer:KF");
 
+  ROS_INFO("Advertising calibration service");
   service_ = observer_nh_.advertiseService("StartCalibrateKF",
                                            &KFDisturbanceObserver::startCalibrationCallback, this);
 
+  ROS_INFO("Creating observer state publisher");
   observer_state_pub_ = observer_nh_.advertise<mav_disturbance_observer::ObserverState>(
       "observer_state", 10);
 
+  ROS_INFO("Creating dynamic reconfigure server");
   dynamic_reconfigure::Server<mav_disturbance_observer::KFDisturbanceObserverConfig>::CallbackType f;
+  
   f = boost::bind(&KFDisturbanceObserver::DynConfigCallback, this, _1, _2);
+
+  ROS_INFO("Setting callback");
   dyn_config_server_.setCallback(f);
 
+  ROS_INFO("Loading ROS Parameters");
   loadROSParams();
 
+
+  ROS_INFO("Resetting state and disturbance matrices");
   state_.setZero();
   predicted_state_.setZero();
   forces_offset_.setZero();

@@ -31,7 +31,7 @@ def callback(data):
     
 # Listens to mav_msgs/Actuators message from mav_linear_mpc
 def listener():
-    rospy.Subscriber('/' + mav_name + '/command/motor_speed', Actuators, callback)
+    rospy.Subscriber('/' + mav_name + uav_num + '/command/motor_speed', Actuators, callback)
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 

@@ -21,11 +21,11 @@
 
     <!-- RC Teleop in mav_linear_mpc node outputs to PID_attitude_controller. Also requires odometry from gazebo -->
 
-    <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
+    <!-- <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
       <remap from="odometry" to="/simulation/uav$(arg uav_num)/ground_truth/mavros/position/local" />
       <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
-    </node>
+    </node> -->
 
-    <node pkg="mav_linear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/>
+    <!-- <node pkg="mav_linear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/> -->
   </group>
 </launch>

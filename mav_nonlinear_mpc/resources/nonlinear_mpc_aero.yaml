@@ -15,7 +15,7 @@
 #roll fit percentage: 78.777678%
 
 ## Controller Parameters:
-mass: 1.650000
+mass: 0.063705
 roll_time_constant: 0.624196
 roll_gain: 1.173807
 pitch_time_constant: 0.549053

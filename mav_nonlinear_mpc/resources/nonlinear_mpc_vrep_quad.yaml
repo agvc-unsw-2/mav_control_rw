@@ -15,12 +15,20 @@
 #roll fit percentage: 78.777678%
 
 ## Controller Parameters:
-mass: 1.650000
-roll_time_constant: 0.624196
-roll_gain: 1.173807
-pitch_time_constant: 0.549053
-pitch_gain: 1.136624
-linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
+# mass: 1.520000
+# roll_time_constant: 0.624196
+# roll_gain: 1.173807
+# pitch_time_constant: 0.549053
+# pitch_gain: 1.136624
+# linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
+# yaw_gain: 1.000000
+
+mass: 1
+roll_time_constant: 1
+roll_gain: 1
+pitch_time_constant: 1
+pitch_gain: 1
+linear_drag_coefficients: [0.00000, 0.00000, 0.000000]
 yaw_gain: 1.000000
 
 # dynamic config default values:
@@ -41,8 +49,8 @@ r_thrust : 1
 
 roll_max: deg(25.0)
 pitch_max: deg(25.0)
-thrust_min: 5
-thrust_max: 20
+thrust_min: 0.1
+thrust_max: 25
 
 K_yaw: 1.8
 

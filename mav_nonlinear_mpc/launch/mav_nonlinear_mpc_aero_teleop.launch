@@ -1,5 +1,5 @@
 <launch>
-  <arg name="mav_name" default="vrep_quad" />
+  <arg name="mav_name" default="aero" />
   <arg name="namespace" default="$(arg mav_name)"/>
   <arg name="uav_num" default="1"/>
   <param name="use_sim_time" value="true" />
@@ -27,7 +27,8 @@
     </node>
 
     <node pkg="mav_nonlinear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/>
-    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo.py"/>
+    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_sim.py"/>
+    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/>
   </group>
 </launch>
 

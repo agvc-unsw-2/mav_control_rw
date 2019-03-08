@@ -81,7 +81,7 @@ PARAMETERS
 NODES
   /vrep_hex/
     PID_attitude_controller (mav_lowlevel_attitude_controller/mav_pid_attitude_controller_node)
-    attitude_cmd_echo (mav_nonlinear_mpc/attitude_cmd_echo.py)
+    attitude_cmd_echo_sim (mav_nonlinear_mpc/attitude_cmd_echo_sim.py)
     mav_actuators_to_float64 (mav_nonlinear_mpc/mav_actuators_to_float64.py)
     mav_nonlinear_mpc (mav_nonlinear_mpc/nonlinear_mpc_node)
 
@@ -90,7 +90,7 @@ ROS_MASTER_URI=http://localhost:11311
 process[vrep_hex/mav_nonlinear_mpc-1]: started with pid [21801]
 process[vrep_hex/PID_attitude_controller-2]: started with pid [21802]
 process[vrep_hex/mav_actuators_to_float64-3]: started with pid [21807]
-process[vrep_hex/attitude_cmd_echo-4]: started with pid [21832]
+process[vrep_hex/attitude_cmd_echo_sim-4]: started with pid [21832]
 [ INFO] [1549271884.087825612]: start initializing mav_disturbance_observer:KF
 [ INFO] [1549271884.089388691]: mav_disturbance_observer:KF dynamic config is called successfully
 [ INFO] [1549271884.102891559]: KF parameters loaded successfully

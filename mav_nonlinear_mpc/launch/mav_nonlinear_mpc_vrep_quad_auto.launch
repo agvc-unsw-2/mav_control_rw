@@ -20,7 +20,7 @@
     </node>
 
     <node pkg="mav_nonlinear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/>
-    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo.py"/>
+    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_sim.py"/>
   </group>
 </launch>
 

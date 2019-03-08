@@ -99,27 +99,18 @@ void KFDisturbanceObserver::initialize()
 
   ROS_INFO("start initializing mav_disturbance_observer:KF");
 
-  ROS_INFO("Advertising calibration service");
   service_ = observer_nh_.advertiseService("StartCalibrateKF",
                                            &KFDisturbanceObserver::startCalibrationCallback, this);
 
-  ROS_INFO("Creating observer state publisher");
   observer_state_pub_ = observer_nh_.advertise<mav_disturbance_observer::ObserverState>(
       "observer_state", 10);
 
-  ROS_INFO("Creating dynamic reconfigure server");
   dynamic_reconfigure::Server<mav_disturbance_observer::KFDisturbanceObserverConfig>::CallbackType f;
-  
   f = boost::bind(&KFDisturbanceObserver::DynConfigCallback, this, _1, _2);
-
-  ROS_INFO("Setting callback");
   dyn_config_server_.setCallback(f);
 
-  ROS_INFO("Loading ROS Parameters");
   loadROSParams();
 
-
-  ROS_INFO("Resetting state and disturbance matrices");
   state_.setZero();
   predicted_state_.setZero();
   forces_offset_.setZero();
@@ -243,8 +234,8 @@ void KFDisturbanceObserver::loadROSParams()
     ROS_ERROR("sampling_time in KF is not loaded from ros parameter server");
     abort();
   }
+  ROS_INFO("Read KF parameters successfully");
 
-  ROS_INFO("KF parameters loaded successfully");
   construct_KF_matrices(
     temporary_drag, 
     temporary_external_forces_limit,
@@ -272,8 +263,9 @@ void KFDisturbanceObserver::construct_KF_matrices(
   double P0_angular_velocity, 
   double P0_force, 
   double P0_torque
-)
-{
+ )
+ {
+
   Eigen::MatrixXd F_continous_time(kStateSize, kStateSize);
   F_continous_time.setZero();
   F_continous_time.block<3, 3>(0, 3) = Eigen::MatrixXd::Identity(3, 3);
@@ -292,7 +284,7 @@ void KFDisturbanceObserver::construct_KF_matrices(
 
   F_ = (sampling_time_ * F_continous_time).exp().sparseView();
 
-  ROS_INFO("KF F_ matrix initialized successfully");
+  ROS_INFO("KF F_matrix initialized successfully");
 
   // First 9x9 (=measurement size) block is identity, rest is zero.
   H_.reserve(kMeasurementSize);
@@ -336,9 +328,10 @@ void KFDisturbanceObserver::DynConfigCallback(
     mav_disturbance_observer::KFDisturbanceObserverConfig &config, uint32_t level)
 {
 
-  std::vector<double> temporary_drag;
-  std::vector<double> temporary_external_forces_limit, temporary_external_moments_limit;
-  std::vector<double> temporary_omega_limit;
+  std::vector<double> temporary_drag(3);
+  std::vector<double> temporary_external_forces_limit(3);
+  std::vector<double> temporary_external_moments_limit(3);
+  std::vector<double> temporary_omega_limit(3);
 
   double P0_position, P0_velocity, P0_attitude, P0_angular_velocity, P0_force, P0_torque;
 
@@ -369,7 +362,7 @@ void KFDisturbanceObserver::DynConfigCallback(
   P0_angular_velocity = config.P0_angular_velocity;
   P0_force = config.P0_force;
   P0_torque = config.P0_torque;
-
+  
   temporary_external_forces_limit.at(0) = config.groups.external_forces_limit.external_forces_limit_x;
   temporary_external_forces_limit.at(1) = config.groups.external_forces_limit.external_forces_limit_y;
   temporary_external_forces_limit.at(2) = config.groups.external_forces_limit.external_forces_limit_z;

@@ -23,7 +23,7 @@ cs_add_executable(mav_pid_attitude_controller_node
 
 target_link_libraries(mav_pid_attitude_controller_node pid_attitude_controller_lib)
 
-add_dependencies(mav_pid_attitude_controller_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
+# add_dependencies(mav_pid_attitude_controller_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 
 ##########

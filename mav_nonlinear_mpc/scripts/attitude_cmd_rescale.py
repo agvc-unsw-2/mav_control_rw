@@ -44,9 +44,9 @@ class Echo_From_Vrep(object):
         msg.roll = (msg.roll / input_max_rollpitch) * self.max_rollpitch
         msg.pitch = (msg.pitch / input_max_rollpitch) * self.max_rollpitch
 
-        msg.thrust.z = self.hover_thrust + (msg.thrust.z - 0.5) * thrust_grad
-        msg.thrust.z = min(msg.thrust.z, 1)
-        msg.thrust.z = max(msg.thrust.z, 0)
+        #msg.thrust.z = self.hover_thrust + (msg.thrust.z - 0.5) * thrust_grad
+        #msg.thrust.z = min(msg.thrust.z, 1)
+        #msg.thrust.z = max(msg.thrust.z, 0)
         return msg
 
     def read_callback(self, msg):

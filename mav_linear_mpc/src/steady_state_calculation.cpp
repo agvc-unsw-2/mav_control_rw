@@ -52,7 +52,7 @@ void SteadyStateCalculation::initialize(const Eigen::MatrixXd& A, const Eigen::M
   left_hand_side.resize(kStateSize + kMeasurementSize, kStateSize + kInputSize);
 
   Bd_ = Bd;
-  Eigen::MatrixXd C(6, 8);
+  Eigen::MatrixXd C(6, 8); // Define 6x8 dynamic-size matrix
   C.setIdentity();
 
   left_hand_side << A - Eigen::MatrixXd::Identity(kStateSize, kStateSize), B, C, Eigen::MatrixXd::Zero(

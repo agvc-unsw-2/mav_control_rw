@@ -8,7 +8,7 @@ n_rotors: 6
 #arm_length: 1
 rotor_force_constant: 8.54858e-6
 rotor_moment_constant: 0.016000
-arm_length: 0.2156
+arm_length: 0.3
 
 roll_gain: 70
 pitch_gain: 70
@@ -19,9 +19,9 @@ pitch_int_gain: 2.0
 #p_gain: 0
 #q_gain: 0
 #r_gain: 0
-p_gain: 25
-q_gain: 22
-r_gain: 1.0
+p_gain: 50
+q_gain: 50
+r_gain: 3.0
 
 #max_integrator_error: 0
 max_integrator_error: 0.6

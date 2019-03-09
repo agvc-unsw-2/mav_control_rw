@@ -1,0 +1,34 @@
+<launch>
+  <arg name="mav_name" default="aero" />
+  <arg name="namespace" default="$(arg mav_name)"/>
+  <arg name="uav_num" default="1"/>
+  <arg name="verbose" default="true"/>
+  <!-- <param name="use_sim_time" value="true" /> -->
+
+  <!-- From sim -->
+  <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/$(arg namespace)$(arg uav_num)/joy" />
+
+  <!-- From mavros -->
+  <!-- <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/mavros/rc/in" /> -->
+
+  <group ns="$(arg namespace)$(arg uav_num)">
+    <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node"  respawn="true" clear_params="true" output="screen">
+      <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml"/>
+      <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+      <param name="use_rc_teleop" value="true" />
+
+      <remap from="odometry" to="/mavros/local_position/pose" />
+    </node>
+
+    <!-- Don't need joy as package as it should be coming from mavros -->
+    <node name="joy_node" pkg="joy" type="joy_node" />
+
+    <!-- Don't need joy interface as function is fulfilled by rc_teleop -->
+    <!-- <node name="rotors_joy_interface" pkg="rotors_joy_interface" type="rotors_joy_interface" /> -->
+
+    <!-- RC Teleop in mav_nonlinear_mpc node outputs to PID_attitude_controller. Also requires odometry from gazebo -->
+    <!-- <node pkg="mav_nonlinear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/> -->
+    <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_sim.py"/> -->
+    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/>
+  </group>
+</launch>

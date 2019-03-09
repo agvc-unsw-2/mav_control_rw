@@ -177,6 +177,22 @@ class KFDisturbanceObserver
   bool startCalibration();
 
   void initialize();
+  
+
+  void construct_KF_matrices(
+    std::vector<double> &temporary_drag,
+    std::vector<double> &temporary_external_forces_limit,
+    std::vector<double> &temporary_external_moments_limit,
+    std::vector<double> &temporary_omega_limit,
+
+    double P0_position, 
+    double P0_velocity, 
+    double P0_attitude, 
+    double P0_angular_velocity, 
+    double P0_force, 
+    double P0_torque
+  );
+
   void systemDynamics(double dt);
   bool startCalibrationCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
 

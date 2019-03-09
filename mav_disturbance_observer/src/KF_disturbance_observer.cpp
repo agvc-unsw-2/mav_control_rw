@@ -234,6 +234,37 @@ void KFDisturbanceObserver::loadROSParams()
     ROS_ERROR("sampling_time in KF is not loaded from ros parameter server");
     abort();
   }
+  ROS_INFO("Read KF parameters successfully");
+
+  construct_KF_matrices(
+    temporary_drag, 
+    temporary_external_forces_limit,
+    temporary_external_moments_limit,
+    temporary_omega_limit,
+
+    P0_position,
+    P0_velocity,
+    P0_attitude,
+    P0_angular_velocity,
+    P0_force,
+    P0_torque
+  );
+}
+
+void KFDisturbanceObserver::construct_KF_matrices(
+  std::vector<double> &temporary_drag,
+  std::vector<double> &temporary_external_forces_limit,
+  std::vector<double> &temporary_external_moments_limit,
+  std::vector<double> &temporary_omega_limit,
+
+  double P0_position, 
+  double P0_velocity, 
+  double P0_attitude, 
+  double P0_angular_velocity, 
+  double P0_force, 
+  double P0_torque
+ )
+ {
 
   Eigen::MatrixXd F_continous_time(kStateSize, kStateSize);
   F_continous_time.setZero();
@@ -253,7 +284,7 @@ void KFDisturbanceObserver::loadROSParams()
 
   F_ = (sampling_time_ * F_continous_time).exp().sparseView();
 
-  ROS_INFO("KF parameters loaded successfully");
+  ROS_INFO("KF F_matrix initialized successfully");
 
   // First 9x9 (=measurement size) block is identity, rest is zero.
   H_.reserve(kMeasurementSize);
@@ -290,16 +321,59 @@ void KFDisturbanceObserver::loadROSParams()
   for (int i = 0; i < 3; i++) {
     drag_coefficients_matrix_(i, i) = temporary_drag.at(i);
   }
+  ROS_INFO("Updated KF Matrices successfully");
 }
 
 void KFDisturbanceObserver::DynConfigCallback(
     mav_disturbance_observer::KFDisturbanceObserverConfig &config, uint32_t level)
 {
 
+  std::vector<double> temporary_drag(3);
+  std::vector<double> temporary_external_forces_limit(3);
+  std::vector<double> temporary_external_moments_limit(3);
+  std::vector<double> temporary_omega_limit(3);
+
+  double P0_position, P0_velocity, P0_attitude, P0_angular_velocity, P0_force, P0_torque;
+
   if (config.calibrate == true) {
     startCalibration();
     config.calibrate = false;
   }
+
+  temporary_drag.at(0) = config.groups.drag_coefficients.drag_coefficients_x;
+  temporary_drag.at(1) = config.groups.drag_coefficients.drag_coefficients_y;
+  temporary_drag.at(2) = config.groups.drag_coefficients.drag_coefficients_z;
+
+  roll_omega_ = config.roll_omega;
+  roll_damping_ = config.roll_damping;
+  roll_gain_ = config.roll_gain;
+
+  pitch_omega_ = config.roll_omega;
+  pitch_damping_ = config.roll_damping;
+  pitch_gain_ = config.roll_gain;
+
+  yaw_omega_ = config.roll_omega;
+  yaw_damping_ = config.roll_damping;
+  yaw_gain_ = config.roll_gain;
+
+  P0_position = config.P0_position;
+  P0_velocity = config.P0_velocity;
+  P0_attitude = config.P0_attitude;
+  P0_angular_velocity = config.P0_angular_velocity;
+  P0_force = config.P0_force;
+  P0_torque = config.P0_torque;
+  
+  temporary_external_forces_limit.at(0) = config.groups.external_forces_limit.external_forces_limit_x;
+  temporary_external_forces_limit.at(1) = config.groups.external_forces_limit.external_forces_limit_y;
+  temporary_external_forces_limit.at(2) = config.groups.external_forces_limit.external_forces_limit_z;
+
+  temporary_external_moments_limit.at(0) = config.groups.external_moments_limit.external_moments_limit_roll;
+  temporary_external_moments_limit.at(1) = config.groups.external_moments_limit.external_moments_limit_pitch;
+  temporary_external_moments_limit.at(2) = config.groups.external_moments_limit.external_moments_limit_yaw;
+
+  temporary_omega_limit.at(0) = config.groups.omega_limit.omega_limit_roll;
+  temporary_omega_limit.at(1) = config.groups.omega_limit.omega_limit_pitch;
+  temporary_omega_limit.at(2) = config.groups.omega_limit.omega_limit_yaw;
 
   for (size_t i = 0; i < 3; i++) {
     process_noise_covariance_(i) = config.q_position;
@@ -313,6 +387,20 @@ void KFDisturbanceObserver::DynConfigCallback(
     measurement_covariance_(i + 3) = config.r_velocity;
     measurement_covariance_(i + 6) = config.r_attitude;
   }
+
+  construct_KF_matrices(
+    temporary_drag, 
+    temporary_external_forces_limit,
+    temporary_external_moments_limit,
+    temporary_omega_limit,
+
+    P0_position,
+    P0_velocity,
+    P0_attitude,
+    P0_angular_velocity,
+    P0_force,
+    P0_torque
+  );
 
   ROS_INFO("mav_disturbance_observer:KF dynamic config is called successfully");
 

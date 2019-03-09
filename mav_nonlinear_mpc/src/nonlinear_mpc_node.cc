@@ -69,6 +69,9 @@ bool NonLinearModelPredictiveControllerNode::setReference(
 void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
     mav_nonlinear_mpc::NonLinearMPCConfig &config, uint32_t level)
 {
+  ROS_INFO(
+    "Received reconfigure request"
+  );
   Eigen::Vector3d q_position;
   Eigen::Vector3d q_velocity;
   Eigen::Vector2d q_attitude;
@@ -85,6 +88,18 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   control_limits << config.roll_max, config.pitch_max, config.yaw_rate_max, config.thrust_min, config
       .thrust_max;
 
+	  // Update model parameters
+  nonlinear_mpc_.setMass(config.mass);
+  nonlinear_mpc_.setRollTimeConstant(config.roll_time_constant);
+  nonlinear_mpc_.setRollGain(config.roll_gain);
+  nonlinear_mpc_.setPitchTimeConstant(config.pitch_time_constant);
+  nonlinear_mpc_.setPitchGain(config.pitch_gain);
+
+  // Update controller parameters
+  nonlinear_mpc_.setPositionErrorIntegrationLimit(config.position_error_integration_limit);
+  nonlinear_mpc_.setAntiWindupBall(config.antiwindup_ball);
+
+  // Update dynamic parameters
   nonlinear_mpc_.setPositionPenality(q_position);
   nonlinear_mpc_.setVelocityPenality(q_velocity);
   nonlinear_mpc_.setAttitudePenality(q_attitude);
@@ -99,7 +114,7 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   nonlinear_mpc_.setEnableOffsetFree(config.enable_offset_free);
 
   nonlinear_mpc_.applyParameters();
-
+  nonlinear_mpc_.constructModelMatrices();
 }
 
 

@@ -57,6 +57,13 @@ LinearModelPredictiveControllerNode::~LinearModelPredictiveControllerNode()
 void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::LinearMPCConfig &config,
                                                             uint32_t level)
 {
+  ROS_INFO(
+    "Reconfigure Request: %f, %f, %f",
+    config.q_x,
+    config.q_y,
+    config.q_z
+  );
+
   Eigen::Vector3d q_position;
   Eigen::Vector3d q_velocity;
   Eigen::Vector2d q_attitude;
@@ -74,6 +81,18 @@ void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::Line
 
   control_limits << config.roll_max, config.pitch_max, config.yaw_rate_max, config.thrust_min, config.thrust_max;
 
+  // Update model parameters
+  linear_mpc_.setMass(config.mass);
+  linear_mpc_.setRollTimeConstant(config.roll_time_constant);
+  linear_mpc_.setRollGain(config.roll_gain);
+  linear_mpc_.setPitchTimeConstant(config.pitch_time_constant);
+  linear_mpc_.setPitchGain(config.pitch_gain);
+
+  // Update controller parameters
+  linear_mpc_.setPositionErrorIntegrationLimit(config.position_error_integration_limit);
+  linear_mpc_.setAntiWindupBall(config.antiwindup_ball);
+
+  // Update dynamic parameters
   linear_mpc_.setPositionPenality(q_position);
   linear_mpc_.setVelocityPenality(q_velocity);
   linear_mpc_.setAttitudePenality(q_attitude);
@@ -89,6 +108,7 @@ void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::Line
   linear_mpc_.setEnableOffsetFree(config.enable_offset_free);
 
   linear_mpc_.applyParameters();
+  linear_mpc_.constructModelMatrices();
 }
 
 bool LinearModelPredictiveControllerNode::setReference(

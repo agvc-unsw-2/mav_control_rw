@@ -59,6 +59,38 @@ class NonlinearModelPredictiveControl
   NonlinearModelPredictiveControl(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
   ~NonlinearModelPredictiveControl();
 
+  // Model parameters added as dynamic parameters
+  
+  void setMass(double mass)
+  {
+    mass_ = mass;
+  }
+  void setRollTimeConstant(double roll_time_constant)
+  {
+    roll_time_constant_ = roll_time_constant;
+  }
+  void setRollGain(double roll_gain)
+  {
+    roll_gain_ = roll_gain;
+  }
+  void setPitchTimeConstant(double pitch_time_constant)
+  {
+    pitch_time_constant_ = pitch_time_constant;
+  }
+  void setPitchGain(double pitch_gain)
+  {
+    pitch_gain_ = pitch_gain;
+  }
+
+  // Additional controller parameters added as dynamic parameters
+  void setPositionErrorIntegrationLimit(double position_error_integration_limit)
+  {
+    position_error_integration_limit_ = position_error_integration_limit;
+  }
+  void setAntiWindupBall(double antiwindup_ball)
+  {
+    antiwindup_ball_ = antiwindup_ball;
+  }
   // Dynamic parameters
   void setPositionPenality(const Eigen::Vector3d& q_position)
   {
@@ -112,6 +144,7 @@ class NonlinearModelPredictiveControl
   }
 
   void applyParameters();
+  void constructModelMatrices();
 
   double getMass() const
   {

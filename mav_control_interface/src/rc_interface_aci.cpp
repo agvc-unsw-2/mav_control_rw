@@ -40,16 +40,19 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
     last_data_.left_side = -msg->axes[3];
 
     if (msg->axes[5] > 0.0)
-      last_data_.control_interface = RcData::ControlInterface::ON;
+      //last_data_.control_interface = RcData::ControlInterface::ON;
+      last_data_.control_interface = RcData::ControlInterface::OFF;
     else
       last_data_.control_interface = RcData::ControlInterface::OFF;
 
     if (msg->axes[4] <= -0.5)
       last_data_.control_mode = RcData::ControlMode::MANUAL;
     else if (msg->axes[4] > -0.5 && msg->axes[4] < 0.5)
-      last_data_.control_mode = RcData::ControlMode::ALTITUDE_CONTROL;
+      //last_data_.control_mode = RcData::ControlMode::ALTITUDE_CONTROL;
+      last_data_.control_mode = RcData::ControlMode::MANUAL;
     else
-      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
+      //last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
+      last_data_.control_mode = RcData::ControlMode::MANUAL;
 
     last_data_.wheel = msg->axes[6];
   }

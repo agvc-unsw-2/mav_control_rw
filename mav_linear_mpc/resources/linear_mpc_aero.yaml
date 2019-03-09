@@ -10,6 +10,9 @@
 #
 #==================================================================================================================
 
+# WARNING: UNCONFIGIURED!!!
+# RUN IN TELEOP IN ORDER TO CONFIGURE
+
 ## Controller Parameters:
 mass: 0.063705 # magic number for scaling thrust between 0 and 1.
 # RC is linear between 0 to 0.5 for negative axis of joystick
@@ -52,8 +55,8 @@ r_droll: 0.3
 r_dpitch: 0.3
 r_dthrust: 0.0025
 
-roll_max: deg(10.0)
-pitch_max: deg(10.0)
+roll_max: deg(25.0)
+pitch_max: deg(25.0)
 yaw_rate_max: deg(90)
 thrust_min: 5
 thrust_max: 20

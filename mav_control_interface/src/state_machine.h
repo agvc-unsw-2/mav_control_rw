@@ -287,7 +287,7 @@ private:
     void operator()(const RcUpdate& evt, FSM& fsm, SourceState&, TargetState&)
     {
       mav_msgs::EigenRollPitchYawrateThrust command;
-      command.pitch = evt.rc_data.right_up_down * fsm.parameters_.rc_max_roll_pitch_command_;
+      command.pitch = -evt.rc_data.right_up_down * fsm.parameters_.rc_max_roll_pitch_command_;
       command.roll = evt.rc_data.right_side * fsm.parameters_.rc_max_roll_pitch_command_;
       command.yaw_rate = -evt.rc_data.left_side * fsm.parameters_.rc_max_yaw_rate_command_;
       constexpr double thrust_below_hovering_factor = 0.8;

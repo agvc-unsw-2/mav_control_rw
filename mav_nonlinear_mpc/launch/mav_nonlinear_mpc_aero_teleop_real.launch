@@ -8,7 +8,7 @@
   <!-- From sim -->
   <!-- <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/$(arg namespace)$(arg uav_num)/joy" /> -->
 
-  <!-- From mavros -->
+  <!-- From mavros for mav_nonlinear_mpc code-->
   <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/mavros/rc/in_remapped" />
    
    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" output="screen" type="joystick_remapper.py" >
@@ -25,7 +25,7 @@
       <param name="use_rc_teleop" value="true" />
 
       <remap from="odometry" to="/mavros/local_position/pose" />
-      <remap from="command/roll_pitch_yawrate_thrust" to="/mavros/setpoint_raw/roll_pitch_yawrate_thrust" />
+      <remap from="command/roll_pitch_yawrate_thrust" to="/mavros/setpoint_raw/roll_pitch_yawrate_thrust_raw" />
     </node>
 
     <!-- Don't need joy as package as it should be coming from mavros -->

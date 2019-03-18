@@ -20,8 +20,10 @@ class Echo_From_Vrep(object):
         self.input_delay = rospy.Duration(input_delay)
         self.updated = False
         self.msg_to_publish = RollPitchYawrateThrust()
-        self.pub = rospy.Publisher('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_scaled', RollPitchYawrateThrust, queue_size=1)
-        rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, self.read_callback)
+        self.pub = rospy.Publisher('/mavros/setpoint_raw/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
+        #self.pub = rospy.Publisher('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
+        rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
+        rospy.Subscriber('/mavros/setpoint_raw/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
 
         self.scale_factors_initialized = False
 
@@ -38,11 +40,14 @@ class Echo_From_Vrep(object):
     def scale_msg(self, msg):
         input_max_yawrate = math.radians(90)
         input_max_rollpitch = math.radians(45)
-        input_min_thrust = 0
-        input_max_thrust = 1
-        thrust_grad = (self.hover_thrust - self.min_thrust) * 2
-        msg.roll = (msg.roll / input_max_rollpitch) * self.max_rollpitch
-        msg.pitch = (msg.pitch / input_max_rollpitch) * self.max_rollpitch
+        input_min_thrust = 0.1
+        input_max_thrust = 0.9
+        #thrust_grad = (self.hover_thrust - self.min_thrust) * 2
+        
+        msg.thrust.z = (msg.thrust.z / input_max_thrust) * self.max_thrust
+
+        #msg.roll = (msg.roll / input_max_rollpitch) * self.max_rollpitch
+        #msg.pitch = (msg.pitch / input_max_rollpitch) * self.max_rollpitch
 
         #msg.thrust.z = self.hover_thrust + (msg.thrust.z - 0.5) * thrust_grad
         #msg.thrust.z = min(msg.thrust.z, 1)
@@ -53,6 +58,7 @@ class Echo_From_Vrep(object):
         #print(data.angular_velocities)
         self.msg_to_publish = msg
         self.msg_to_publish = self.scale_msg(self.msg_to_publish)
+        #print("Scaled RC message")
         self.pub.publish(self.msg_to_publish)
 
 myargs = rospy.myargv(argv=sys.argv)
@@ -71,5 +77,19 @@ if __name__ == '__main__':
     rospy.init_node('attitude_cmd_echo_' + uav_num, anonymous=False)
 
     echo_node = Echo_From_Vrep(mav_name, uav_num, add_input_delay, input_delay)
-    echo_node.initialise_scale_factors(25, 90, 0.2, 0, 1)
+
+    max_rollpitch = 25
+    max_yawrate = 90
+    output_min_thrust = 0
+    output_max_thrust = 0.5
+    hover_thrust = 0.2 # unused
+    echo_node.initialise_scale_factors(
+        max_rollpitch,
+        max_yawrate,
+        hover_thrust,
+        output_min_thrust,
+        output_max_thrust
+    )
+
+
     rospy.spin()

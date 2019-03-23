@@ -95,7 +95,7 @@ if __name__ == '__main__':
     max_rollpitch = 25 #unused
     max_yawrate = 90 #unused
     output_min_thrust = 0.0
-    output_max_thrust = 0.4
+    output_max_thrust = 0.6
     input_min_thrust = 0.0
     input_max_thrust = 0.89
     hover_thrust = 0.2 # unused

@@ -28,23 +28,37 @@ class Echo_From_Vrep(object):
         self.scale_factors_initialized = False
 
     # Input in degrees for simplicity
-    def initialise_scale_factors(self, max_rollpitch, max_yawrate, hover_thrust, min_thrust, max_thrust):
+    def initialise_scale_factors(
+            self, 
+            max_rollpitch, 
+            max_yawrate, 
+            hover_thrust, 
+            out_min_thrust, 
+            out_max_thrust,
+            in_min_thrust,
+            in_max_thrust
+        ):
         self.max_rollpitch = math.radians(max_rollpitch)
         self.max_yawrate = math.radians(max_yawrate)
         self.hover_thrust = hover_thrust
-        self.min_thrust = min_thrust
-        self.max_thrust = max_thrust
+        self.out_min_thrust = out_min_thrust
+        self.out_max_thrust = out_max_thrust
+        self.in_min_thrust = in_min_thrust
+        self.in_max_thrust = in_max_thrust
 
         self.scale_factors_initialized = True
 
     def scale_msg(self, msg):
+        if self.scale_factors_initialized == False:
+            msg.thrust.z = 0
+            return msg
         input_max_yawrate = math.radians(90)
         input_max_rollpitch = math.radians(45)
-        input_min_thrust = 0.1
-        input_max_thrust = 0.9
-        #thrust_grad = (self.hover_thrust - self.min_thrust) * 2
+        input_min_thrust = self.in_min_thrust
+        input_max_thrust = self.in_max_thrust
+        thrust_grad = (self.out_max_thrust - self.out_min_thrust)
         
-        msg.thrust.z = (msg.thrust.z / input_max_thrust) * self.max_thrust
+        msg.thrust.z = (msg.thrust.z / input_max_thrust) * thrust_grad + self.out_min_thrust
 
         #msg.roll = (msg.roll / input_max_rollpitch) * self.max_rollpitch
         #msg.pitch = (msg.pitch / input_max_rollpitch) * self.max_rollpitch
@@ -78,17 +92,21 @@ if __name__ == '__main__':
 
     echo_node = Echo_From_Vrep(mav_name, uav_num, add_input_delay, input_delay)
 
-    max_rollpitch = 25
-    max_yawrate = 90
-    output_min_thrust = 0
-    output_max_thrust = 0.5
+    max_rollpitch = 25 #unused
+    max_yawrate = 90 #unused
+    output_min_thrust = 0.0
+    output_max_thrust = 0.4
+    input_min_thrust = 0.0
+    input_max_thrust = 0.89
     hover_thrust = 0.2 # unused
     echo_node.initialise_scale_factors(
         max_rollpitch,
         max_yawrate,
         hover_thrust,
         output_min_thrust,
-        output_max_thrust
+        output_max_thrust,
+        input_min_thrust,
+        input_max_thrust
     )
 
 

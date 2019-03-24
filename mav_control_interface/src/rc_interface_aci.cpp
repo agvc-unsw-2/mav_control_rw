@@ -40,20 +40,44 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
     last_data_.left_side = -msg->axes[3];
 
     if (msg->axes[5] > 0.0)
-      //last_data_.control_interface = RcData::ControlInterface::ON;
+    {
       last_data_.control_interface = RcData::ControlInterface::OFF;
-    else
-      last_data_.control_interface = RcData::ControlInterface::OFF;
+      last_data_.control_mode = RcData::ControlMode::MANUAL;
 
+      ROS_WARN_STREAM_THROTTLE(5.0, "MANUAL OFFBOARD MODE");
+    }
+    else
+    {
+      last_data_.control_interface = RcData::ControlInterface::ON;
+      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
+
+      //ROS_WARN_STREAM_THROTTLE(1.0, "CONTROL INTERFACE OFF");
+      ROS_WARN_STREAM_THROTTLE(5.0, "POSITION OFFBOARD MODE");
+    }
+
+    /*
     if (msg->axes[4] <= -0.5)
+    {
       last_data_.control_mode = RcData::ControlMode::MANUAL;
+      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
+      //ROS_WARN_STREAM_THROTTLE(1.0, "POSITION MPC CONTROL");
+    }
     else if (msg->axes[4] > -0.5 && msg->axes[4] < 0.5)
+    {
       //last_data_.control_mode = RcData::ControlMode::ALTITUDE_CONTROL;
-      last_data_.control_mode = RcData::ControlMode::MANUAL;
-    else
-      //last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
-      last_data_.control_mode = RcData::ControlMode::MANUAL;
+      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
+      ROS_WARN_STREAM_THROTTLE(1.0, "POSITION MPC CONTROL");
 
+      //last_data_.control_mode = RcData::ControlMode::MANUAL;
+    }
+    else
+    {
+      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
+      ROS_WARN_STREAM_THROTTLE(1.0, "POSITION MPC CONTROL");
+
+      //last_data_.control_mode = RcData::ControlMode::MANUAL;
+    }
+    */
     last_data_.wheel = msg->axes[6];
   }
   else {  //set to zero if RC is off
@@ -83,10 +107,11 @@ bool RcInterfaceAci::isActive() const
 {
   if (!is_on_)
     return false;
-  else if (std::abs(last_data_.right_up_down) > STICK_DEADZONE
-      || std::abs(last_data_.right_side) > STICK_DEADZONE
-      || std::abs(last_data_.left_up_down) > STICK_DEADZONE
-      || std::abs(last_data_.left_side) > STICK_DEADZONE) {
+  else if {
+    std::abs(last_data_.right_up_down) > STICK_DEADZONE ||
+    std::abs(last_data_.right_side) > STICK_DEADZONE ||
+    // std::abs(last_data_.left_up_down) > STICK_DEADZONE ||
+    std::abs(last_data_.left_side) > STICK_DEADZONE) {
     return true;
   }
   return false;

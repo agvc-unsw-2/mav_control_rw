@@ -15,7 +15,7 @@
 #roll fit percentage: 78.777678%
 
 ## Controller Parameters:
-mass: 0.063705 # magic number for scaling thrust between 0 and 1.
+# mass: 0.063705 # magic number for scaling thrust between 0 and 1.
 # RC is linear between 0 to 0.5 for negative axis of joystick
 # RC is linear between 0.5 to 1 for positive axis of joystick
 # WARNING:
@@ -31,10 +31,19 @@ mass: 0.063705 # magic number for scaling thrust between 0 and 1.
 # px4 subscribes to roll pitch yawrate thrust
 # mpc doesn't subscribe to odometry of quadcopter to prevent weird behaviour with switching to altitude hold
 # Record roll pitch yawrate thrust and actual roll pitch yawrate thrust
-roll_time_constant: 0.624196
-roll_gain: 1.173807
-pitch_time_constant: 0.549053
-pitch_gain: 1.136624
+
+#roll_time_constant: 0.624196
+#roll_gain: 1.173807
+#pitch_time_constant: 0.549053
+#pitch_gain: 1.136624
+#linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
+#yaw_gain: 1.000000
+
+mass: 1.000000
+roll_time_constant: 0.126858
+roll_gain: 0.904591
+pitch_time_constant: 0.119135
+pitch_gain: 0.804236
 linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
 yaw_gain: 1.000000
 
@@ -65,7 +74,7 @@ Ki_xy: 0.2
 #Ki_z: 0.3
 Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
 position_error_integration_limit: 2
-antiwindup_ball: 0.4
+antiwindup_ball: 0.5
 
 enable_offset_free : true
 enable_integrator : true

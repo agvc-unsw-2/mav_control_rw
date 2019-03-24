@@ -14,6 +14,8 @@
       <remap from="odometry" to="/simulation/uav$(arg uav_num)/ground_truth/mavros/position/local" />
     </node>
     
+    <node name="joy_node" pkg="joy" type="joy_node" />
+
     <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
       <remap from="odometry" to="/simulation/uav$(arg uav_num)/ground_truth/mavros/position/local" />
       <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
@@ -21,8 +23,8 @@
 
     <node pkg="mav_nonlinear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/>
     <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_sim.py"/>
-    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/>
-    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_real" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_real.py"/>
+    <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/> -->
+    <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_real" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_real.py"/> -->
     </group>
 </launch>
 

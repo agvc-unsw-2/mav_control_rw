@@ -165,7 +165,8 @@ class StateMachineDefinition : public msm_front::state_machine_def<StateMachineD
       msm_front::Row<HaveOdometry, OdometryUpdate, InternalTransition, SetOdometry, NoGuard >,
       msm_front::Row<HaveOdometry, OdometryWatchdog, RemoteControl, PrintOdometryWatchdogWarning, OdometryOutdated >,
       msm_front::Row<HaveOdometry, RcUpdate, PositionHold, SetReferenceToCurrentPosition, RcInactivePosition >,
-      msm_front::Row<HaveOdometry, RcUpdate, RcTeleOp, SetReferenceFromRc, RcActivePosition >,
+      //msm_front::Row<HaveOdometry, RcUpdate, RcTeleOp, SetReferenceFromRc, RcActivePosition >,
+      msm_front::Row<HaveOdometry, RcUpdate, RcTeleOp, SetReferenceAttitude, RcActivePosition >,
       //  +---------+-------------+---------+---------------------------+----------------------+
       msm_front::Row<PositionHold, RcUpdate, RemoteControl, NoAction, RcModeManual>,
       msm_front::Row<PositionHold, RcUpdate, RcTeleOp, SetReferenceToCurrentPosition, RcActivePosition >,
@@ -176,7 +177,8 @@ class StateMachineDefinition : public msm_front::state_machine_def<StateMachineD
       msm_front::Row<RcTeleOp, RcUpdate, RemoteControl, NoAction, RcModeManual>,
       msm_front::Row<RcTeleOp, BackToPositionHold, PositionHold, NoAction, NoGuard>,
       msm_front::Row<RcTeleOp, Takeoff, PositionHold, SetTakeoffCommands, NoGuard>,
-      msm_front::Row<RcTeleOp, RcUpdate, InternalTransition, SetReferenceFromRc, RcActivePosition >,
+      //msm_front::Row<RcTeleOp, RcUpdate, InternalTransition, SetReferenceFromRc, RcActivePosition >,
+      msm_front::Row<RcTeleOp, RcUpdate, InternalTransition, SetReferenceAttitude, RcActivePosition >,
       //msm_front::Row<RcTeleOp, RcUpdate, InternalTransition, SetReferenceToCurrentPosition, RcInactivePosition >,
       msm_front::Row<RcTeleOp, OdometryUpdate, InternalTransition, SetOdometryAndCompute, NoGuard>,
       msm_front::Row<RcTeleOp, OdometryWatchdog, RemoteControl, PrintOdometryWatchdogWarning, OdometryOutdated >

@@ -107,13 +107,13 @@ bool RcInterfaceAci::isActive() const
 {
   if (!is_on_)
     return false;
-  else if {
-    std::abs(last_data_.right_up_down) > STICK_DEADZONE ||
-    std::abs(last_data_.right_side) > STICK_DEADZONE ||
-    // std::abs(last_data_.left_up_down) > STICK_DEADZONE ||
-    std::abs(last_data_.left_side) > STICK_DEADZONE) {
-    return true;
-  }
+  else if (
+    std::abs(last_data_.right_up_down) > STICK_DEADZONE
+    || std::abs(last_data_.right_side) > STICK_DEADZONE
+    //|| std::abs(last_data_.left_up_down) > STICK_DEADZONE
+    || std::abs(last_data_.left_side) > STICK_DEADZONE
+  ) return true;
+  // else
   return false;
 }
 

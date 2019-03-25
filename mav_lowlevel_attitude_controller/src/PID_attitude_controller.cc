@@ -149,6 +149,7 @@ void PIDAttitudeController::CalculateRotorVelocities(Eigen::VectorXd* rotor_velo
 
   *rotor_velocities = angular_acc_to_rotor_velocities_ * (angular_acceleration_thrust - cross_term);
   *rotor_velocities = rotor_velocities->cwiseMax(Eigen::VectorXd::Zero(rotor_velocities->rows()));
+  // accounts for simulator being in thrust. Force is proportional to sqrt of rotor velocity
   *rotor_velocities = rotor_velocities->cwiseSqrt();
 }
 

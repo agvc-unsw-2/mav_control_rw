@@ -10,14 +10,14 @@
 #
 #==================================================================================================================
 
-## Controller Parameters:
-#mass: 1.52
-mass: 0.063705
-roll_time_constant: 0.25
-pitch_time_constant: 0.255
-roll_gain: 0.9
-pitch_gain: 0.9
-drag_coefficients: [ 0.010000 , 0.010000, 0.0000]
+# Controller Parameters:
+mass: 1.950000
+roll_time_constant: 0.635581
+roll_gain: 1.275039
+pitch_time_constant: 0.630045
+pitch_gain: 1.241289
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+yaw_gain: 1.000000
 
 q_x: 40
 q_y: 40

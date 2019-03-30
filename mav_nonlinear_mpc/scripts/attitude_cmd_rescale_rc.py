@@ -82,7 +82,7 @@ if len(myargs) != 4:
     sys.exit()
 mav_name = myargs[1]
 uav_num = str(myargs[2])
-input_thrust_scaling_factor = myargs[3]
+input_thrust_scaling_factor = float(myargs[3])
 
 if __name__ == '__main__':
     print('-----------------------')

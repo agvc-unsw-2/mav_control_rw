@@ -33,7 +33,8 @@ KF_observer:
 #roll fit percentage: 92.251027%
 
   #model from system identification (2nd order attitude model)
-  drag_coefficients: [0.020000, 0.020000, 0.000000]
+  #drag_coefficients: [0.020000, 0.020000, 0.000000]
+  drag_coefficients: [0.00000, 0.00000, 0.000000]
   roll_gain: 0.991811
   roll_damping: 0.999770
   roll_omega: 4.039406

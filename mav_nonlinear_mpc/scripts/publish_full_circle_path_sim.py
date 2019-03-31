@@ -30,7 +30,7 @@ class Publish_Path(object):
         self.publish_interval = publish_interval
         self.ref_time_step = ref_time_step
         self.traj_msg = MultiDOFJointTrajectory()
-        self.N = int(publish_interval / ref_time_step)
+        self.N = int(publish_interval / ref_time_step) * 2
         self.traj_msg.points = [None]*self.N
 
         for i in range(self.N):
@@ -48,7 +48,6 @@ class Publish_Path(object):
         if t_since_start < 0:
             self.t0 = t_read
             t_since_start = 0.0
-        t_since_start = t_read
         d = self.circle_r
         mu = self.vel_scale_factor
 
@@ -58,7 +57,7 @@ class Publish_Path(object):
         #yaw = math.atan2(vel_ref[1],vel_ref[0])
         #quat = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
         rotation = Quaternion(0.0, 0.0, 0.0, 1.0)
-        if t_since_start > (self.t_last_published + self.publish_interval): #publish every 100ms
+        if t_since_start > (self.t_last_published + (self.publish_interval)): #publish every 100ms
             # generate 2 * points required before next publish interval
             for i in range(self.N):
                 t = t_since_start + (i * self.ref_time_step)
@@ -75,7 +74,7 @@ class Publish_Path(object):
                 
             self.traj_msg.header.stamp = msg.data
             self.pub.publish(self.traj_msg)
-            self.t_last_published = t
+            self.t_last_published = t_since_start
 
 myargs = rospy.myargv(argv=sys.argv)
 if len(myargs) != 3:
@@ -92,7 +91,7 @@ if __name__ == '__main__':
     circle_r = 5.0
     altitude = 1.0
     vel_mag = 2.0
-    publish_interval = 0.5 #s
+    publish_interval = 5.0 #s
     ref_time_step = 0.01 #s
     publisher_ = Publish_Path(
         mav_name, 

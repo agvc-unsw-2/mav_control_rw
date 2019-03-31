@@ -406,6 +406,8 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
   Eigen::VectorXd ref(kMeasurementSize);
 
   CVXGEN_queue_.clear();
+  // calculate target_state and target_input for each step in the prediction horizon
+  // except the last step
   for (int i = 0; i < kPredictionHorizonSteps - 1; i++) {
     ref << position_ref_.at(i), velocity_ref_.at(i);
     steady_state_calculation_.computeSteadyState(estimated_disturbances, ref, &target_state,
@@ -416,6 +418,8 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
           target_input;
     }
   }
+  // calculate target state and target input for last step in prediction horizon
+  // (terminal state)
   ref << position_ref_.at(kPredictionHorizonSteps - 1), velocity_ref_.at(
       kPredictionHorizonSteps - 1);
 
@@ -423,6 +427,7 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
                                                &target_input);
   CVXGEN_queue_.push_back(target_state);
 
+  // push 'steady state' target states for every step in prediction horizon to queue
   for (int i = 0; i < kPredictionHorizonSteps; i++) {
     Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
         CVXGEN_queue_[i];
@@ -434,18 +439,19 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
 
   roll_pitch_inertial_frame << -sin(yaw) * pitch + cos(yaw) * roll, cos(yaw) * pitch
       + sin(yaw) * roll;
+  // load x_0 state
   x_0 << odometry_.position_W, odometry_.getVelocityWorld(), roll_pitch_inertial_frame;
 
   //Solve using CVXGEN
   Eigen::Map<Eigen::Matrix<double, kDisturbanceSize, 1>>(const_cast<double*>(params.d)) =
-      estimated_disturbances;
+      estimated_disturbances; // constant disturbance
   Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_prev)) =
-      linearized_command_roll_pitch_thrust_;
+      linearized_command_roll_pitch_thrust_; // initialized as 0
   Eigen::Map<Eigen::Matrix<double, kStateSize, 1>>(const_cast<double*>(params.x_0)) = x_0;
 
-  tic();
+  tic(); // start timer
   int solver_status = solve();
-  solve_time_average_ += tocq();
+  solve_time_average_ += tocq(); // stop timer and caclulate
 
   linearized_command_roll_pitch_thrust_ << vars.u_0[0], vars.u_0[1], vars.u_0[2];
 

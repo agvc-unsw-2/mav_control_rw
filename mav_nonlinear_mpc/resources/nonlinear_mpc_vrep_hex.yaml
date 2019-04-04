@@ -18,8 +18,10 @@
 mass: 1.650000
 roll_time_constant: 0.624196
 roll_gain: 1.173807
+#roll_gain: 0.6
 pitch_time_constant: 0.549053
 pitch_gain: 1.136624
+#pitch_gain: 0.6
 #linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
 linear_drag_coefficients: [0.00000, 0.00000, 0.000000]
 yaw_gain: 1.000000

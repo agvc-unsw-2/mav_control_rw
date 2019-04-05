@@ -1,0 +1,9 @@
+<launch>
+  <arg name="mav_name" default="aero" />
+  <arg name="namespace" default="$(arg mav_name)"/>
+  <arg name="uav_num" default="1"/>
+  <param name="use_sim_time" value="false" />
+
+  <node pkg="mav_nonlinear_mpc" name="publish_full_circle_path_real" args="$(arg mav_name) $(arg uav_num)" output="screen" type="publish_full_circle_path_sim.py"/>
+  </group>
+</launch>

@@ -4,5 +4,5 @@
   <arg name="uav_num" default="1"/>
   <param name="use_sim_time" value="true" />
 
-  <node pkg="mav_nonlinear_mpc" name="publish_full_circle_path_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="publish_full_circle_path_sim.py"/>
+  <node pkg="mav_nonlinear_mpc" name="publish_full_circle_path" args="$(arg mav_name) $(arg uav_num)" output="screen" type="publish_full_circle_path.py"/>
 </launch>

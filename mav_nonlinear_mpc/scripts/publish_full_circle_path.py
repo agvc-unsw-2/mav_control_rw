@@ -19,7 +19,7 @@ from math import sin
 
 class Path_Publisher(object):
     def __init__(self, mav_name, uav_num, circle_r, altitude, vel_mag, ref_time_step, publish_interval):
-        rospy.init_node('publish_full_circle_path_sim' + uav_num, anonymous=False)
+        rospy.init_node('publish_full_circle_path' + uav_num, anonymous=False)
         self.pub = rospy.Publisher(
             '/' + mav_name + uav_num + '/command/trajectory', MultiDOFJointTrajectory, queue_size=1
         )
@@ -52,7 +52,6 @@ class Path_Publisher(object):
             if now_secs == 0: # simulation hasn't started
                 print(now_secs)
             else:
-                
                 print(now_secs)
                 if self.t0 == -1:
                     self.t0 = now_secs
@@ -93,10 +92,10 @@ uav_num = str(myargs[2])
 if __name__ == '__main__':
     print('-----------------------')
     print("Launching " + myargs[0] + '...')
-    circle_r = 5.0
+    circle_r = 0.7
     altitude = 1.0
-    vel_mag = 2.0
-    publish_interval = 5.0 #s
+    vel_mag = 1.0
+    publish_interval = 1.0 #s
     ref_time_step = 0.01 #s
     publisher_obj = Path_Publisher(
         mav_name, 
@@ -110,4 +109,5 @@ if __name__ == '__main__':
     try:
         publisher_obj.publish_path()
     except rospy.ROSInterruptException:
-        pass
+        # Read current reference and publish it as new position reference to stop the drone quickly
+        self.pub.publish(self.traj_msg)

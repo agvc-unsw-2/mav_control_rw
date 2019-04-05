@@ -24,7 +24,7 @@
 # yaw_gain: 1.000000
 
 # Controller Parameters:
-mass: 1.950000
+mass: 1.450000
 roll_time_constant: 0.635581
 #roll_gain: 1.275039
 roll_gain: 0.6

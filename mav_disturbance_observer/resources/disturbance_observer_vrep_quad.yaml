@@ -29,7 +29,7 @@ KF_observer:
   external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
 
   #model from system identification (2nd order attitude model)
-  drag_coefficients: [0.010000, 0.010000, 0.000000]
+  drag_coefficients: [0.00000, 0.00000, 0.000000]
   roll_gain: 1.024860
   roll_damping: 1.000000
   roll_omega: 2.860295

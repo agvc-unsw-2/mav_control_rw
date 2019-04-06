@@ -8,6 +8,9 @@ from std_msgs.msg import Time
 from mav_msgs.msg import RollPitchYawrateThrust
 import std_msgs.msg
 
+from dynamic_reconfigure.server import Server
+from Config.cfg import ThrustRescaler
+
 class Echo_From_Vrep(object):
     def __init__(
         self, 
@@ -52,6 +55,13 @@ class Echo_From_Vrep(object):
         #print("Scaled RC message")
         self.pub.publish(self.msg_to_publish)
 
+    def dyn_config_callback(self, config, level):
+        print("Received reconfigure request")
+        print("thrust_scaling_factor=", end="")
+        print(config.thrust_scaling_factor)
+        self.thrust_scaling_factor = config.thrust_scaling_factor
+        return config
+
 myargs = rospy.myargv(argv=sys.argv)
 if len(myargs) != 4:
     print("USAGE: " + myargs[0] + " MAV_NAME UAV_NUM THRUST_SCALING_FACTOR")
@@ -72,6 +82,6 @@ if __name__ == '__main__':
     echo_node.initialise_scale_factors(
         input_thrust_scaling_factor
     )
-
+    srv = Server(ThrustRescaler, self.dyn_config_callback)
 
     rospy.spin()

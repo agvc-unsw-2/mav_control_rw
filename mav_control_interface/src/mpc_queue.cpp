@@ -19,11 +19,12 @@
 
 namespace mav_control {
 
+// TODO(ucrg): Have hard coded dt in one location
 MPCQueue::MPCQueue(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh, int mpc_queue_size)
     : nh_(nh),
       private_nh_(private_nh),
       mpc_queue_size_(mpc_queue_size),
-      maximum_queue_size_(10000),
+      maximum_queue_size_(10000), // 10k * 10ms = 10s max queue size
       current_queue_size_(0),
       initialized_(false),
       prediction_sampling_time_(0.01),
@@ -113,6 +114,7 @@ void MPCQueue::initializeQueue(double controller_sampling_time,
 
 void MPCQueue::fillQueueWithPoint(const mav_msgs::EigenTrajectoryPoint& point)
 {
+  // default minimum_queue_size_ is kPredictionHorizonSteps for linear MPC and ACADO_N+1 for nonlinear MPC
   while (current_queue_size_ < minimum_queue_size_)
     pushBackPoint(point);
 }
@@ -129,7 +131,7 @@ void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeq
 
   mav_msgs::EigenTrajectoryPointDeque interpolated_queue;
   linearInterpolateTrajectory(queue, interpolated_queue);
-
+  // interpolated queue now has a point for every queue_dt (10ms default)
   {
     // Two options: if time is 0 or < than queue start time, shrink the queue to
     // minimum and insert.
@@ -144,11 +146,14 @@ void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeq
       queue_start_time_ = commanded_time_from_start;
     } else {
       // Find where this insertion point belongs and clear the queue out up to that point.
+      // This is so that the for loop below can write new references into the queue for the corresponding times
       double queue_end_time = queue_start_time_ + current_queue_size_ * queue_dt_;
       if (commanded_time_from_start < queue_end_time) {
         size_t start_index = std::round((commanded_time_from_start - queue_start_time_)/queue_dt_);
 
         double last_ref = (position_reference_.begin() + start_index)->x();
+        // Clear the section of the queues for pos, vel, acc, etc that need to be overwritten
+        // (Queue for position references is position_reference_)
         position_reference_.erase(position_reference_.begin() + start_index, position_reference_.end());
         velocity_reference_.erase(velocity_reference_.begin() + start_index, velocity_reference_.end());
         acceleration_reference_.erase(acceleration_reference_.begin() + start_index, acceleration_reference_.end());
@@ -318,6 +323,7 @@ void MPCQueue::linearInterpolateTrajectory(const mav_msgs::EigenTrajectoryPointD
 
   //fill time_input vector from input_queue
   // This is a default DT if none is specified. Corresponds to 100 Hz.
+  // TODO(ucrg): Have hard coded dt in one location
   const int64_t kDefaultDtNsec = 10000000;
   int64_t time_prev = 0;
   for (auto it = input_queue.begin(); it != input_queue.end(); ++it) {
@@ -335,6 +341,7 @@ void MPCQueue::linearInterpolateTrajectory(const mav_msgs::EigenTrajectoryPointD
 //
   time_output.push_back(time_0);  //set t0;
 //
+// Set N for 100 points per second (default)
   int N = (time_input.back() - time_input.front()) / queue_dt_ns + 1;
 //  std::cout << "N: " << N << std::endl;
 //
@@ -342,18 +349,22 @@ void MPCQueue::linearInterpolateTrajectory(const mav_msgs::EigenTrajectoryPointD
   for (size_t i = 1; i < N; i++)
     time_output.push_back(time_0 + queue_dt_ns * i);
 
-  //for each time_output find the first larger element in the time_input vector
+  //for each time_output (10ms interval) find the first larger element in the time_input vector.
+  //this corresponds to the setpoint at that 10ms interval
   for (auto it = time_output.begin(); it != time_output.end(); ++it) {
     mav_msgs::EigenTrajectoryPoint point;
 
+    // *it contains time_output. Find index sol corresponding to time in time_input
     std::vector<int64_t>::iterator sol = std::upper_bound(time_input.begin(), time_input.end(),
                                                         *it);
     if(sol == time_input.end()){
       sol--;
     }
+    // time_out is some time betwen time1 and time2. *sol gives time
     int64_t time1 = *(sol - 1);
     int64_t time2 = *sol;
 
+    // linear interpolate to get point position, velocity and acceleration
     Eigen::Vector3d position_2 = input_queue.at(sol - time_input.begin()).position_W;
     Eigen::Vector3d position_1 = input_queue.at(sol - time_input.begin() - 1).position_W;
 
@@ -370,6 +381,7 @@ void MPCQueue::linearInterpolateTrajectory(const mav_msgs::EigenTrajectoryPointD
     point.acceleration_W = acceleration_1
         + ((acceleration_2 - acceleration_1) / (time2 - time1)) * (*it - time1);
 
+    // linear interpolate yaw and/or yawrate
     double yaw_2 = input_queue.at(sol - time_input.begin()).getYaw();
     double yaw_1 = input_queue.at(sol - time_input.begin() - 1).getYaw();
 

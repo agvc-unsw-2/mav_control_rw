@@ -80,4 +80,4 @@ enable_offset_free : true
 enable_integrator : true
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
-prediction_sampling_time: 0.1
+prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s prediction time

@@ -18,9 +18,12 @@
 mass: 1.650000
 roll_time_constant: 0.624196
 roll_gain: 1.173807
+#roll_gain: 0.6
 pitch_time_constant: 0.549053
 pitch_gain: 1.136624
-linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
+#pitch_gain: 0.6
+#linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
+linear_drag_coefficients: [0.00000, 0.00000, 0.000000]
 yaw_gain: 1.000000
 
 # dynamic config default values:
@@ -39,10 +42,10 @@ r_roll  : 50
 r_pitch : 50
 r_thrust : 1
 
-roll_max: deg(25.0)
-pitch_max: deg(25.0)
+roll_max: deg(45.0)
+pitch_max: deg(45.0)
 thrust_min: 5
-thrust_max: 20
+thrust_max: 50
 
 K_yaw: 1.8
 
@@ -53,7 +56,7 @@ position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
 enable_offset_free : true
-enable_integrator : true
+enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
-prediction_sampling_time: 0.1
+prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s prediction time

@@ -9,10 +9,10 @@ arm_length: 0.2156
 
 roll_gain: 60
 pitch_gain: 60
-roll_int_gain: 2.0
-pitch_int_gain: 2.0
-p_gain: 30
-q_gain: 30
+roll_int_gain: 0.1
+pitch_int_gain: 0.1
+p_gain: 50
+q_gain: 50
 r_gain: 1.0
 
 max_integrator_error: 0.6

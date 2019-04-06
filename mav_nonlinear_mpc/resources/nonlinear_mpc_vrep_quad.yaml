@@ -24,11 +24,13 @@
 # yaw_gain: 1.000000
 
 # Controller Parameters:
-mass: 1.950000
+mass: 1.450000
 roll_time_constant: 0.635581
-roll_gain: 1.275039
+#roll_gain: 1.275039
+roll_gain: 0.6
 pitch_time_constant: 0.630045
-pitch_gain: 1.241289
+#pitch_gain: 1.241289
+pitch_gain: 0.6
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
 
@@ -65,4 +67,4 @@ enable_offset_free : true
 enable_integrator : true
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
-prediction_sampling_time: 0.1
+prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s prediction time

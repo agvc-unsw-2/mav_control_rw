@@ -61,6 +61,7 @@ extern "C"
 /** Indicator for fixed initial state. */
 #define ACADO_INITIAL_STATE_FIXED 1
 /** Number of control/estimation intervals. */
+//#define ACADO_N 20 // default
 #define ACADO_N 20
 /** Number of online data values. */
 #define ACADO_NOD 9

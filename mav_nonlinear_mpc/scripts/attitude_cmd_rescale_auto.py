@@ -8,8 +8,20 @@ from std_msgs.msg import Time
 from mav_msgs.msg import RollPitchYawrateThrust
 import std_msgs.msg
 
+#import pygame
+#from pygame.locals import *
+
 from dynamic_reconfigure.server import Server
-from Config.cfg import ThrustRescaler
+from mav_nonlinear_mpc.cfg import ThrustRescalerConfig
+
+def display(str):
+    text = font.render(str, True, (255, 255, 255), (159, 182, 205))
+    textRect = text.get_rect()
+    textRect.centerx = screen.get_rect().centerx
+    textRect.centery = screen.get_rect().centery
+    screen.blit(text, textRect)
+    pygame.display.update()
+
 
 class Echo_From_Vrep(object):
     def __init__(
@@ -57,10 +69,13 @@ class Echo_From_Vrep(object):
 
     def dyn_config_callback(self, config, level):
         print("Received reconfigure request")
-        print("thrust_scaling_factor=", end="")
+        print("thrust_scaling_factor:")
         print(config.thrust_scaling_factor)
         self.thrust_scaling_factor = config.thrust_scaling_factor
         return config
+
+    def update_scaling_factor(self, new_factor):
+        self.thrust_scaling_factor = new_factor
 
 myargs = rospy.myargv(argv=sys.argv)
 if len(myargs) != 4:
@@ -69,6 +84,16 @@ if len(myargs) != 4:
 mav_name = myargs[1]
 uav_num = str(myargs[2])
 input_thrust_scaling_factor = float(myargs[3])
+
+#pygame.init()
+#screen = pygame.display.set_mode( (640,480) )
+#pygame.display.set_caption('Python numbers')
+#screen.fill((159, 182, 205))
+#
+#font = pygame.font.Font(None, 17)
+
+#num = 0
+#done = False
 
 if __name__ == '__main__':
     print('-----------------------')
@@ -82,6 +107,7 @@ if __name__ == '__main__':
     echo_node.initialise_scale_factors(
         input_thrust_scaling_factor
     )
-    srv = Server(ThrustRescaler, self.dyn_config_callback)
+    srv = Server(ThrustRescalerConfig, echo_node.dyn_config_callback)
+    
 
     rospy.spin()

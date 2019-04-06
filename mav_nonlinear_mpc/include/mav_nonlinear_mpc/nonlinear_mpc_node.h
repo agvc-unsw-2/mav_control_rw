@@ -49,6 +49,7 @@
 //dynamic reconfiguration
 #include <dynamic_reconfigure/server.h>
 #include <mav_nonlinear_mpc/NonLinearMPCConfig.h>
+#include <mav_nonlinear_mpc/ThrustRescalerConfig.h>
 
 #include <mav_nonlinear_mpc/nonlinear_mpc.h>
 #include <mav_control_interface/position_controller_interface.h>

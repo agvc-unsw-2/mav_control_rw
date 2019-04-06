@@ -66,12 +66,14 @@ cs_add_executable(nonlinear_mpc_node
   src/nonlinear_mpc_node.cc
 )
 
+#generate_dynamic_reconfigure_options(cfg/ThrustRescaler.cfg)
+
 target_link_libraries(mav_nonlinear_mpc_lib ${lapacke_LIBRARIES})
 
 target_link_libraries(nonlinear_mpc_node mav_nonlinear_mpc_lib)
 
 add_dependencies(nonlinear_mpc_node ${${PROJECT_NAME}_EXPORTED_TARGETS})
-
+#add_dependencies(nonlinear_mpc_node ${PROJECT_NAME}_gencfg)
 
 ##########
 # EXPORT #

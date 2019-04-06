@@ -39,9 +39,9 @@ class Echo_From_Vrep(object):
         if self.scale_factors_initialized == False:
             msg.thrust.z = 0
             return msg
-
+        max_output_thrust = 0.75
         msg.thrust.z = msg.thrust.z * self.thrust_scaling_factor
-        msg.thrust.z = min(msg.thrust.z, 1)
+        msg.thrust.z = min(msg.thrust.z, max_output_thrust)
         msg.thrust.z = max(msg.thrust.z, 0)
         return msg
 

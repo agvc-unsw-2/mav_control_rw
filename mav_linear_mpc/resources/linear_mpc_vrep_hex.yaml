@@ -16,7 +16,7 @@ roll_time_constant: 0.624196
 roll_gain: 1.173807
 pitch_time_constant: 0.549053
 pitch_gain: 1.136624
-drag_coefficients: [ 0.020000 , 0.020000, 0.0000]
+drag_coefficients: [ 0.000000 , 0.000000, 0.0000]
 
 q_x: 40
 q_y: 40
@@ -37,10 +37,10 @@ r_droll: 0.3
 r_dpitch: 0.3
 r_dthrust: 0.0025
 
-roll_max: deg(25.0)
-pitch_max: deg(25.0)
+roll_max: deg(45.0)
+pitch_max: deg(45.0)
 yaw_rate_max: deg(90)
-thrust_min: 5
+thrust_min: 0.1
 thrust_max: 20
 
 K_yaw: 1.8
@@ -51,7 +51,7 @@ Ki_altitude: 0.3 # Replace Ki_z
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_offset_free : false
+enable_offset_free : true
 enable_integrator : true
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

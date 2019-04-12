@@ -31,7 +31,7 @@ roll_gain: 0.6
 pitch_time_constant: 0.630045
 #pitch_gain: 1.241289
 pitch_gain: 0.6
-linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
 yaw_gain: 1.000000
 
 # dynamic config default values:
@@ -63,8 +63,8 @@ Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_offset_free : true
-enable_integrator : true
+enable_offset_free : false
+enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s prediction time

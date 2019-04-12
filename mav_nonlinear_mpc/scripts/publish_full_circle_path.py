@@ -34,12 +34,19 @@ class Path_Publisher(object):
         self.N = int(publish_interval / ref_time_step) * 2
         self.traj_msg.points = [None]*self.N
         self.rate = rospy.Rate(1.0/publish_interval)
-
+        self.cur_ref = MultiDOFJointTrajectory()
         for i in range(self.N):
             self.traj_msg.points[i] = MultiDOFJointTrajectoryPoint()
 
-        #rospy.Subscriber('/mavros/imu/data', Imu, self.write_callback)
-    
+        rospy.Subscriber(
+            '/' + mav_name + uav_num + '/command/current_reference', 
+            MultiDOFJointTrajectory, 
+            self.get_cur_ref
+        )
+
+    def get_cur_ref(self, data):
+        self.cur_ref = data
+
     def publish_path(self):
         d = self.circle_r
         mu = self.vel_scale_factor
@@ -50,9 +57,9 @@ class Path_Publisher(object):
             now_secs = rospy.get_time()
             now_obj = rospy.get_rostime()
             if now_secs == 0: # simulation hasn't started
-                print(now_secs)
+                #print(now_secs)
             else:
-                print(now_secs)
+                #print(now_secs)
                 if self.t0 == -1:
                     self.t0 = now_secs
                 t_since_start = now_secs - self.t0
@@ -80,7 +87,7 @@ class Path_Publisher(object):
                 self.pub.publish(self.traj_msg)
                 self.t_last_published = t_since_start
             self.rate.sleep() #wait until next time instance
-
+        self.pub.publish(self.cur_ref)
 myargs = rospy.myargv(argv=sys.argv)
 if len(myargs) != 3:
     print("USAGE: " + myargs[0] + " MAV_NAME UAV_NUM")
@@ -95,7 +102,7 @@ if __name__ == '__main__':
     circle_r = 0.7
     altitude = 1.0
     vel_mag = 1.0
-    publish_interval = 1.0 #s
+    publish_interval = 2.0 #s
     ref_time_step = 0.01 #s
     publisher_obj = Path_Publisher(
         mav_name, 
@@ -110,4 +117,4 @@ if __name__ == '__main__':
         publisher_obj.publish_path()
     except rospy.ROSInterruptException:
         # Read current reference and publish it as new position reference to stop the drone quickly
-        self.pub.publish(self.traj_msg)
+        print("Error or ending publisher")

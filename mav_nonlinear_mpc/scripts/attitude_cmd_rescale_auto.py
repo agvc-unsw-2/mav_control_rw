@@ -8,20 +8,8 @@ from std_msgs.msg import Time
 from mav_msgs.msg import RollPitchYawrateThrust
 import std_msgs.msg
 
-#import pygame
-#from pygame.locals import *
-
 from dynamic_reconfigure.server import Server
 from mav_nonlinear_mpc.cfg import ThrustRescalerConfig
-
-def display(str):
-    text = font.render(str, True, (255, 255, 255), (159, 182, 205))
-    textRect = text.get_rect()
-    textRect.centerx = screen.get_rect().centerx
-    textRect.centery = screen.get_rect().centery
-    screen.blit(text, textRect)
-    pygame.display.update()
-
 
 class Echo_From_Vrep(object):
     def __init__(
@@ -37,7 +25,7 @@ class Echo_From_Vrep(object):
         self.msg_to_publish = RollPitchYawrateThrust()
         self.pub = rospy.Publisher('/mavros/setpoint_raw/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
         #self.pub = rospy.Publisher('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
-        rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
+        #rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
         rospy.Subscriber('/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N', RollPitchYawrateThrust, self.read_callback)
 
         self.scale_factors_initialized = False
@@ -84,16 +72,6 @@ if len(myargs) != 4:
 mav_name = myargs[1]
 uav_num = str(myargs[2])
 input_thrust_scaling_factor = float(myargs[3])
-
-#pygame.init()
-#screen = pygame.display.set_mode( (640,480) )
-#pygame.display.set_caption('Python numbers')
-#screen.fill((159, 182, 205))
-#
-#font = pygame.font.Font(None, 17)
-
-#num = 0
-#done = False
 
 if __name__ == '__main__':
     print('-----------------------')

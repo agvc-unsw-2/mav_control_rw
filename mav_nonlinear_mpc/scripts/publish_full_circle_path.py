@@ -58,6 +58,7 @@ class Path_Publisher(object):
             now_obj = rospy.get_rostime()
             if now_secs == 0: # simulation hasn't started
                 #print(now_secs)
+                pass
             else:
                 #print(now_secs)
                 if self.t0 == -1:

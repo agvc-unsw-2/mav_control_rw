@@ -32,6 +32,7 @@ pitch_time_constant: 0.630045
 #pitch_gain: 1.241289
 pitch_gain: 0.6
 linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
+#linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
 yaw_gain: 1.000000
 
 # dynamic config default values:

@@ -46,11 +46,18 @@ extract_warn = False
 
 def extract(list, index):
     global extarct_warn
-    if index == -1:
-        return 0
+    #if index == -1:
+    #    return 0
+
+    if index[0] == '-':
+        index = -int(index)
+        scale = -1
+    else:
+        index = int(index)
+        scale = 1
 
     try:
-        return list[index]
+        return list[index] * scale
     except:
         extract_warn = True
         return 0
@@ -65,7 +72,7 @@ def str_mapping(mapping):
     if mapping == None:
         return "<identity>"
     else:
-        return "".join("%i->%i "%(mapping[i], i) for i in range(0, len(mapping)))
+        return "".join("%s->%i "%(mapping[i], i) for i in range(0, len(mapping)))
 
 ##\brief Subscribes to input, maps and publishes to output topic
 class Remapper:
@@ -97,7 +104,7 @@ def get_param_list(name):
         s = str(rospy.get_param(name));
         if s == "=":
             return None # Identity
-        return map(int, s.split())
+        return s.split()
     except KeyError:
         rospy.logwarn("No %s parameter found. Using identity mapping."%name)
         return None

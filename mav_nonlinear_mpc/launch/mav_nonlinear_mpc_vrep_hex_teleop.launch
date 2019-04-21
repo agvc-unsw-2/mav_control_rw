@@ -3,6 +3,7 @@
   <arg name="namespace" default="$(arg mav_name)"/>
   <arg name="uav_num" default="1"/>
   <param name="use_sim_time" value="true" />
+  <arg name="thrust_scaling_factor" default="-0.2"/>
 
   <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/$(arg namespace)$(arg uav_num)/joy_remapped" />
 
@@ -10,7 +11,7 @@
     <remap from="joy_source" to="/$(arg namespace)$(arg uav_num)/joy" />
     <remap from="joy_dest" to="/$(arg namespace)$(arg uav_num)/joy_remapped" />
     <param name="button_mapping" type="str" value="=" />
-    <param name="axis_mapping" type="str" value="4 3 1 0 4 5 6 7" />
+    <param name="axis_mapping" type="str" value="2 1 -0 3 4 6 5 7" />
   </node>
 
   <group ns="$(arg namespace)$(arg uav_num)">

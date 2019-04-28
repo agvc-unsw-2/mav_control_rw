@@ -1,0 +1,41 @@
+<launch>
+  <arg name="mav_name" default="aero" />
+  <arg name="namespace" default="$(arg mav_name)"/>
+  <arg name="uav_num" default="1"/>
+  <arg name="verbose" default="true"/>
+  <arg name="thrust_scaling_factor" default="0.05"/>
+  <!-- <param name="use_sim_time" value="true" /> -->
+
+  <!-- From mavros for mav_nonlinear_mpc code-->
+  <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/mavros/rc/in_remapped" />
+  <remap from="/$(arg namespace)$(arg uav_num)/joy" to="/mavros/rc/in" />
+  <group ns="$(arg namespace)$(arg uav_num)">
+    <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node"  respawn="true" clear_params="true" output="screen">
+      <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml"/>
+      <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+      <param name="use_rc_teleop" value="false" />
+
+      <remap from="odometry" to="/mavros/local_position/odom" />
+      <remap from="command/roll_pitch_yawrate_thrust" to="/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N" />
+    </node>
+
+    <node name="joy_node" pkg="joy" type="joy_node">
+      <param name="autorepeat_rate" type="double" value="100.0"/>
+    </node>
+
+    <node pkg="mav_nonlinear_mpc"
+          name="attitude_cmd_rescale_and_invert_sim"
+          args="$(arg mav_name) $(arg uav_num) $(arg thrust_scaling_factor)"
+          output="screen"
+          type="attitude_cmd_rescale_and_invert_sim.py"
+    />
+  </group>
+
+  <node pkg="mav_nonlinear_mpc" name="joystick_remapper" output="screen" type="joystick_remapper.py" >
+    <remap from="joy_source" to="/mavros/rc/in" />
+    <remap from="joy_dest" to="/mavros/rc/in_remapped" />
+    <param name="button_mapping" type="str" value="=" />
+    <param name="axis_mapping" type="str" value="1 0 2 3 5 4 6" />
+  </node>
+
+</launch>

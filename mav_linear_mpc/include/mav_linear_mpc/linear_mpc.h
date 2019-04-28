@@ -147,6 +147,11 @@ class LinearModelPredictiveController
     thrust_max_ = control_limits(4) - kGravity;
   }
 
+  void setDragCoefficients(const Eigen::Vector3d& drag_coefficients)
+  {
+    drag_coefficients_ = drag_coefficients;
+  }
+  
   void applyParameters();
   void constructModelMatrices();
 

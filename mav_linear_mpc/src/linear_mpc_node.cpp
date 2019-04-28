@@ -71,6 +71,7 @@ void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::Line
   Eigen::Vector3d r_command;
   Eigen::Vector3d r_delta_command;
   Eigen::VectorXd control_limits(5);
+  Eigen::Vector3d drag_coefficients;
 
   q_position << config.q_x, config.q_y, config.q_z;
   q_velocity << config.q_vx, config.q_vy, config.q_vz;
@@ -80,6 +81,10 @@ void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::Line
   r_delta_command << config.r_droll, config.r_dpitch, config.r_dthrust;
 
   control_limits << config.roll_max, config.pitch_max, config.yaw_rate_max, config.thrust_min, config.thrust_max;
+
+  drag_coefficients << config.groups.drag_coefficients.drag_coefficients_x;
+  drag_coefficients << config.groups.drag_coefficients.drag_coefficients_y;
+  drag_coefficients << config.groups.drag_coefficients.drag_coefficients_z;
 
   // Update model parameters
   linear_mpc_.setMass(config.mass);
@@ -106,6 +111,8 @@ void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::Line
 
   linear_mpc_.setEnableIntegrator(config.enable_integrator);
   linear_mpc_.setEnableOffsetFree(config.enable_offset_free);
+
+  linear_mpc_.setDragCoefficients(drag_coefficients);
 
   linear_mpc_.applyParameters();
   linear_mpc_.constructModelMatrices();

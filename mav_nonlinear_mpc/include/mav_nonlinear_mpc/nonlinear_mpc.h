@@ -123,6 +123,7 @@ class NonlinearModelPredictiveControl
     Ki_xy_ = Ki_xy;
   }
 
+
   void setEnableOffsetFree(bool enable_offset_free)
   {
     enable_offset_free_ = enable_offset_free;
@@ -141,6 +142,11 @@ class NonlinearModelPredictiveControl
     yaw_rate_limit_ = control_limits(2);
     thrust_min_ = control_limits(3);
     thrust_max_ = control_limits(4);
+  }
+
+  void setDragCoefficients(const Eigen::Vector3d& drag_coefficients)
+  {
+    drag_coefficients_ = drag_coefficients;
   }
 
   void applyParameters();

@@ -78,6 +78,7 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
 
   Eigen::Vector3d r_command;
   Eigen::VectorXd control_limits(5);
+  Eigen::Vector3d drag_coefficients;
 
   q_position << config.q_x, config.q_y, config.q_z;
   q_velocity << config.q_vx, config.q_vy, config.q_vz;
@@ -87,6 +88,10 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
 
   control_limits << config.roll_max, config.pitch_max, config.yaw_rate_max, config.thrust_min, config
       .thrust_max;
+  
+  drag_coefficients << config.groups.drag_coefficients.drag_coefficients_x;
+  drag_coefficients << config.groups.drag_coefficients.drag_coefficients_y;
+  drag_coefficients << config.groups.drag_coefficients.drag_coefficients_z;
 
 	  // Update model parameters
   nonlinear_mpc_.setMass(config.mass);
@@ -109,6 +114,8 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
 
   nonlinear_mpc_.setAltitudeIntratorGain(config.Ki_altitude);
   nonlinear_mpc_.setXYIntratorGain(config.Ki_xy);
+
+  nonlinear_mpc_.setDragCoefficients(drag_coefficients);
 
   nonlinear_mpc_.setEnableIntegrator(config.enable_integrator);
   nonlinear_mpc_.setEnableOffsetFree(config.enable_offset_free);

@@ -23,7 +23,7 @@ def display(str):
     pygame.display.update()
 
 
-class Echo_From_Vrep(object):
+class RescaleAndInverter(object):
     def __init__(
         self, 
         mav_name, 
@@ -37,9 +37,9 @@ class Echo_From_Vrep(object):
         self.msg_to_publish = RollPitchYawrateThrust()
         self.pub = rospy.Publisher('/mavros/setpoint_raw/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
         #self.pub = rospy.Publisher('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
-        rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
-        rospy.Subscriber('/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N', RollPitchYawrateThrust, self.read_callback)
-
+        rospy.Subscriber('/mavros/setpoint_raw/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
+        #rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
+        
         self.scale_factors_initialized = False
 
     # Input in degrees for simplicity
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     input_delay = 0.15
     rospy.init_node('attitude_cmd_echo_' + uav_num, anonymous=False)
 
-    echo_node = Echo_From_Vrep(mav_name, uav_num, add_input_delay, input_delay)
+    echo_node = RescaleAndInverter(mav_name, uav_num, add_input_delay, input_delay)
 
     echo_node.initialise_scale_factors(
         input_thrust_scaling_factor

@@ -1,1 +1,1 @@
-rqt_plot /simulation/uav1/ground_truth/mavros/imu/data/linear_acceleration/x:y /vrep_quad1/command/current_reference/points[0]/accelerations[0]/linear/x:y
+rqt_plot /vrep_quad/ground_truth/mavros/imu/data/linear_acceleration/x:y /vrep_quad1/command/current_reference/points[0]/accelerations[0]/linear/x:y

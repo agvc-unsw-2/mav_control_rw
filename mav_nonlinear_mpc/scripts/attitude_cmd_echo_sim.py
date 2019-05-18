@@ -13,7 +13,13 @@ class Echo_From_Vrep(object):
         self.input_delay = rospy.Duration(input_delay)
         self.updated = False
         self.msg_to_publish = RollPitchYawrateThrust()
-        self.pub = rospy.Publisher("/simulation/uav" + uav_num + "/command/roll_pitch_yawrate_thrust", RollPitchYawrateThrust, queue_size=1)
+
+        if 'quad' in mav_name:
+            uav_type = 'quad'
+        elif 'hex' in mav_name:
+            uav_type = 'hex'
+            
+        self.pub = rospy.Publisher("/vrep_" + uav_type + uav_num + "/command/roll_pitch_yawrate_thrust", RollPitchYawrateThrust, queue_size=1)
 
         rospy.Subscriber('/sim_time', Time, self.write_callback)
         rospy.Subscriber('/' + mav_name + uav_num + '/command/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, self.read_callback)

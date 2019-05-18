@@ -11,7 +11,7 @@
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <param name="use_rc_teleop" value="true" />
 
-      <remap from="odometry" to="/simulation/uav$(arg uav_num)/ground_truth/mavros/position/local" />
+      <remap from="odometry" to="/$(arg namespace)$(arg uav_num)/ground_truth/mavros/local_position/odom" />
     </node>
 
     <node name="joy_node" pkg="joy" type="joy_node" />
@@ -22,7 +22,7 @@
     <!-- RC Teleop in mav_linear_mpc node outputs to PID_attitude_controller. Also requires odometry from gazebo -->
 
     <!-- <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
-      <remap from="odometry" to="/simulation/uav$(arg uav_num)/ground_truth/mavros/position/local" />
+      <remap from="odometry" to="/$(arg namespace)$(arg uav_num)/ground_truth/mavros/local_position/odom" />
       <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
     </node> -->
 

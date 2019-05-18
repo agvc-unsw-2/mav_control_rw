@@ -59,7 +59,14 @@ uav_num = str(myargs[2])
 
 rospy.init_node('ActuatorsToFloat64Pub' + uav_num, anonymous=False)
 
-pub = rospy.Publisher("/simulation/uav" + uav_num + "/command/motor_speed", Float64MultiArray, queue_size=10)
+if 'quad' in mav_name:
+    uav_type = 'quad'
+elif 'hex' in mav_name:
+    uav_type = 'hex'
+
+print(uav_type)
+
+pub = rospy.Publisher("/vrep_" + uav_type + uav_num + "/command/motor_speed_arr", Float64MultiArray, queue_size=10)
 
 # Publishes angular velocities of mav_msgs/Actuators as Float64MultiArray
 def callback(data):

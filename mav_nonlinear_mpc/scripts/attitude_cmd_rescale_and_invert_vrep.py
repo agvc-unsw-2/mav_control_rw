@@ -54,10 +54,14 @@ class RescaleAndInverter(object):
         if self.scale_factors_initialized == False:
             msg.thrust.z = 0
             return msg
-        #max_output_thrust = 0.75
         msg.thrust.z = msg.thrust.z * self.thrust_scaling_factor
+        # Constrain thrust
+        #max_output_thrust = 0.75
         #msg.thrust.z = min(msg.thrust.z, max_output_thrust)
         #msg.thrust.z = max(msg.thrust.z, 0)
+
+        msg.roll = msg.roll * 0.707
+        msg.pitch = msg.pitch * 0.707
         return msg
 
     def invert_roll(self, msg):

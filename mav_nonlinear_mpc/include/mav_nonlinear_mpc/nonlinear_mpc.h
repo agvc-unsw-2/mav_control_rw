@@ -40,9 +40,10 @@
 #include "acado_common.h"
 #include "acado_auxiliary_functions.h"
 #include <mav_disturbance_observer/KF_disturbance_observer.h>
-#include <mav_disturbance_observer_simple/KF_disturbance_observer_simple.h>
+#include <mav_disturbance_observer_first_order/KF_disturbance_observer_first_order.h>
 #include <std_srvs/Empty.h>
 #include <lapacke.h>
+
 
 ACADOvariables acadoVariables;
 ACADOworkspace acadoWorkspace;
@@ -244,9 +245,20 @@ class NonlinearModelPredictiveControl
   Eigen::Matrix<double, ACADO_N + 1, ACADO_NOD> acado_online_data_;
 
   // disturbance observer
+
+  enum Disturbance_Observer_Types {
+    KF_DO_first_order__,
+    KF_DO_second_order__,
+    integral_DO_first_order__,
+    integral_DO_second_order__
+  };
+
+  Disturbance_Observer_Types disturbance_observer_type_;
+
   bool enable_offset_free_;
-  KFDisturbanceObserver disturbance_observer_;
-  KF_DO_simple disturbance_observer_simple_;
+  KF_DO_first_order KF_DO_first_order_; // KF disturbance observer with first order model
+  KFDisturbanceObserver KF_DO_second_order_; // KF disturbance observer with second order model
+  // TODO: Insert 1st and 2nd order IDO here
 
   // commands
   Eigen::Vector4d command_roll_pitch_yaw_thrust_;

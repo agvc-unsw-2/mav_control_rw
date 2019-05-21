@@ -45,8 +45,8 @@ NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::Node
       position_error_integration_(0, 0, 0),
       mpc_queue_(nh, private_nh, ACADO_N+1),
       command_roll_pitch_yaw_thrust_(0, 0, 0, 0),
-      disturbance_observer_(nh, private_nh),
-      disturbance_observer_simple_(nh, private_nh),
+      KF_DO_first_order_(nh, private_nh),
+      KF_DO_second_order_(nh, private_nh),
       verbose_(true),
       solve_time_average_(0),
       received_first_odometry_(false)
@@ -149,6 +149,13 @@ void NonlinearModelPredictiveControl::initializeParameters()
     abort();
   }
   
+  disturbance_observer_type_ = KF_DO_second_order__;
+
+  // if (!private_nh_.getParam("disturbance_observer_type", disturbance_observer_type_)) {
+  //   ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+  //   abort();
+  // }
+
   constructModelMatrices();
   initialized_parameters_ = true;
 
@@ -217,14 +224,17 @@ void NonlinearModelPredictiveControl::setOdometry(const mav_msgs::EigenOdometry&
 
     initializeAcadoSolver(x0);
 
-    disturbance_observer_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
+    
+    KF_DO_second_order_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
                                 odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
                                 Eigen::Vector3d::Zero());
 
-    disturbance_observer_simple_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
-                                odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
-                                Eigen::Vector3d::Zero());
-
+    KF_DO_first_order_.reset(
+      odometry.position_W, // Position
+      odometry.getVelocityWorld(), // Velocity
+      euler_angles, // Attitude
+      Eigen::Vector3d::Zero() // External forces
+    );
     received_first_odometry_ = true;
   }
 
@@ -306,19 +316,19 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   mpc_queue_.updateQueue();
   mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
 
-  disturbance_observer_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
-  disturbance_observer_.feedPositionMeasurement(odometry_.position_W);
-  disturbance_observer_.feedVelocityMeasurement(odometry_.getVelocityWorld());
-  disturbance_observer_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+  KF_DO_second_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  KF_DO_second_order_.feedPositionMeasurement(odometry_.position_W);
+  KF_DO_second_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  KF_DO_second_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 
-  bool observer_update_successful = disturbance_observer_.updateEstimator();
+  bool observer_update_successful = KF_DO_second_order_.updateEstimator();
   if (!observer_update_successful) {
-    disturbance_observer_.reset(odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
+    KF_DO_second_order_.reset(odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
                                 Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(),
                                 Eigen::Vector3d::Zero());
   }
 
-  disturbance_observer_.getEstimatedState(&KF_estimated_state);
+  KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
 
   if (enable_offset_free_ == true) {
     estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);

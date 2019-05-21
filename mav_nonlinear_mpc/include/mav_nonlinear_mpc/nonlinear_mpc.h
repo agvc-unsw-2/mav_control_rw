@@ -40,6 +40,7 @@
 #include "acado_common.h"
 #include "acado_auxiliary_functions.h"
 #include <mav_disturbance_observer/KF_disturbance_observer.h>
+#include <mav_disturbance_observer_simple/KF_disturbance_observer_simple.h>
 #include <std_srvs/Empty.h>
 #include <lapacke.h>
 
@@ -245,6 +246,7 @@ class NonlinearModelPredictiveControl
   // disturbance observer
   bool enable_offset_free_;
   KFDisturbanceObserver disturbance_observer_;
+  KF_DO_simple disturbance_observer_simple_;
 
   // commands
   Eigen::Vector4d command_roll_pitch_yaw_thrust_;

@@ -46,6 +46,7 @@ NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::Node
       mpc_queue_(nh, private_nh, ACADO_N+1),
       command_roll_pitch_yaw_thrust_(0, 0, 0, 0),
       disturbance_observer_(nh, private_nh),
+      disturbance_observer_simple_(nh, private_nh),
       verbose_(true),
       solve_time_average_(0),
       received_first_odometry_(false)
@@ -217,6 +218,10 @@ void NonlinearModelPredictiveControl::setOdometry(const mav_msgs::EigenOdometry&
     initializeAcadoSolver(x0);
 
     disturbance_observer_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
+                                odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
+                                Eigen::Vector3d::Zero());
+
+    disturbance_observer_simple_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
                                 odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
                                 Eigen::Vector3d::Zero());
 

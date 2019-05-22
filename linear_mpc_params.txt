@@ -50,7 +50,7 @@ PARAMETERS
  * /vrep_hex/mav_linear_mpc/antiwindup_ball: 0.4
  * /vrep_hex/mav_linear_mpc/drag_coefficients: [0.02, 0.02, 0.0]
  * /vrep_hex/mav_linear_mpc/enable_integrator: True
- * /vrep_hex/mav_linear_mpc/enable_offset_free: True
+ * /vrep_hex/mav_linear_mpc/enable_disturbance_observer: True
  * /vrep_hex/mav_linear_mpc/mass: 1.65
  * /vrep_hex/mav_linear_mpc/pitch_gain: 1.136624
  * /vrep_hex/mav_linear_mpc/pitch_max: 0.436332312999

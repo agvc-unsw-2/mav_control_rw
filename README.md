@@ -175,7 +175,7 @@ A summary of the linear and nonlinear MPC parameters:
 |`Ki_xy, Ki_z`*            | integrator gains on `xy` and `z` axes respectively                            |
 |`position_error_integration_limit` | limit of position error integration                                 |
 |`antiwindup_ball`        | if the error is larger than this ball, no integral action is applied          |
-|`enable_offset_free`*     | use estimated disturbances to achieve offset free tracking                    |
+|`enable_disturbance_observer`*     | use estimated disturbances to achieve offset free tracking                    |
 |`enable_integrator`*      | use error integration to achieve offset free tracking                         |
 |`sampling_time`          | the controller sampling time (must be equal to the rate of `odometry` message |
 |`prediction_sampling_time`| the prediction sampling time inside the controller                           |

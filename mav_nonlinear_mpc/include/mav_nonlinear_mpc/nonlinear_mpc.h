@@ -126,9 +126,9 @@ class NonlinearModelPredictiveControl
   }
 
 
-  void setEnableOffsetFree(bool enable_offset_free)
+  void setEnableDisturbanceObserver(bool enable_disturbance_observer)
   {
-    enable_offset_free_ = enable_offset_free;
+    enable_disturbance_observer_ = enable_disturbance_observer;
   }
 
   void setEnableIntegrator(bool enable_integrator)
@@ -259,7 +259,7 @@ class NonlinearModelPredictiveControl
 
   Disturbance_Observer_Types disturbance_observer_type_;
 
-  bool enable_offset_free_;
+  bool enable_disturbance_observer_;
   KF_DO_first_order KF_DO_first_order_; // KF disturbance observer with first order model
   KFDisturbanceObserver KF_DO_second_order_; // KF disturbance observer with second order model
   // TODO: Insert 1st and 2nd order IDO here

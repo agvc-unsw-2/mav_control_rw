@@ -127,9 +127,9 @@ class LinearModelPredictiveController
     Ki_xy_ = Ki_xy;
   }
 
-  void setEnableOffsetFree(bool enable_offset_free)
+  void setEnableDisturbanceObserver(bool enable_disturbance_observer)
   {
-    enable_offset_free_ = enable_offset_free;
+    enable_disturbance_observer_ = enable_disturbance_observer;
   }
 
   void setEnableIntegrator(bool enable_integrator)
@@ -253,7 +253,7 @@ class LinearModelPredictiveController
   std::deque<Eigen::Matrix<double, kStateSize, 1>> CVXGEN_queue_;
 
   // disturbance observer
-  bool enable_offset_free_;
+  bool enable_disturbance_observer_;
   KFDisturbanceObserver disturbance_observer_;
 
   // commands

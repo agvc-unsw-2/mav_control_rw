@@ -77,7 +77,7 @@ Ki_altitude: 0.3 # Replace Ki_z
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_offset_free : true
+enable_disturbance_observer : true
 enable_integrator : true
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

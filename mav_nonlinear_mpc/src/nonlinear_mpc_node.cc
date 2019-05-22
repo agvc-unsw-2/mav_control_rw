@@ -118,7 +118,7 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   nonlinear_mpc_.setDragCoefficients(drag_coefficients);
 
   nonlinear_mpc_.setEnableIntegrator(config.enable_integrator);
-  nonlinear_mpc_.setEnableOffsetFree(config.enable_offset_free);
+  nonlinear_mpc_.setEnableDisturbanceObserver(config.enable_disturbance_observer);
 
   nonlinear_mpc_.applyParameters();
   nonlinear_mpc_.constructModelMatrices();

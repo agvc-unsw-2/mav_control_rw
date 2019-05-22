@@ -374,7 +374,7 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
 
   disturbance_observer_.getEstimatedState(&KF_estimated_state);
 
-  if (enable_offset_free_ == true) {
+  if (enable_disturbance_observer_ == true) {
     estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
   } else {
     estimated_disturbances.setZero();

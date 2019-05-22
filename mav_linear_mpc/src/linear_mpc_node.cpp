@@ -110,7 +110,7 @@ void LinearModelPredictiveControllerNode::DynConfigCallback(mav_linear_mpc::Line
   linear_mpc_.setXYIntratorGain(config.Ki_xy);
 
   linear_mpc_.setEnableIntegrator(config.enable_integrator);
-  linear_mpc_.setEnableOffsetFree(config.enable_offset_free);
+  linear_mpc_.setEnableDisturbanceObserver(config.enable_disturbance_observer);
 
   linear_mpc_.setDragCoefficients(drag_coefficients);
 

@@ -349,6 +349,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     NonlinearModelPredictiveControl::update_KF_DO_first_order_measurements();
     observer_update_successful = KF_DO_first_order_.updateEstimator();
     if (!observer_update_successful) {
+      ROS_WARN_THROTTLE(1, "KF_DO_first_order_ failed to update estimator. Resetting");
       KF_DO_first_order_.reset(
         odometry_.position_W, odometry_.getVelocityWorld(), current_rpy, Eigen::Vector3d::Zero()
       );
@@ -358,6 +359,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     NonlinearModelPredictiveControl::update_KF_DO_second_order_measurements();
     observer_update_successful = KF_DO_second_order_.updateEstimator();
     if (!observer_update_successful) {
+      ROS_WARN_THROTTLE(1, "KF_DO_second_order_ failed to update estimator. Resetting");
       KF_DO_second_order_.reset(
         odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
         Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero()
@@ -372,7 +374,14 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
 // TODO: Add disturbance_observer_type as a dynamic reconfigure, and appropriate reset the disturbance observers on change.
 
   if (enable_disturbance_observer_ == true) {
-    estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+    if (disturbance_observer_type_ == KF_DO_first_order__) {
+      estimated_disturbances = KF_estimated_state.segment(9, kDisturbanceSize);
+    } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+      estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+    } else {
+      ROS_ERROR("Invalid disturbance observer type in use");
+      abort();
+    }
   } else {
     estimated_disturbances.setZero(kDisturbanceSize);
   }

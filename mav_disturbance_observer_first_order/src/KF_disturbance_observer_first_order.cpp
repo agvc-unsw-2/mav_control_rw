@@ -191,7 +191,7 @@ void KF_DO_first_order::loadROSParams()
   }
 
   if (!observer_nh_.getParam("drag_coefficients", temporary_drag)) {
-    ROS_ERROR("drag_coefficients_first_order in KF_first_order are not loaded from ros parameter server");
+    ROS_ERROR("drag_coefficients in KF_first_order are not loaded from ros parameter server");
     abort();
   }
 

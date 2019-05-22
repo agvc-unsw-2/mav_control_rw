@@ -246,6 +246,10 @@ class NonlinearModelPredictiveControl
 
   // disturbance observer
 
+  void update_KF_DO_first_order_measurements();
+  void update_KF_DO_second_order_measurements();
+
+
   enum Disturbance_Observer_Types {
     KF_DO_first_order__,
     KF_DO_second_order__,

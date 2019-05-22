@@ -226,10 +226,21 @@ void NonlinearModelPredictiveControl::setOdometry(const mav_msgs::EigenOdometry&
 
     initializeAcadoSolver(x0);
 
-    
-    KF_DO_second_order_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
-                                odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
-                                Eigen::Vector3d::Zero());
+    if (disturbance_observer_type_ == KF_DO_first_order__) {
+      KF_DO_first_order_.reset(
+        odometry.position_W, odometry.getVelocityWorld(), euler_angles, Eigen::Vector3d::Zero()
+      );
+    } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+      KF_DO_second_order_.reset(
+        odometry.position_W, odometry.getVelocityWorld(), euler_angles,
+        odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
+        Eigen::Vector3d::Zero()
+      );  
+    } else {
+      ROS_ERROR("Invalid disturbance observer type in use");
+      abort();
+    }
+
 
     KF_DO_first_order_.reset(
       odometry.position_W, // Position
@@ -301,6 +312,20 @@ void NonlinearModelPredictiveControl::initializeAcadoSolver(Eigen::VectorXd x0)
       referenceN_.transpose();
 }
 
+void NonlinearModelPredictiveControl::update_KF_DO_first_order_measurements() {
+  KF_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  KF_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
+  KF_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  KF_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+}
+
+void NonlinearModelPredictiveControl::update_KF_DO_second_order_measurements() {
+  KF_DO_second_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  KF_DO_second_order_.feedPositionMeasurement(odometry_.position_W);
+  KF_DO_second_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  KF_DO_second_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+}
+
 void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     Eigen::Vector4d* ref_attitude_thrust)
 {
@@ -318,19 +343,34 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   mpc_queue_.updateQueue();
   mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
 
-  KF_DO_second_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
-  KF_DO_second_order_.feedPositionMeasurement(odometry_.position_W);
-  KF_DO_second_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
-  KF_DO_second_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+  bool observer_update_successful = false;
 
-  bool observer_update_successful = KF_DO_second_order_.updateEstimator();
-  if (!observer_update_successful) {
-    KF_DO_second_order_.reset(odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
-                                Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(),
-                                Eigen::Vector3d::Zero());
+  if (disturbance_observer_type_ == KF_DO_first_order__) {
+    NonlinearModelPredictiveControl::update_KF_DO_first_order_measurements();
+    observer_update_successful = KF_DO_first_order_.updateEstimator();
+    if (!observer_update_successful) {
+      KF_DO_first_order_.reset(
+        odometry_.position_W, odometry_.getVelocityWorld(), current_rpy, Eigen::Vector3d::Zero()
+      );
+    }
+    KF_DO_first_order_.getEstimatedState(&KF_estimated_state);
+  } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+    NonlinearModelPredictiveControl::update_KF_DO_second_order_measurements();
+    observer_update_successful = KF_DO_second_order_.updateEstimator();
+    if (!observer_update_successful) {
+      KF_DO_second_order_.reset(
+        odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
+        Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero()
+      );
+    }
+    KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
+  } else {
+    ROS_ERROR("Invalid disturbance observer type in use");
+    abort();
   }
 
-  KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
+
+
 
   if (enable_offset_free_ == true) {
     estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);

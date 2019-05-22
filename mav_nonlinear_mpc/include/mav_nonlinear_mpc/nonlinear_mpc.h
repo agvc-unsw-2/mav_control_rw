@@ -131,6 +131,11 @@ class NonlinearModelPredictiveControl
     enable_disturbance_observer_ = enable_disturbance_observer;
   }
 
+  void setDisturbanceObserverType(int disturbance_observer_type)
+  {
+    disturbance_observer_type_ = static_cast<NonlinearModelPredictiveControl::Disturbance_Observer_Types>(disturbance_observer_type);
+  }
+
   void setEnableIntegrator(bool enable_integrator)
   {
     enable_integrator_ = enable_integrator;

@@ -119,6 +119,7 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
 
   nonlinear_mpc_.setEnableIntegrator(config.enable_integrator);
   nonlinear_mpc_.setEnableDisturbanceObserver(config.enable_disturbance_observer);
+  nonlinear_mpc_.setDisturbanceObserverType(config.disturbance_observer_type);
 
   nonlinear_mpc_.applyParameters();
   nonlinear_mpc_.constructModelMatrices();

@@ -119,8 +119,8 @@ void KF_DO_first_order::initialize()
 
 void KF_DO_first_order::loadROSParams()
 {
-  std::vector<double> temporary_drag = {0.20, 0.20, 0.20};
-  std::vector<double> temporary_external_forces_limit = {5.0, 5.0, 3.0};
+  std::vector<double> temporary_drag;
+  std::vector<double> temporary_external_forces_limit;
 
   double P0_position, P0_velocity, P0_attitude, P0_force;
 
@@ -185,15 +185,15 @@ void KF_DO_first_order::loadROSParams()
     abort();
   }
 
-  // if (!observer_nh_.getParam("external_forces_limit", temporary_external_forces_limit)) {
-  //   ROS_ERROR("external_forces_limit in KF_first_order is not loaded from ros parameter server");
-  //   abort();
-  // }
+  if (!observer_nh_.getParam("external_forces_limit", temporary_external_forces_limit)) {
+    ROS_ERROR("external_forces_limit in KF_first_order is not loaded from ros parameter server");
+    abort();
+  }
 
-  // if (!observer_nh_.getParam("drag_coefficients_first_order", temporary_drag)) {
-  //   ROS_ERROR("drag_coefficients_first_order in KF_first_order are not loaded from ros parameter server");
-  //   abort();
-  // }
+  if (!observer_nh_.getParam("drag_coefficients", temporary_drag)) {
+    ROS_ERROR("drag_coefficients_first_order in KF_first_order are not loaded from ros parameter server");
+    abort();
+  }
 
   ROS_INFO("Read KF_first_order parameters successfully");
 

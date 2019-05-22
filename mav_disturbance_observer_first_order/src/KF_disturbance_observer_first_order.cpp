@@ -43,12 +43,12 @@ KF_DO_first_order::KF_DO_first_order(const ros::NodeHandle& nh,
                            const ros::NodeHandle& private_nh)
     : nh_(nh),
       private_nh_(private_nh),
-      observer_nh_(private_nh, "KF_observer"),
+      observer_nh_(private_nh, "KF_observer_first_order"),
       initialized_(false),
       is_calibrating_(false),
       F_(kStateSize, kStateSize),
       H_(kMeasurementSize, kStateSize),
-      dyn_config_server_(ros::NodeHandle(private_nh, "KF_observer")),
+      dyn_config_server_(ros::NodeHandle(private_nh, "KF_observer_first_order")),
       calibration_counter_(0)
 {
   state_covariance_.setZero();
@@ -74,7 +74,7 @@ bool KF_DO_first_order::startCalibrationCallback(std_srvs::Empty::Request& req,
   if (startCalibration()) {
     return true;
   }
-  ROS_WARN("KF Calibration Failed...");
+  ROS_WARN("KF_first_order Calibration Failed...");
   return false;
 }
 
@@ -95,7 +95,7 @@ void KF_DO_first_order::initialize()
 
   ROS_INFO("start initializing mav_disturbance_observer_first_order:KF");
 
-  service_ = observer_nh_.advertiseService("StartCalibrateKF",
+  service_ = observer_nh_.advertiseService("StartCalibrateKF_first_order",
                                            &KF_DO_first_order::startCalibrationCallback, this);
 
   observer_state_pub_ = observer_nh_.advertise<mav_disturbance_observer_first_order::ObserverState>(
@@ -113,88 +113,89 @@ void KF_DO_first_order::initialize()
 
   initialized_ = true;
 
-  ROS_INFO("Kalman Filter Initialized!");
+  ROS_INFO("First Order Kalman Filter Initialized!");
 
 }
 
 void KF_DO_first_order::loadROSParams()
 {
-  std::vector<double> temporary_drag;
-  std::vector<double> temporary_external_forces_limit;
+  std::vector<double> temporary_drag = {0.20, 0.20, 0.20};
+  std::vector<double> temporary_external_forces_limit = {5.0, 5.0, 3.0};
 
   double P0_position, P0_velocity, P0_attitude, P0_force;
 
   double calibration_duration;
   if (!observer_nh_.getParam("calibration_duration", calibration_duration)) {
-    ROS_ERROR("calibration_duration in KF are not loaded from ros parameter server");
+    ROS_ERROR("calibration_duration in KF_first_order are not loaded from ros parameter server");
     abort();
   }
   calibration_duration_ = ros::Duration(calibration_duration);
 
-  if (!observer_nh_.getParam("drag_coefficients", temporary_drag)) {
-    ROS_ERROR("Drag Coefficients in KF are not loaded from ros parameter server");
-    abort();
-  }
-
   if (!observer_nh_.getParam("roll_tau", roll_tau_)) {
-    ROS_ERROR("roll_tau in KF is not loaded from ros parameter server");
+    ROS_ERROR("roll_tau in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("roll_gain", roll_gain_)) {
-    ROS_ERROR("roll_gain in KF is not loaded from ros parameter server");
+    ROS_ERROR("roll_gain in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("pitch_tau", pitch_tau_)) {
-    ROS_ERROR("pitch_tau in KF is not loaded from ros parameter server");
+    ROS_ERROR("pitch_tau in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("pitch_gain", pitch_gain_)) {
-    ROS_ERROR("pitch_gain in KF is not loaded from ros parameter server");
+    ROS_ERROR("pitch_gain in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("yaw_tau", yaw_tau_)) {
-    ROS_ERROR("yaw_tau in KF is not loaded from ros parameter server");
+    ROS_ERROR("yaw_tau in KF_first_order is not loaded from ros parameter server");
   }
 
   if (!observer_nh_.getParam("yaw_gain", yaw_gain_)) {
-    ROS_ERROR("yaw_gain in KF is not loaded from ros parameter server");
+    ROS_ERROR("yaw_gain in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_position", P0_position)) {
-    ROS_ERROR("P0_position in KF is not loaded from ros parameter server");
+    ROS_ERROR("P0_position in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_velocity", P0_velocity)) {
-    ROS_ERROR("P0_velocity in KF is not loaded from ros parameter server");
+    ROS_ERROR("P0_velocity in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_attitude", P0_attitude)) {
-    ROS_ERROR("P0_attitude in KF is not loaded from ros parameter server");
+    ROS_ERROR("P0_attitude in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_force", P0_force)) {
-    ROS_ERROR("P0_force in KF is not loaded from ros parameter server");
-    abort();
-  }
-
-  if (!observer_nh_.getParam("external_forces_limit", temporary_external_forces_limit)) {
-    ROS_ERROR("external_forces_limit in KF is not loaded from ros parameter server");
+    ROS_ERROR("P0_force in KF_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("sampling_time", sampling_time_)) {
-    ROS_ERROR("sampling_time in KF is not loaded from ros parameter server");
+    ROS_ERROR("sampling_time in KF_first_order is not loaded from ros parameter server");
     abort();
   }
-  ROS_INFO("Read KF parameters successfully");
+
+  // if (!observer_nh_.getParam("external_forces_limit", temporary_external_forces_limit)) {
+  //   ROS_ERROR("external_forces_limit in KF_first_order is not loaded from ros parameter server");
+  //   abort();
+  // }
+
+  // if (!observer_nh_.getParam("drag_coefficients_first_order", temporary_drag)) {
+  //   ROS_ERROR("drag_coefficients_first_order in KF_first_order are not loaded from ros parameter server");
+  //   abort();
+  // }
+
+  ROS_INFO("Read KF_first_order parameters successfully");
 
   construct_KF_matrices(
     temporary_drag, 
@@ -232,7 +233,7 @@ void KF_DO_first_order::construct_KF_matrices(
 
   F_ = (sampling_time_ * F_continous_time).exp().sparseView();
 
-  ROS_INFO("KF F_matrix initialized successfully");
+  ROS_INFO("KF_first_order F_matrix initialized successfully");
 
   // First 9x9 (=measurement size) block is identity, rest is zero.
   H_.reserve(kMeasurementSize);
@@ -249,7 +250,7 @@ void KF_DO_first_order::construct_KF_matrices(
 
   state_covariance_ = initial_state_covariance_.asDiagonal();
 
-  ROS_INFO_STREAM("state_covariance_: \n" << state_covariance_);
+  ROS_INFO_STREAM("KF_first_order state_covariance_: \n" << state_covariance_);
 
   Eigen::Map<Eigen::Vector3d> external_forces_limit_map(temporary_external_forces_limit.data(), 3,
                                                         1);
@@ -262,7 +263,7 @@ void KF_DO_first_order::construct_KF_matrices(
   for (int i = 0; i < 3; i++) {
     drag_coefficients_matrix_(i, i) = temporary_drag.at(i);
   }
-  ROS_INFO("Updated KF Matrices successfully");
+  ROS_INFO("Updated KF_first_order Matrices successfully");
 }
 
 void KF_DO_first_order::DynConfigCallback(
@@ -296,7 +297,7 @@ void KF_DO_first_order::DynConfigCallback(
   P0_velocity = config.P0_velocity;
   P0_attitude = config.P0_attitude;
   P0_force = config.P0_force;
-  
+
   temporary_external_forces_limit.at(0) = config.groups.external_forces_limit.external_forces_limit_x;
   temporary_external_forces_limit.at(1) = config.groups.external_forces_limit.external_forces_limit_y;
   temporary_external_forces_limit.at(2) = config.groups.external_forces_limit.external_forces_limit_z;
@@ -322,7 +323,7 @@ void KF_DO_first_order::DynConfigCallback(
     P0_force
   );
 
-  ROS_INFO("mav_disturbance_observer_first_order:KF dynamic config is called successfully");
+  ROS_INFO("mav_disturbance_observer_first_order:KF_first_order dynamic config is called successfully");
 
 }
 
@@ -418,7 +419,7 @@ bool KF_DO_first_order::updateEstimator()
 
   //Limits on estimated_disturbances
   if (state_.allFinite() == false) {
-    ROS_ERROR("The estimated state in KF Disturbance Observer has a non-finite element");
+    ROS_ERROR("The estimated state in KF_DO_first_order has a non-finite element");
     return false;
   }
   Eigen::Vector3d external_forces = state_.segment(12, 3);
@@ -429,7 +430,7 @@ bool KF_DO_first_order::updateEstimator()
   state_.segment(9, 3) << external_forces;
 
   if (is_calibrating_ == true) {
-    ROS_INFO_THROTTLE(1.0, "calibrating KF...");
+    ROS_INFO_THROTTLE(1.0, "calibrating KF_first_order...");
     forces_offset_ += external_forces;
     calibration_counter_++;
 

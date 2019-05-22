@@ -148,13 +148,15 @@ void NonlinearModelPredictiveControl::initializeParameters()
     ROS_ERROR("prediction_sampling_time in nonlinear MPC is not loaded from ros parameter server");
     abort();
   }
-  
-  disturbance_observer_type_ = KF_DO_second_order__;
 
-  // if (!private_nh_.getParam("disturbance_observer_type", disturbance_observer_type_)) {
-  //   ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
-  //   abort();
-  // }
+  int disturbance_observer_type_temp;
+
+  if (!private_nh_.getParam("disturbance_observer_type", disturbance_observer_type_temp)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+
+  disturbance_observer_type_ = static_cast<NonlinearModelPredictiveControl::Disturbance_Observer_Types>(disturbance_observer_type_temp);
 
   constructModelMatrices();
   initialized_parameters_ = true;

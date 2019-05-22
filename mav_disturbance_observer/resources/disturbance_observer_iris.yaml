@@ -1,5 +1,5 @@
 ## Kalman Filter Parameters:
-KF_observer:
+KF_observer_second_order:
   calibration_duration: 5 #sec
   
   #covariance of initial state

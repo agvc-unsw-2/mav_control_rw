@@ -43,12 +43,12 @@ KFDisturbanceObserver::KFDisturbanceObserver(const ros::NodeHandle& nh,
                                              const ros::NodeHandle& private_nh)
     : nh_(nh),
       private_nh_(private_nh),
-      observer_nh_(private_nh, "KF_observer"),
+      observer_nh_(private_nh, "KF_observer_second_order"),
       initialized_(false),
       is_calibrating_(false),
       F_(kStateSize, kStateSize),
       H_(kMeasurementSize, kStateSize),
-      dyn_config_server_(ros::NodeHandle(private_nh, "KF_observer")),
+      dyn_config_server_(ros::NodeHandle(private_nh, "KF_observer_second_order")),
       calibration_counter_(0)
 {
   state_covariance_.setZero();

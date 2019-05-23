@@ -297,13 +297,13 @@ void Integral_DO_first_order::DynConfigCallback(
   temporary_external_forces_limit.at(1) = config.groups.external_forces_limit.external_forces_limit_y;
   temporary_external_forces_limit.at(2) = config.groups.external_forces_limit.external_forces_limit_z;
 
-  L_state_(0, 0) = config.groups.L_state.L_state_x;
-  //L_state_(1, 1) = config.groups.L_state.L_state_y;
-  //L_state_(2, 2) = config.groups.L_state.L_state_z;
+  L_state_(0, 0) = config.groups.state_observer_gains.state_observer_gains_x;
+  L_state_(1, 1) = config.groups.state_observer_gains.state_observer_gains_y;
+  L_state_(2, 2) = config.groups.state_observer_gains.state_observer_gains_z;
 
-  //L_disturbance_(0) = config.groups.L_disturbance.L_disturbance_x;
-  //L_disturbance_(1) = config.groups.L_disturbance.L_disturbance_y;
-  //L_disturbance_(2) = config.groups.L_disturbance.L_disturbance_z;
+  L_disturbance_(0) = config.groups.disturbance_observer_gains.disturbance_observer_gains_x;
+  L_disturbance_(1) = config.groups.disturbance_observer_gains.disturbance_observer_gains_y;
+  L_disturbance_(2) = config.groups.disturbance_observer_gains.disturbance_observer_gains_z;
 
   constructModelMatrices(
     temporary_external_forces_limit

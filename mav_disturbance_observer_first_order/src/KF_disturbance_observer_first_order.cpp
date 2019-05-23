@@ -422,7 +422,7 @@ bool KF_DO_first_order::updateEstimator()
     ROS_ERROR("The estimated state in KF_DO_first_order has a non-finite element");
     return false;
   }
-  Eigen::Vector3d external_forces = state_.segment(12, 3);
+  Eigen::Vector3d external_forces = state_.segment(9, 3);
 
   external_forces = external_forces.cwiseMax(-external_forces_limit_);
   external_forces = external_forces.cwiseMin(external_forces_limit_);

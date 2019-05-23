@@ -106,34 +106,38 @@ class Integral_DO_first_order
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
-  static constexpr int kStateSize = 12;
+  static constexpr int kStateSize = 9;
+  static constexpr int kInputSize = 3;
+  static constexpr int kOutputSize = 3;
   static constexpr int kMeasurementSize = 9;
+  static constexpr int kDisturbanceSize = 3;
   static constexpr double kGravity = 9.8066;
 
   typedef Eigen::Matrix<double, kStateSize, 1> StateVector;
 
   ros::NodeHandle nh_, private_nh_, observer_nh_;
   bool initialized_;
-  Eigen::Matrix<double, kStateSize, 1> state_;  // [pos, vel, rpy, omega, external_forces, external_moments]
+  Eigen::Matrix<double, kStateSize, 1> state_;  // [pos, vel, rpy]
   Eigen::Matrix<double, kStateSize, 1> predicted_state_;
   Eigen::Matrix<double, kMeasurementSize, 1> measurements_;  // [pos, vel, rpy]
   Eigen::Matrix3d rotation_matrix_;
   Eigen::Vector4d roll_pitch_yaw_thrust_cmd_;
-  Eigen::Matrix<double, kStateSize, 1> process_noise_covariance_; // We express it as diag() later.
-  Eigen::Matrix<double, kStateSize, kStateSize> state_covariance_;
-  Eigen::Matrix<double, kStateSize, 1> initial_state_covariance_; // P0
-  Eigen::Matrix<double, kMeasurementSize, 1> measurement_covariance_; // We express it as diag() later.
-  Eigen::Matrix3d drag_coefficients_matrix_;
+  Eigen::Vector3d drag_coefficients_;
 
-  Eigen::SparseMatrix<double> F_; // System dynamics matrix.
-//  Eigen::Matrix<double, kStateSize, kStateSize> F_; // System dynamics matrix.
-  Eigen::Matrix<double, kStateSize, kMeasurementSize> K_; // Kalman gain matrix.
-  Eigen::SparseMatrix<double> H_; // Measurement matrix.
-//  Eigen::Matrix<double, kMeasurementSize, kStateSize> H_; // Measurement matrix.
-
+  Eigen::Vector3d disturbance_; // TODO: Remove if unnecessary
+  Eigen::Vector3d output_; // TODO: Remove if unnecessary
+  Eigen::Vector3d external_forces_;
   Eigen::Vector3d external_forces_limit_;
 
   // Parameters
+
+  Eigen::Matrix<double, kStateSize, kStateSize> model_A_;   //dynamics matrix
+  Eigen::Matrix<double, kStateSize, kInputSize> model_B_;   //transfer matrix
+  Eigen::Matrix<double, kStateSize, kInputSize> model_Bd_;  //Disturbance transfer matrix
+
+  Eigen::Matrix<double, kStateSize, kOutputSize> L_state_;   //dynamics matrix
+  Eigen::Matrix<double, kDisturbanceSize, 1> L_disturbance_; // Use this with asDiagonal()
+
   double roll_tau_;
   double roll_gain_;
 
@@ -144,6 +148,10 @@ class Integral_DO_first_order
   double yaw_gain_;
 
   double sampling_time_;
+  double prediction_sampling_time_;  
+
+  Eigen::Vector3d state_observer_gains;
+  Eigen::Vector3d disturbance_observer_gains;
 
   ros::ServiceServer service_;
   ros::Publisher observer_state_pub_;
@@ -156,19 +164,12 @@ class Integral_DO_first_order
   bool startCalibration();
 
   void initialize();
-  
 
-  void construct_KF_matrices(
-    std::vector<double> &temporary_drag,
-    std::vector<double> &temporary_external_forces_limit,
-
-    double P0_position, 
-    double P0_velocity, 
-    double P0_attitude, 
-    double P0_force
+  void constructModelMatrices(
+    std::vector<double> &temporary_external_forces_limit
   );
 
-  void systemDynamics(double dt);
+  void estimateDisturbance();
   bool startCalibrationCallback(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
 
   dynamic_reconfigure::Server<mav_integral_disturbance_observer_first_order::Integral_DO_first_orderConfig> dyn_config_server_;
@@ -176,6 +177,9 @@ class Integral_DO_first_order
   void DynConfigCallback(mav_integral_disturbance_observer_first_order::Integral_DO_first_orderConfig &config, uint32_t level);
 
   void loadROSParams();
+  
+  // Debug
+  bool verbose_;
 
 };
 }

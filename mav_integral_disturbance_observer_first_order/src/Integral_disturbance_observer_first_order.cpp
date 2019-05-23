@@ -46,14 +46,10 @@ Integral_DO_first_order::Integral_DO_first_order(const ros::NodeHandle& nh,
       observer_nh_(private_nh, "Integral_observer_first_order"),
       initialized_(false),
       is_calibrating_(false),
-      F_(kStateSize, kStateSize),
-      H_(kMeasurementSize, kStateSize),
+      verbose_(true),
       dyn_config_server_(ros::NodeHandle(private_nh, "Integral_observer_first_order")),
       calibration_counter_(0)
 {
-  state_covariance_.setZero();
-  process_noise_covariance_.setZero();
-  measurement_covariance_.setZero();
 
   // initialize params to reasonable values
   roll_tau_ = 1.0;
@@ -93,7 +89,7 @@ bool Integral_DO_first_order::startCalibration()
 void Integral_DO_first_order::initialize()
 {
 
-  ROS_INFO("start initializing mav_integral_disturbance_observer_first_order:KF");
+  ROS_INFO("start initializing mav_integral_disturbance_observer_first_order");
 
   service_ = observer_nh_.advertiseService("StartCalibrateIDO_first_order",
                                            &Integral_DO_first_order::startCalibrationCallback, this);
@@ -107,22 +103,23 @@ void Integral_DO_first_order::initialize()
 
   loadROSParams();
 
+  // TODO remove predicted_state_ or state_ as necessary
   state_.setZero();
   predicted_state_.setZero();
   forces_offset_.setZero();
 
   initialized_ = true;
 
-  ROS_INFO("First Order Kalman Filter Initialized!");
+  ROS_INFO("First Order Integral Disturbance Observer Initialized!");
 
 }
 
 void Integral_DO_first_order::loadROSParams()
 {
-  std::vector<double> temporary_drag;
-  std::vector<double> temporary_external_forces_limit;
-
-  double P0_position, P0_velocity, P0_attitude, P0_force;
+  std::vector<double> L_state_tmp(kOutputSize);
+  std::vector<double> L_disturbance_tmp(kDisturbanceSize);
+  std::vector<double> drag_coefficients(3);
+  std::vector<double> temporary_external_forces_limit(3);
 
   double calibration_duration;
   if (!observer_nh_.getParam("calibration_duration", calibration_duration)) {
@@ -160,26 +157,6 @@ void Integral_DO_first_order::loadROSParams()
     abort();
   }
 
-  if (!observer_nh_.getParam("P0_position", P0_position)) {
-    ROS_ERROR("P0_position in IDO_first_order is not loaded from ros parameter server");
-    abort();
-  }
-
-  if (!observer_nh_.getParam("P0_velocity", P0_velocity)) {
-    ROS_ERROR("P0_velocity in IDO_first_order is not loaded from ros parameter server");
-    abort();
-  }
-
-  if (!observer_nh_.getParam("P0_attitude", P0_attitude)) {
-    ROS_ERROR("P0_attitude in IDO_first_order is not loaded from ros parameter server");
-    abort();
-  }
-
-  if (!observer_nh_.getParam("P0_force", P0_force)) {
-    ROS_ERROR("P0_force in IDO_first_order is not loaded from ros parameter server");
-    abort();
-  }
-
   if (!private_nh_.getParam("sampling_time", sampling_time_)) {
     ROS_ERROR("sampling_time in IDO_first_order is not loaded from ros parameter server");
     abort();
@@ -190,99 +167,122 @@ void Integral_DO_first_order::loadROSParams()
     abort();
   }
 
-  if (!observer_nh_.getParam("drag_coefficients", temporary_drag)) {
+  if (!observer_nh_.getParam("drag_coefficients", drag_coefficients)) {
     ROS_ERROR("drag_coefficients in IDO_first_order are not loaded from ros parameter server");
     abort();
   }
 
+  drag_coefficients_ << drag_coefficients.at(0), drag_coefficients.at(1), drag_coefficients.at(2);
+  // TODO initialise L_state_ and L_disturbance_
+  
+  if (!observer_nh_.getParam("L_state", L_state_tmp)) {
+    ROS_ERROR("L_state in IDO_first_order are not loaded from ros parameter server");
+    abort();
+  }
+  
+  if (!observer_nh_.getParam("L_disturbance", L_disturbance_tmp)) {
+    ROS_ERROR("L_disturbance in IDO_first_order are not loaded from ros parameter server");
+    abort();
+  }
+
+  if (!observer_nh_.getParam("prediction_sampling_time", prediction_sampling_time_)) {
+    ROS_ERROR("L_disturbance in IDO_first_order are not loaded from ros parameter server");
+    abort();
+  }
+  
+  for (int i = 0; i < kOutputSize; i++) {
+    L_state_(i, i) = L_state_tmp.at(i);
+  }
+  for (int i = 0; i < kDisturbanceSize; i++) {
+    L_disturbance_(i) = L_disturbance_tmp.at(i);
+  }
+
   ROS_INFO("Read IDO_first_order parameters successfully");
 
-  construct_KF_matrices(
-    temporary_drag, 
-    temporary_external_forces_limit,
-
-    P0_position,
-    P0_velocity,
-    P0_attitude,
-    P0_force
+  constructModelMatrices(
+    temporary_external_forces_limit
   );
 }
 
-void Integral_DO_first_order::construct_KF_matrices(
-  std::vector<double> &temporary_drag,
-  std::vector<double> &temporary_external_forces_limit,
+void Integral_DO_first_order::constructModelMatrices(
+  std::vector<double> &temporary_external_forces_limit
+)
+{
+  //construct model matrices
+  Eigen::MatrixXd A_continous_time(kStateSize, kStateSize);
+  A_continous_time = Eigen::MatrixXd::Zero(kStateSize, kStateSize);
+  Eigen::MatrixXd B_continous_time;
+  B_continous_time = Eigen::MatrixXd::Zero(kStateSize, kInputSize);
+  Eigen::MatrixXd Bd_continous_time;
+  Bd_continous_time = Eigen::MatrixXd::Zero(kStateSize, kDisturbanceSize);
 
-  double P0_position, 
-  double P0_velocity, 
-  double P0_attitude, 
-  double P0_force
- )
- {
+  // TODO: Remove gravity if necessary
 
-  Eigen::MatrixXd F_continous_time(kStateSize, kStateSize);
-  F_continous_time.setZero();
+  A_continous_time(0, 3) = 1;
+  A_continous_time(1, 4) = 1;
+  A_continous_time(2, 5) = 1;
+  A_continous_time(3, 3) = -drag_coefficients_(0);
+  A_continous_time(3, 7) = kGravity;
+  A_continous_time(4, 4) = -drag_coefficients_(1);
+  A_continous_time(4, 6) = -kGravity;
+  A_continous_time(5, 5) = -drag_coefficients_(2);
+  A_continous_time(6, 6) = -1.0 / roll_tau_;
+  A_continous_time(7, 7) = -1.0 / pitch_tau_;
+  A_continous_time(8, 8) = -1.0 / yaw_tau_;
 
-  F_continous_time.block<3, 3>(0, 3) = Eigen::MatrixXd::Identity(3, 3);
-  F_continous_time.block<3, 3>(3, 3) = -1.0
-      * Eigen::DiagonalMatrix<double, 3>(temporary_drag.at(0), temporary_drag.at(1),
-                                         temporary_drag.at(2));
-  F_continous_time.block<3, 3>(3, 9) = Eigen::MatrixXd::Identity(3, 3);
-  //TODO: Fix this
-  F_continous_time.block<3, 3>(6, 6) = -1.0
-      * Eigen::DiagonalMatrix<double, 3>(1/roll_tau_, 1/pitch_tau_, 1/yaw_tau_);
+  B_continous_time(5, 2) = 1.0;
+  B_continous_time(6, 0) = roll_gain_ / roll_tau_;
+  B_continous_time(7, 1) = pitch_gain_ / pitch_tau_;
+  B_continous_time(8, 2) = yaw_gain_ / yaw_tau_;
 
-  F_ = (sampling_time_ * F_continous_time).exp().sparseView();
+  Bd_continous_time(3, 0) = 1.0;
+  Bd_continous_time(4, 1) = 1.0;
+  Bd_continous_time(5, 2) = 1.0;
 
-  ROS_INFO("IDO_first_order F_matrix initialized successfully");
+  model_A_ = (prediction_sampling_time_ * A_continous_time).exp();
 
-  // First 9x9 (=measurement size) block is identity, rest is zero.
-  H_.reserve(kMeasurementSize);
-  for (int i = 0; i < kMeasurementSize; ++i) {
-    H_.insert(i, i) = 1.0;
+  Eigen::MatrixXd integral_exp_A;
+  integral_exp_A = Eigen::MatrixXd::Zero(kStateSize, kStateSize);
+  const int count_integral_A = 100;
+
+  for (int i = 0; i < count_integral_A; i++) {
+    integral_exp_A += (A_continous_time * prediction_sampling_time_ * i / count_integral_A).exp()
+        * prediction_sampling_time_ / count_integral_A;
   }
 
-  for (int i = 0; i < 3; i++) {
-    initial_state_covariance_(i) = P0_position;
-    initial_state_covariance_(i + 3) = P0_velocity;
-    initial_state_covariance_(i + 6) = P0_attitude;
-    initial_state_covariance_(i + 9) = P0_force;
+  model_B_ = integral_exp_A * B_continous_time;
+  model_Bd_ = integral_exp_A * Bd_continous_time;
+
+  if (verbose_) {
+    ROS_INFO_STREAM("IDO_first_order, A_continuous_time: \n" << A_continous_time);
+    ROS_INFO_STREAM("IDO_first_order, B_continuous_time: \n" << B_continous_time);
+    ROS_INFO_STREAM("IDO_first_order, Bd_continuous_time: \n" << Bd_continous_time);
+    ROS_INFO_STREAM("IDO_first_order, A: \n" << model_A_);
+    ROS_INFO_STREAM("IDO_first_order, B: \n" << model_B_);
+    ROS_INFO_STREAM("IDO_first_order, B_d: \n" << model_Bd_);
   }
-
-  state_covariance_ = initial_state_covariance_.asDiagonal();
-
-  ROS_INFO_STREAM("IDO_first_order state_covariance_: \n" << state_covariance_);
 
   Eigen::Map<Eigen::Vector3d> external_forces_limit_map(temporary_external_forces_limit.data(), 3,
                                                         1);
 
   external_forces_limit_ = external_forces_limit_map;
 
-  F_.makeCompressed();
-
-  drag_coefficients_matrix_.setZero();
-  for (int i = 0; i < 3; i++) {
-    drag_coefficients_matrix_(i, i) = temporary_drag.at(i);
-  }
-  ROS_INFO("Updated IDO_first_order Matrices successfully");
 }
 
 void Integral_DO_first_order::DynConfigCallback(
     mav_integral_disturbance_observer_first_order::Integral_DO_first_orderConfig &config, uint32_t level)
 {
 
-  std::vector<double> temporary_drag(3);
   std::vector<double> temporary_external_forces_limit(3);
-
-  double P0_position, P0_velocity, P0_attitude, P0_force;
 
   if (config.calibrate == true) {
     startCalibration();
     config.calibrate = false;
   }
 
-  temporary_drag.at(0) = config.groups.drag_coefficients.drag_coefficients_x;
-  temporary_drag.at(1) = config.groups.drag_coefficients.drag_coefficients_y;
-  temporary_drag.at(2) = config.groups.drag_coefficients.drag_coefficients_z;
+  drag_coefficients_(0) = config.groups.drag_coefficients.drag_coefficients_x;
+  drag_coefficients_(1) = config.groups.drag_coefficients.drag_coefficients_y;
+  drag_coefficients_(2) = config.groups.drag_coefficients.drag_coefficients_z;
 
   roll_tau_ = config.roll_tau;
   roll_gain_ = config.roll_gain;
@@ -293,34 +293,20 @@ void Integral_DO_first_order::DynConfigCallback(
   yaw_tau_ = config.roll_tau;
   yaw_gain_ = config.roll_gain;
 
-  P0_position = config.P0_position;
-  P0_velocity = config.P0_velocity;
-  P0_attitude = config.P0_attitude;
-  P0_force = config.P0_force;
-
   temporary_external_forces_limit.at(0) = config.groups.external_forces_limit.external_forces_limit_x;
   temporary_external_forces_limit.at(1) = config.groups.external_forces_limit.external_forces_limit_y;
   temporary_external_forces_limit.at(2) = config.groups.external_forces_limit.external_forces_limit_z;
 
-  for (size_t i = 0; i < 3; i++) {
-    process_noise_covariance_(i) = config.q_position;
-    process_noise_covariance_(i + 3) = config.q_velocity;
-    process_noise_covariance_(i + 6) = config.q_attitude;
-    process_noise_covariance_(i + 9) = config.q_force;
+  L_state_(0, 0) = config.groups.L_state.L_state_x;
+  //L_state_(1, 1) = config.groups.L_state.L_state_y;
+  //L_state_(2, 2) = config.groups.L_state.L_state_z;
 
-    measurement_covariance_(i) = config.r_position;
-    measurement_covariance_(i + 3) = config.r_velocity;
-    measurement_covariance_(i + 6) = config.r_attitude;
-  }
+  //L_disturbance_(0) = config.groups.L_disturbance.L_disturbance_x;
+  //L_disturbance_(1) = config.groups.L_disturbance.L_disturbance_y;
+  //L_disturbance_(2) = config.groups.L_disturbance.L_disturbance_z;
 
-  construct_KF_matrices(
-    temporary_drag, 
-    temporary_external_forces_limit,
-
-    P0_position,
-    P0_velocity,
-    P0_attitude,
-    P0_force
+  constructModelMatrices(
+    temporary_external_forces_limit
   );
 
   ROS_INFO("mav_integral_disturbance_observer_first_order:IDO_first_order dynamic config is called successfully");
@@ -360,9 +346,6 @@ void Integral_DO_first_order::reset(const Eigen::Vector3d& initial_position,
                                   const Eigen::Vector3d& initial_external_forces
                                   )
 {
-
-  state_covariance_ = initial_state_covariance_.asDiagonal();
-
   state_.setZero();
 
   state_.segment(0, 3) = initial_position;
@@ -376,58 +359,31 @@ bool Integral_DO_first_order::updateEstimator()
   if (initialized_ == false)
     return false;
 
-  ROS_INFO_ONCE("KF is updated for first time.");
-  static ros::Time t_previous = ros::Time::now();
-  static bool do_once = true;
-  double dt;
+  ROS_INFO_ONCE("IDO is updated for first time.");
 
-  if (do_once) {
-    dt = 0.01;
-    do_once = false;
-  } else {
-    ros::Time t0 = ros::Time::now();
-    dt = (t0 - t_previous).toSec();
-    t_previous = t0;
-  }
-
-  //check that dt is not so different from 0.01
-  if (dt > 0.015) {
-    dt = 0.015;
-  }
-
-  if (dt < 0.005) {
-    dt = 0.005;
-  }
-
-  state_covariance_ = F_ * state_covariance_ * F_.transpose();
-  state_covariance_.diagonal() += process_noise_covariance_;
-
-  //predict state
-  systemDynamics(dt);
-
-  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp = H_ * state_covariance_
-      * H_.transpose() + measurement_covariance_.asDiagonal().toDenseMatrix();
-
-  K_ = state_covariance_ * H_.transpose() * tmp.inverse();
+  //predict state and disturbance
+  estimateDisturbance();
 
   //Update with measurements
-  state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
+  state_ = predicted_state_;
 
-  //Update covariance
-  state_covariance_ = (Eigen::Matrix<double, kStateSize, kStateSize>::Identity() - K_ * H_)
-      * state_covariance_;
-
-  //Limits on estimated_disturbances
+  //Limits on estimated states
   if (state_.allFinite() == false) {
     ROS_ERROR("The estimated state in Integral_DO_first_order has a non-finite element");
     return false;
   }
-  Eigen::Vector3d external_forces = state_.segment(9, 3);
+  //Limits on estimated disturbacnes
+  if (disturbance_.allFinite() == false) {
+    ROS_ERROR("The estimated disturbance in Integral_DO_first_order has a non-finite element");
+    return false;
+  }
+
+  Eigen::Vector3d external_forces = disturbance_.segment(0, 3);
 
   external_forces = external_forces.cwiseMax(-external_forces_limit_);
   external_forces = external_forces.cwiseMin(external_forces_limit_);
 
-  state_.segment(9, 3) << external_forces;
+  disturbance_.segment(0, 3) << external_forces;
 
   if (is_calibrating_ == true) {
     ROS_INFO_THROTTLE(1.0, "calibrating IDO_first_order...");
@@ -450,7 +406,7 @@ bool Integral_DO_first_order::updateEstimator()
       msg->position[i] = state_(i);
       msg->velocity[i] = state_(i + 3);
       msg->attitude[i] = state_(i + 6);
-      msg->external_forces[i] = state_(i + 9);
+      msg->external_forces[i] = disturbance_(i);
       msg->forces_offset[i] = forces_offset_(i);
     }
 
@@ -459,47 +415,45 @@ bool Integral_DO_first_order::updateEstimator()
   return true;
 }
 
-void Integral_DO_first_order::systemDynamics(double dt)
+void Integral_DO_first_order::estimateDisturbance()
 {
-  Eigen::Vector3d old_position = state_.segment(0, 3);
-  Eigen::Vector3d old_velocity = state_.segment(3, 3);
-  Eigen::Vector3d old_attitude = state_.segment(6, 3);
-  Eigen::Vector3d old_external_forces = state_.segment(9, 3);
+  Eigen::Matrix<double, kStateSize, 1> measured_state;  // [pos, vel, rpy]
+  measured_state.setZero();
+  Eigen::Matrix<double, kInputSize, 1> input;
+  input.setZero();
+  Eigen::Matrix<double, kOutputSize, 1> output;
+  output.setZero();
+  Eigen::Matrix<double, kOutputSize, 1> output_est_error;
+  output_est_error.setZero();
+  Eigen::Matrix<double, kDisturbanceSize, 1> disturbance_tmp;
+  disturbance_tmp.setZero();
 
-  const Eigen::Vector3d thrust(0.0, 0.0, this->roll_pitch_yaw_thrust_cmd_(3));
+  input.segment(0, kInputSize) = roll_pitch_yaw_thrust_cmd_.segment(0, 3);
 
-  const Eigen::Vector3d acceleration = rotation_matrix_ * thrust + Eigen::Vector3d(0, 0, -kGravity)
-      + this->drag_coefficients_matrix_ * old_velocity + old_external_forces;
+  measured_state = measurements_.segment(0, kStateSize);
 
-  const Eigen::Vector3d new_velocity = old_velocity + acceleration * dt;
+  output.segment(0, kOutputSize) = measured_state.segment(0, kOutputSize);
 
-  const Eigen::Vector3d new_position = old_position + old_velocity * dt
-      + 0.5 * acceleration * dt * dt;
+  // e(k) = y(k) - y_estimated(k)
+  // y(k) = C * measured_state = measured_state.segment(0, 3)
+  // y_estimated(k) = C * predicted_state_ = predicted_state_.segment()
 
-  Eigen::Vector3d new_omega;
+  output_est_error.segment(0, kOutputSize) = measured_state.segment(0, kOutputSize) - predicted_state_.segment(0, kOutputSize);
 
-// TODO :Fix this
-  new_omega(0) =
-    (1/roll_tau_) * (roll_gain_ * roll_pitch_yaw_thrust_cmd_(0) - old_attitude(0));
-  new_omega(1) =
-    (1/pitch_tau_) * (pitch_gain_ * roll_pitch_yaw_thrust_cmd_(1) - old_attitude(1));
-  new_omega(2) =
-    (1/yaw_tau_) * (yaw_gain_ * roll_pitch_yaw_thrust_cmd_(2) - old_attitude(2));
+  // TODO: Check if predicted_state_prev needs to be stored
+  // TODO: Add feedInput
+  // TODO: Add feedOutput
 
-  const Eigen::Vector3d new_attitude = old_attitude + new_omega * dt;
-
-  const Eigen::Vector3d new_external_forces = old_external_forces;
-
-  //Eigen::Vector3d new_external_forces = exp(-0.01/2.0 )*old_external_forces; //make external forces decay
-  //Eigen::Vector3d new_external_moments = exp(-0.01/2.0 )*old_external_moments; //make external moments decay
+  disturbance_tmp.segment(0, kDisturbanceSize) = disturbance_.segment(0, kDisturbanceSize);
 
   //Update the state vector
-
-  predicted_state_.segment(0, 3) = new_position;
-  predicted_state_.segment(3, 3) = new_velocity;
-  predicted_state_.segment(6, 3) = new_attitude;
-  predicted_state_.segment(9, 3) = new_external_forces;
-
+  predicted_state_ = 
+    model_A_ * measured_state +
+    model_B_ * input +
+    model_Bd_ * disturbance_tmp +
+    L_state_ * output_est_error;
+  
+  disturbance_ = disturbance_ + L_disturbance_.asDiagonal() * output_est_error;
 }
 
 void Integral_DO_first_order::getEstimatedState(Eigen::VectorXd* estimated_state) const

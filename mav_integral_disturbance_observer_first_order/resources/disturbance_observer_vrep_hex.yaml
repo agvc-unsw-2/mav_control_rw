@@ -1,0 +1,36 @@
+## Kalman Filter Parameters:
+Integral_observer_first_order:
+  calibration_duration: 5 #sec
+  
+  #covariance of initial state
+  P0_position: 0.1
+  P0_velocity: 0.1
+  P0_attitude: 0.1
+  P0_force: 0.1
+  P0_torque: 0.1
+  
+  #process noise
+  q_position: 0.01
+  q_velocity: 0.025
+  q_attitude: 0.015
+  q_force: 0.1
+  q_torque: 0.1
+  
+  #measurement noise
+  r_position: 0.001
+  r_velocity: 0.0012
+  r_attitude: 0.01
+  
+  #limits
+  # setting in yaml file currently broken. Use dynamic reconfigure
+  external_forces_limit:  [ 5.000000, 5.000000, 3.0000000 ]      #m/s^2
+
+  roll_tau: 0.624196
+  roll_gain: 1.173807
+  pitch_tau: 0.549053
+  pitch_gain: 1.136624
+  yaw_tau: 5.0
+  yaw_gain: 1.0
+  
+  drag_coefficients: [0.010000, 0.010000, 0.000000]
+  #drag_coefficients: [0.00000, 0.00000, 0.000000]

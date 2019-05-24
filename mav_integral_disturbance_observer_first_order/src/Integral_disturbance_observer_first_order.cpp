@@ -175,6 +175,11 @@ void Integral_DO_first_order::loadROSParams()
   drag_coefficients_ << drag_coefficients.at(0), drag_coefficients.at(1), drag_coefficients.at(2);
   // TODO initialise L_state_ and L_disturbance_
   
+  if (!observer_nh_.getParam("prediction_sampling_time", prediction_sampling_time_)) {
+    ROS_ERROR("L_disturbance in IDO_first_order are not loaded from ros parameter server");
+    abort();
+  }
+
   if (!observer_nh_.getParam("L_state", L_state_tmp)) {
     ROS_ERROR("L_state in IDO_first_order are not loaded from ros parameter server");
     abort();
@@ -185,16 +190,14 @@ void Integral_DO_first_order::loadROSParams()
     abort();
   }
 
-  if (!observer_nh_.getParam("prediction_sampling_time", prediction_sampling_time_)) {
-    ROS_ERROR("L_disturbance in IDO_first_order are not loaded from ros parameter server");
-    abort();
-  }
   
+  // TODO: Discretise L_state_ and L_disturbance (based on sampling time and prediction time)
+
   for (int i = 0; i < kOutputSize; i++) {
-    L_state_(i, i) = L_state_tmp.at(i);
+    L_state_(i, i) = L_state_tmp.at(i) * prediction_sampling_time_; // discretise
   }
   for (int i = 0; i < kDisturbanceSize; i++) {
-    L_disturbance_(i) = L_disturbance_tmp.at(i);
+    L_disturbance_(i) = L_disturbance_tmp.at(i) * prediction_sampling_time_; // discretise
   }
 
   ROS_INFO("Read IDO_first_order parameters successfully");
@@ -230,7 +233,7 @@ void Integral_DO_first_order::constructModelMatrices(
   A_continous_time(7, 7) = -1.0 / pitch_tau_;
   A_continous_time(8, 8) = -1.0 / yaw_tau_;
 
-  B_continous_time(5, 2) = 1.0;
+  B_continous_time(5, 3) = 1.0; // thrust in N
   B_continous_time(6, 0) = roll_gain_ / roll_tau_;
   B_continous_time(7, 1) = pitch_gain_ / pitch_tau_;
   B_continous_time(8, 2) = yaw_gain_ / yaw_tau_;
@@ -428,7 +431,7 @@ void Integral_DO_first_order::estimateDisturbance()
   Eigen::Matrix<double, kDisturbanceSize, 1> disturbance_tmp;
   disturbance_tmp.setZero();
 
-  input.segment(0, kInputSize) = roll_pitch_yaw_thrust_cmd_.segment(0, 3);
+  input.segment(0, kInputSize) = roll_pitch_yaw_thrust_cmd_.segment(0, kInputSize);
 
   measured_state = measurements_.segment(0, kStateSize);
 

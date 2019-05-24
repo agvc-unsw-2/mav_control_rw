@@ -22,4 +22,5 @@
   <depend>mav_control_interface</depend>
   <depend>mav_disturbance_observer</depend>
   <depend>mav_disturbance_observer_first_order</depend>
+  <depend>mav_integral_disturbance_observer_first_order</depend>
 </package>

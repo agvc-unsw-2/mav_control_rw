@@ -350,11 +350,18 @@ void Integral_DO_first_order::reset(const Eigen::Vector3d& initial_position,
                                   )
 {
   state_.setZero();
+  predicted_state_.setZero();
+  disturbance_.setZero();
 
   state_.segment(0, 3) = initial_position;
   state_.segment(3, 3) = initial_velocity;
   state_.segment(6, 3) = initial_attitude;
   state_.segment(9, 3) = initial_external_forces;
+
+  predicted_state_.segment(0, 3) = initial_position;
+  predicted_state_.segment(3, 3) = initial_velocity;
+  predicted_state_.segment(6, 3) = initial_attitude;
+  predicted_state_.segment(9, 3) = initial_external_forces;
 }
 
 bool Integral_DO_first_order::updateEstimator()
@@ -381,16 +388,16 @@ bool Integral_DO_first_order::updateEstimator()
     return false;
   }
 
-  Eigen::Vector3d external_forces = disturbance_.segment(0, 3);
+  Eigen::Vector3d external_forces_tmp = disturbance_.segment(0, 3);
 
-  external_forces = external_forces.cwiseMax(-external_forces_limit_);
-  external_forces = external_forces.cwiseMin(external_forces_limit_);
+  external_forces_tmp = external_forces_tmp.cwiseMax(-external_forces_limit_);
+  external_forces_tmp = external_forces_tmp.cwiseMin(external_forces_limit_);
 
-  disturbance_.segment(0, 3) << external_forces;
+  disturbance_.segment(0, 3) << external_forces_tmp;
 
   if (is_calibrating_ == true) {
     ROS_INFO_THROTTLE(1.0, "calibrating IDO_first_order...");
-    forces_offset_ += external_forces;
+    forces_offset_ += external_forces_tmp;
     calibration_counter_++;
 
     if ((ros::Time::now() - start_calibration_time_) > calibration_duration_) {
@@ -459,13 +466,13 @@ void Integral_DO_first_order::estimateDisturbance()
   disturbance_ = disturbance_ + L_disturbance_.asDiagonal() * output_est_error;
 }
 
-void Integral_DO_first_order::getEstimatedState(Eigen::VectorXd* estimated_state) const
+void Integral_DO_first_order::getEstimatedDisturbance(Eigen::VectorXd* estimated_disturbance) const
 {
-  assert(estimated_state);
+  assert(estimated_disturbance);
   assert(initialized_);
 
-  estimated_state->resize(kStateSize);
-  *estimated_state = this->state_;
+  estimated_disturbance->resize(kDisturbanceSize);
+  *estimated_disturbance = this->disturbance_;
 }
 
 Integral_DO_first_order::~Integral_DO_first_order()

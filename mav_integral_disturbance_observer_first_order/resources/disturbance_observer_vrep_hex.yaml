@@ -34,3 +34,6 @@ Integral_observer_first_order:
   
   drag_coefficients: [0.010000, 0.010000, 0.000000]
   #drag_coefficients: [0.00000, 0.00000, 0.000000]
+  L_state: [0.010000, 0.010000, 0.0100000] # per second
+  L_disturbance: [0.010000, 0.010000, 0.0100000] # per second
+  prediction_sampling_time: 0.1

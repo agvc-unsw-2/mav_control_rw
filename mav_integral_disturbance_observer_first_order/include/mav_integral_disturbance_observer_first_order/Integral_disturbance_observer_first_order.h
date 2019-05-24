@@ -91,7 +91,7 @@ class Integral_DO_first_order
       return Eigen::Vector3d::Zero();
   }
 
-  void getEstimatedState(Eigen::VectorXd* estimated_state) const;
+  void getEstimatedDisturbance(Eigen::VectorXd* estimated_state) const;
 
   //Feeding
   void feedPositionMeasurement(const Eigen::Vector3d& position);
@@ -124,9 +124,7 @@ class Integral_DO_first_order
   Eigen::Vector4d roll_pitch_yaw_thrust_cmd_;
   Eigen::Vector3d drag_coefficients_;
 
-  Eigen::Vector3d disturbance_; // TODO: Remove if unnecessary
-  Eigen::Vector3d output_; // TODO: Remove if unnecessary
-  Eigen::Vector3d external_forces_;
+  Eigen::Vector3d disturbance_;
   Eigen::Vector3d external_forces_limit_;
 
   // Parameters

@@ -33,14 +33,27 @@ KF_observer_second_order:
 #roll fit percentage: 92.251027%
 
   #model from system identification (2nd order attitude model)
-  #drag_coefficients: [0.020000, 0.020000, 0.000000]
+
   drag_coefficients: [0.00000, 0.00000, 0.000000]
-  roll_gain: 0.991811
-  roll_damping: 0.999770
-  roll_omega: 4.039406
-  pitch_gain: 0.989065
-  pitch_damping: 1.000000
-  pitch_omega: 3.580602
+
+  # Paramaters for PID P gain of 500
+  roll_gain: 1.000981
+  roll_damping: 0.750533
+  roll_omega: 15.985684
+  pitch_gain: 1.004625
+  pitch_damping: 0.903276
+  pitch_omega: 18.495585
   yaw_gain: 1.000000
   yaw_damping: 0.950000
   yaw_omega: 5.000000
+
+  # Paramaters for PID P gain of 70
+  # roll_gain: 0.991811
+  # roll_damping: 0.999770
+  # roll_omega: 4.039406
+  # pitch_gain: 0.989065
+  # pitch_damping: 1.000000
+  # pitch_omega: 3.580602
+  # yaw_gain: 1.000000
+  # yaw_damping: 0.950000
+  # yaw_omega: 5.000000

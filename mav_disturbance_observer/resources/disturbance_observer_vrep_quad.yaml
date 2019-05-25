@@ -28,14 +28,39 @@ KF_observer_second_order:
   external_forces_limit :  [ 5.000000 ,5.000000 ,3.0000000]      #m/s^2
   external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
 
-  #model from system identification (2nd order attitude model)
   drag_coefficients: [0.00000, 0.00000, 0.000000]
-  roll_gain: 1.024860
-  roll_damping: 1.000000
-  roll_omega: 2.860295
-  pitch_gain: 1.032659
-  pitch_damping: 1.000000
-  pitch_omega: 2.815358
+  
+  #model from system identification (2nd order attitude model)
+
+  # Time constants for PID P gain of 600
+  roll_gain: 1.000298
+  roll_damping: 0.463114
+  roll_omega: 11.336867
+  pitch_gain: 1.008354
+  pitch_damping: 0.476652
+  pitch_omega: 11.264051
   yaw_gain: 1.000000
   yaw_damping: 0.950000
   yaw_omega: 5.000000
+
+  # Time constants for PID gains of 200
+  roll_gain: 1.007134
+  roll_damping: 0.839112
+  roll_omega: 6.639183
+  pitch_gain: 0.999276
+  pitch_damping: 0.847333
+  pitch_omega: 6.560188
+  yaw_gain: 1.000000
+  yaw_damping: 0.950000
+  yaw_omega: 5.000000
+
+  # Time constants for PID gains of 60
+  # roll_gain: 1.024860
+  # roll_damping: 1.000000
+  # roll_omega: 2.860295
+  # pitch_gain: 1.032659
+  # pitch_damping: 1.000000
+  # pitch_omega: 2.815358
+  # yaw_gain: 1.000000
+  # yaw_damping: 0.950000
+  # yaw_omega: 5.000000

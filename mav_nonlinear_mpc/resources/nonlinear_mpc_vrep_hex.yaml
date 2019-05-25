@@ -16,15 +16,21 @@
 
 ## Controller Parameters:
 mass: 1.650000
-roll_time_constant: 0.624196
-roll_gain: 1.173807
-#roll_gain: 0.6
-pitch_time_constant: 0.549053
-pitch_gain: 1.136624
-#pitch_gain: 0.6
-#linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
-linear_drag_coefficients: [0.00000, 0.00000, 0.000000]
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+
+# Parameters for PID P gain of 500:
+roll_time_constant: 0.105720
+roll_gain: 1.090762
+pitch_time_constant: 0.104006
+pitch_gain: 1.050036
 yaw_gain: 1.000000
+
+# Paramaters for PID P gain of 70:
+# roll_time_constant: 0.624196
+# roll_gain: 1.173807
+# pitch_time_constant: 0.549053
+# pitch_gain: 1.136624
+# yaw_gain: 1.000000
 
 # dynamic config default values:
 q_x : 80

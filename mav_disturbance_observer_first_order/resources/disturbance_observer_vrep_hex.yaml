@@ -22,7 +22,6 @@ KF_observer_first_order:
   r_attitude: 0.01
   
   #limits
-  # setting in yaml file currently broken. Use dynamic reconfigure
   external_forces_limit:  [ 5.000000, 5.000000, 3.0000000 ]      #m/s^2
 
   roll_tau: 0.624196

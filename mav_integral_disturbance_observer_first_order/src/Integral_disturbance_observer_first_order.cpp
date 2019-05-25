@@ -52,14 +52,14 @@ Integral_DO_first_order::Integral_DO_first_order(const ros::NodeHandle& nh,
 {
 
   // initialize params to reasonable values
-  roll_tau_ = 1.0;
-  roll_gain_ = 1.0;
+  //roll_tau_ = 1.0;
+  //roll_gain_ = 1.0;
 
-  pitch_tau_ = 1.0;
-  pitch_gain_ = 1.0;
+  //pitch_tau_ = 1.0;
+  //pitch_gain_ = 1.0;
 
-  yaw_tau_ = 1.0;
-  yaw_gain_ = 1.0;
+  //yaw_tau_ = 1.0;
+  //yaw_gain_ = 1.0;
 
   initialize();
 }
@@ -173,31 +173,23 @@ void Integral_DO_first_order::loadROSParams()
   }
 
   drag_coefficients_ << drag_coefficients.at(0), drag_coefficients.at(1), drag_coefficients.at(2);
-  // TODO initialise L_state_ and L_disturbance_
-  
-  if (!observer_nh_.getParam("prediction_sampling_time", prediction_sampling_time_)) {
-    ROS_ERROR("L_disturbance in IDO_first_order are not loaded from ros parameter server");
-    abort();
-  }
 
-  if (!observer_nh_.getParam("L_state", L_state_tmp)) {
-    ROS_ERROR("L_state in IDO_first_order are not loaded from ros parameter server");
+  if (!observer_nh_.getParam("state_observer_gains", L_state_tmp)) {
+    ROS_ERROR("state_observer_gains in IDO_first_order are not loaded from ros parameter server");
     abort();
   }
   
-  if (!observer_nh_.getParam("L_disturbance", L_disturbance_tmp)) {
-    ROS_ERROR("L_disturbance in IDO_first_order are not loaded from ros parameter server");
+  if (!observer_nh_.getParam("disturbance_observer_gains", L_disturbance_tmp)) {
+    ROS_ERROR("disturbance_observer_gains in IDO_first_order are not loaded from ros parameter server");
     abort();
   }
 
-  
-  // TODO: Discretise L_state_ and L_disturbance (based on sampling time and prediction time)
-
+  // Initialise _L_state_ and L_disturbance_
   for (int i = 0; i < kOutputSize; i++) {
-    L_state_(i, i) = L_state_tmp.at(i) * prediction_sampling_time_; // discretise
+    L_state_(i, i) = L_state_tmp.at(i) * sampling_time_; // discretise
   }
   for (int i = 0; i < kDisturbanceSize; i++) {
-    L_disturbance_(i) = L_disturbance_tmp.at(i) * prediction_sampling_time_; // discretise
+    L_disturbance_(i) = L_disturbance_tmp.at(i) * sampling_time_; // discretise
   }
 
   ROS_INFO("Read IDO_first_order parameters successfully");
@@ -242,15 +234,15 @@ void Integral_DO_first_order::constructModelMatrices(
   Bd_continous_time(4, 1) = 1.0;
   Bd_continous_time(5, 2) = 1.0;
 
-  model_A_ = (prediction_sampling_time_ * A_continous_time).exp();
+  model_A_ = (sampling_time_ * A_continous_time).exp();
 
   Eigen::MatrixXd integral_exp_A;
   integral_exp_A = Eigen::MatrixXd::Zero(kStateSize, kStateSize);
   const int count_integral_A = 100;
 
   for (int i = 0; i < count_integral_A; i++) {
-    integral_exp_A += (A_continous_time * prediction_sampling_time_ * i / count_integral_A).exp()
-        * prediction_sampling_time_ / count_integral_A;
+    integral_exp_A += (A_continous_time * sampling_time_ * i / count_integral_A).exp()
+        * sampling_time_ / count_integral_A;
   }
 
   model_B_ = integral_exp_A * B_continous_time;
@@ -300,14 +292,15 @@ void Integral_DO_first_order::DynConfigCallback(
   temporary_external_forces_limit.at(1) = config.groups.external_forces_limit.external_forces_limit_y;
   temporary_external_forces_limit.at(2) = config.groups.external_forces_limit.external_forces_limit_z;
 
-  L_state_(0, 0) = config.groups.state_observer_gains.state_observer_gains_x * prediction_sampling_time_;
-  L_state_(1, 1) = config.groups.state_observer_gains.state_observer_gains_y * prediction_sampling_time_;
-  L_state_(2, 2) = config.groups.state_observer_gains.state_observer_gains_z * prediction_sampling_time_;
+  L_state_(0, 0) = config.groups.state_observer_gains.state_observer_gains_x * sampling_time_;
+  L_state_(1, 1) = config.groups.state_observer_gains.state_observer_gains_y * sampling_time_;
+  L_state_(2, 2) = config.groups.state_observer_gains.state_observer_gains_z * sampling_time_;
 
-  L_disturbance_(0) = config.groups.disturbance_observer_gains.disturbance_observer_gains_x * prediction_sampling_time_;
-  L_disturbance_(1) = config.groups.disturbance_observer_gains.disturbance_observer_gains_y * prediction_sampling_time_;
-  L_disturbance_(2) = config.groups.disturbance_observer_gains.disturbance_observer_gains_z * prediction_sampling_time_;
+  L_disturbance_(0) = config.groups.disturbance_observer_gains.disturbance_observer_gains_x * sampling_time_;
+  L_disturbance_(1) = config.groups.disturbance_observer_gains.disturbance_observer_gains_y * sampling_time_;
+  L_disturbance_(2) = config.groups.disturbance_observer_gains.disturbance_observer_gains_z * sampling_time_;
 
+  // TODO: Decide whether we want to reset disturbances when changing in dynamic config
   constructModelMatrices(
     temporary_external_forces_limit
   );

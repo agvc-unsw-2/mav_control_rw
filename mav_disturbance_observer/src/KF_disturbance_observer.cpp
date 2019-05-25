@@ -464,7 +464,7 @@ bool KFDisturbanceObserver::updateEstimator()
   double dt;
 
   if (do_once) {
-    dt = 0.01;
+    dt = sampling_time_;
     do_once = false;
   } else {
     ros::Time t0 = ros::Time::now();
@@ -472,13 +472,13 @@ bool KFDisturbanceObserver::updateEstimator()
     t_previous = t0;
   }
 
-  //check that dt is not so different from 0.01
-  if (dt > 0.015) {
-    dt = 0.015;
+  //check that dt is not so different from default sampling time of 0.01
+  if (dt > sampling_time_ * 1.5) {
+    dt = sampling_time_ * 1.5;
   }
 
-  if (dt < 0.005) {
-    dt = 0.005;
+  if (dt < sampling_time_ * 0.5) {
+    dt = sampling_time_ * 0.5;
   }
 
   state_covariance_ = F_ * state_covariance_ * F_.transpose();

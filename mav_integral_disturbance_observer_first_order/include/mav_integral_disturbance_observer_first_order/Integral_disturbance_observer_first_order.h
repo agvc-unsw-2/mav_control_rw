@@ -146,7 +146,6 @@ class Integral_DO_first_order
   double yaw_gain_;
 
   double sampling_time_;
-  double prediction_sampling_time_;  
 
   Eigen::Vector3d state_observer_gains;
   Eigen::Vector3d disturbance_observer_gains;

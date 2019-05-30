@@ -13,5 +13,8 @@ Integral_observer_first_order:
   
   drag_coefficients: [0.010000, 0.010000, 0.000000]
   #drag_coefficients: [0.00000, 0.00000, 0.000000]
-  state_observer_gains: [1.000000, 1.000000, 1.000000] # per second
-  disturbance_observer_gains: [1.00000, 1.00000, 1.000000] # per second
+  #state_observer_gains: [0.010000, 0.010000, 0.010000] # per second
+  state_observer_gains: [10.000000, 10.000000, 10.000000] # per second
+  #disturbance_observer_gains: [0.00000, 0.00000, 0.00000] # per second
+  #disturbance_observer_gains: [0.010000, 0.010000, 0.010000] # per second
+  disturbance_observer_gains: [1.00000, 1.00000, 1.000000] # per second  

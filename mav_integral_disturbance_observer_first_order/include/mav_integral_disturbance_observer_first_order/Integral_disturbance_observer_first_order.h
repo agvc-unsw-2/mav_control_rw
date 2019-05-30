@@ -132,6 +132,7 @@ class Integral_DO_first_order
   Eigen::Matrix<double, kStateSize, kStateSize> model_A_;   //dynamics matrix
   Eigen::Matrix<double, kStateSize, kInputSize> model_B_;   //transfer matrix
   Eigen::Matrix<double, kStateSize, kDisturbanceSize> model_Bd_;  //Disturbance transfer matrix
+  Eigen::Matrix<double, kOutputSize, kStateSize> model_C_;  //Disturbance transfer matrix
 
   Eigen::Matrix<double, kStateSize, kOutputSize> L_state_;   //dynamics matrix
   Eigen::Matrix<double, kDisturbanceSize, 1> L_disturbance_; // Use this with asDiagonal()

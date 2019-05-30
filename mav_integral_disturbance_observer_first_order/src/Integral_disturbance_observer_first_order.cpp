@@ -188,6 +188,7 @@ void Integral_DO_first_order::loadROSParams()
   for (int i = 0; i < kOutputSize; i++) {
     L_state_(i, i) = L_state_tmp.at(i) * sampling_time_; // discretise
   }
+
   for (int i = 0; i < kDisturbanceSize; i++) {
     L_disturbance_(i) = L_disturbance_tmp.at(i) * sampling_time_; // discretise
   }
@@ -197,6 +198,11 @@ void Integral_DO_first_order::loadROSParams()
   constructModelMatrices(
     temporary_external_forces_limit
   );
+
+  if (verbose_) {
+    ROS_INFO_STREAM("IDO_first_order, L_state_: \n" << L_state_);
+    ROS_INFO_STREAM("IDO_first_order, L_disturbance_: \n" << L_disturbance_);
+  }
 }
 
 void Integral_DO_first_order::constructModelMatrices(
@@ -210,6 +216,9 @@ void Integral_DO_first_order::constructModelMatrices(
   B_continous_time = Eigen::MatrixXd::Zero(kStateSize, kInputSize);
   Eigen::MatrixXd Bd_continous_time;
   Bd_continous_time = Eigen::MatrixXd::Zero(kStateSize, kDisturbanceSize);
+
+  Eigen::MatrixXd model_C_(kStateSize, kStateSize);
+  model_C_ = Eigen::MatrixXd::Zero(kOutputSize, kStateSize);
 
   // TODO: Remove gravity if necessary
 
@@ -247,6 +256,9 @@ void Integral_DO_first_order::constructModelMatrices(
 
   model_B_ = integral_exp_A * B_continous_time;
   model_Bd_ = integral_exp_A * Bd_continous_time;
+  model_C_(0, 0) = 1;
+  model_C_(1, 1) = 1;
+  model_C_(2, 2) = 1;
 
   if (verbose_) {
     ROS_INFO_STREAM("IDO_first_order, A_continuous_time: \n" << A_continous_time);
@@ -255,12 +267,14 @@ void Integral_DO_first_order::constructModelMatrices(
     ROS_INFO_STREAM("IDO_first_order, A: \n" << model_A_);
     ROS_INFO_STREAM("IDO_first_order, B: \n" << model_B_);
     ROS_INFO_STREAM("IDO_first_order, B_d: \n" << model_Bd_);
+    ROS_INFO_STREAM("IDO_first_order, C: \n" << model_C_);
   }
 
   Eigen::Map<Eigen::Vector3d> external_forces_limit_map(temporary_external_forces_limit.data(), 3,
                                                         1);
 
   external_forces_limit_ = external_forces_limit_map;
+
 
 }
 
@@ -304,6 +318,11 @@ void Integral_DO_first_order::DynConfigCallback(
   constructModelMatrices(
     temporary_external_forces_limit
   );
+
+  if (verbose_) {
+    ROS_INFO_STREAM("IDO_first_order, L_state_: \n" << L_state_);
+    ROS_INFO_STREAM("IDO_first_order, L_disturbance_: \n" << L_disturbance_);
+  }
 
   ROS_INFO("mav_integral_disturbance_observer_first_order:IDO_first_order dynamic config is called successfully");
 
@@ -420,43 +439,66 @@ bool Integral_DO_first_order::updateEstimator()
 
 void Integral_DO_first_order::estimateDisturbance()
 {
-  Eigen::Matrix<double, kStateSize, 1> measured_state;  // [pos, vel, rpy]
-  measured_state.setZero();
   Eigen::Matrix<double, kInputSize, 1> input;
   input.setZero();
   Eigen::Matrix<double, kOutputSize, 1> output;
   output.setZero();
+  Eigen::Matrix<double, kOutputSize, 1> output_est;
+  output_est.setZero();
   Eigen::Matrix<double, kOutputSize, 1> output_est_error;
   output_est_error.setZero();
   Eigen::Matrix<double, kDisturbanceSize, 1> disturbance_tmp;
   disturbance_tmp.setZero();
 
-  input.segment(0, kInputSize) = roll_pitch_yaw_thrust_cmd_.segment(0, kInputSize);
+  //input.segment(0, kInputSize) = roll_pitch_yaw_thrust_cmd_.segment(0, kInputSize);
+  input = roll_pitch_yaw_thrust_cmd_;
+  double mass = 1.0;
+  double hover_thrust = 11.685886;
+  //input(3) = (input(3) - kGravity) / mass; // TODO Make this a global variable rosparam
+  input(3) = input(3) - hover_thrust; // alternate to kGravity / mass
 
-  measured_state = measurements_.segment(0, kStateSize);
-
-  output.segment(0, kOutputSize) = measured_state.segment(0, kOutputSize);
+  //output = model_C_ * measurements_;
+  //output_est = model_C_ * predicted_state_;
+  output.segment(0, kOutputSize) = measurements_.segment(0, kOutputSize);
+  output_est.segment(0, kOutputSize) = predicted_state_.segment(0, kOutputSize);
 
   // e(k) = y(k) - y_estimated(k)
   // y(k) = C * measured_state = measured_state.segment(0, 3)
   // y_estimated(k) = C * predicted_state_ = predicted_state_.segment()
 
-  output_est_error.segment(0, kOutputSize) = measured_state.segment(0, kOutputSize) - predicted_state_.segment(0, kOutputSize);
+  //output_est_error = output_est - output;
+  output_est_error = output - output_est;
+
+  ROS_INFO_STREAM_THROTTLE(1.0, 
+    "\nInput:\n" << input
+  );
+
+  ROS_INFO_STREAM_THROTTLE(1.0, 
+    "\nMeasurements:\n" << measurements_ << 
+    "\nPredicted State:\n" << predicted_state_
+  );
+  ROS_INFO_STREAM_THROTTLE(1.0,
+    "\nOutput:\n" << output << 
+    "\nOutput_est:\n" << output_est << 
+    "\nOutput est error:\n" << output_est_error
+  );
+  //output_est_error = output - output_est; // try other way?
 
   // TODO: Check if predicted_state_prev needs to be stored
   // TODO: Add feedInput
   // TODO: Add feedOutput
 
-  disturbance_tmp.segment(0, kDisturbanceSize) = disturbance_.segment(0, kDisturbanceSize);
+  disturbance_tmp = disturbance_;
+  // disturbance_tmp.segment(0, kDisturbanceSize) = disturbance_.segment(0, kDisturbanceSize);
 
   //Update the state vector
   predicted_state_ = 
-    model_A_ * measured_state +
-    model_B_ * input +
-    model_Bd_ * disturbance_tmp +
-    L_state_ * output_est_error;
+    (model_A_ * predicted_state_) +
+    (model_B_ * input) +
+    (model_Bd_ * disturbance_tmp) +
+    (L_state_ * output_est_error);
   
-  disturbance_ = disturbance_ + L_disturbance_.asDiagonal() * output_est_error;
+  disturbance_ = disturbance_ + (L_disturbance_.asDiagonal() * output_est_error);
 }
 
 void Integral_DO_first_order::getEstimatedDisturbance(Eigen::VectorXd* estimated_disturbance) const

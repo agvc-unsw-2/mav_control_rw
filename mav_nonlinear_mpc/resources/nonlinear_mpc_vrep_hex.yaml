@@ -61,7 +61,7 @@ Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : false
+enable_disturbance_observer : true
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
@@ -73,4 +73,4 @@ prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s
 #  integral_DO_first_order__, //2
 #  integral_DO_second_order__ //3
 #};
-disturbance_observer_type: 1
+disturbance_observer_type: 2

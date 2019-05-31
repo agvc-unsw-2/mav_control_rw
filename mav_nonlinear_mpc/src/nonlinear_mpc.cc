@@ -48,6 +48,7 @@ NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::Node
       KF_DO_first_order_(nh, private_nh),
       KF_DO_second_order_(nh, private_nh),
       Integral_DO_first_order_(nh, private_nh),
+      integral_DO_first_order_(nh, private_nh),
       verbose_(true),
       solve_time_average_(0),
       received_first_odometry_(false)
@@ -328,6 +329,13 @@ void NonlinearModelPredictiveControl::update_Integral_DO_first_order_measurement
   Integral_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
   Integral_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
   Integral_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+}
+
+void NonlinearModelPredictiveControl::update_integral_DO_first_order_measurements() {
+  integral_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  integral_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
+  integral_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  integral_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 }
 
 void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(

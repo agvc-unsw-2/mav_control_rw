@@ -42,6 +42,7 @@
 #include <mav_disturbance_observer/KF_disturbance_observer.h>
 #include <mav_disturbance_observer_first_order/KF_disturbance_observer_first_order.h>
 #include <mav_integral_disturbance_observer_first_order/Integral_disturbance_observer_first_order.h>
+#include <integral_disturbance_observer_first_order/integral_disturbance_observer_first_order.h>
 #include <std_srvs/Empty.h>
 #include <lapacke.h>
 
@@ -255,13 +256,15 @@ class NonlinearModelPredictiveControl
   void update_KF_DO_first_order_measurements();
   void update_KF_DO_second_order_measurements();
   void update_Integral_DO_first_order_measurements();
+  void update_integral_DO_first_order_measurements();
 
 
   enum Disturbance_Observer_Types {
     KF_DO_first_order__,
     KF_DO_second_order__,
     Integral_DO_first_order__,
-    Integral_DO_second_order__
+    integral_DO_first_order__,
+    Integral_DO_second_order__,
   };
 
   Disturbance_Observer_Types disturbance_observer_type_;
@@ -269,7 +272,8 @@ class NonlinearModelPredictiveControl
   bool enable_disturbance_observer_;
   KF_DO_first_order KF_DO_first_order_; // KF disturbance observer with first order model
   KFDisturbanceObserver KF_DO_second_order_; // KF disturbance observer with second order model
-  Integral_DO_first_order Integral_DO_first_order_; // KF disturbance observer with second order model
+  Integral_DO_first_order Integral_DO_first_order_; // integral disturbance observer with first order model
+  integral_DO_first_order integral_DO_first_order_; // new version of integral disturbance observer with first order model
   // TODO: Insert 1st and 2nd order IDO here
 
   // commands

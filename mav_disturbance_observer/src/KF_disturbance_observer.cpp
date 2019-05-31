@@ -288,6 +288,7 @@ void KFDisturbanceObserver::construct_KF_matrices(
 
   // First 9x9 (=measurement size) block is identity, rest is zero.
   H_.reserve(kMeasurementSize);
+  H_.setZero(); // set to 0
   for (int i = 0; i < kMeasurementSize; ++i) {
     H_.insert(i, i) = 1.0;
   }

@@ -73,4 +73,4 @@ prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s
 #  integral_DO_first_order__, //2
 #  integral_DO_second_order__ //3
 #};
-disturbance_observer_type: 2
+disturbance_observer_type: 1

@@ -236,11 +236,14 @@ void KF_DO_first_order::construct_KF_matrices(
   ROS_INFO("KF_first_order F_matrix initialized successfully");
 
   // First 9x9 (=measurement size) block is identity, rest is zero.
+  //ROS_INFO_STREAM("\nH_ init:\n" << H_);
   H_.reserve(kMeasurementSize);
+  H_.setZero();
+  //ROS_INFO_STREAM("\nH_ reserved:\n" << H_);
   for (int i = 0; i < kMeasurementSize; ++i) {
     H_.insert(i, i) = 1.0;
   }
-
+  ROS_INFO_STREAM("\nH_ inserted:\n" << H_);
   for (int i = 0; i < 3; i++) {
     initial_state_covariance_(i) = P0_position;
     initial_state_covariance_(i + 3) = P0_velocity;
@@ -410,8 +413,31 @@ bool KF_DO_first_order::updateEstimator()
 
   K_ = state_covariance_ * H_.transpose() * tmp.inverse();
 
+  Eigen::Matrix<double, kStateSize, 1> output_est_error;
+  Eigen::Matrix<double, kMeasurementSize, 1> meas_error;
+  Eigen::Matrix<double, kMeasurementSize, 1> est_output;
+  est_output = H_ * state_;
+  meas_error = (measurements_ - H_ * state_);
+  output_est_error = K_ * (measurements_ - H_ * state_);
+
+  // ROS_INFO_STREAM_THROTTLE(1.0,
+  //   "\nH_:\n" << H_ <<
+  //   "\nK_:\n" << K_ <<
+  //   "\nstate_before:\n" << state_
+  // );
+
   //Update with measurements
   state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
+
+
+  // ROS_INFO_STREAM_THROTTLE(1.0, 
+  //   "\nest_output:\n" << est_output <<
+  //   "\nmeasurements_:\n" << measurements_ <<
+  //   "\nmeas_error:\n" << meas_error <<
+  //   "\noutput_est_error:\n" << output_est_error <<
+  //   "\npredicted_state_:\n" << predicted_state_ <<
+  //   "\nstate_:\n" << state_
+  // );
 
   //Update covariance
   state_covariance_ = (Eigen::Matrix<double, kStateSize, kStateSize>::Identity() - K_ * H_)

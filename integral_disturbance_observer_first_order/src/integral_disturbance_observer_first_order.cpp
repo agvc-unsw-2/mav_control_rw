@@ -74,7 +74,7 @@ bool integral_DO_first_order::startCalibrationCallback(std_srvs::Empty::Request&
   if (startCalibration()) {
     return true;
   }
-  ROS_WARN("IDO_first_order Calibration Failed...");
+  ROS_WARN("integral_DO_first_order Calibration Failed...");
   return false;
 }
 
@@ -95,7 +95,7 @@ void integral_DO_first_order::initialize()
 
   ROS_INFO("start initializing integral_disturbance_observer_first_order");
 
-  service_ = observer_nh_.advertiseService("StartCalibrateIDO_first_order",
+  service_ = observer_nh_.advertiseService("StartCalibrateintegral_DO_first_order",
                                            &integral_DO_first_order::startCalibrationCallback, this);
 
   observer_state_pub_ = observer_nh_.advertise<integral_disturbance_observer_first_order::ObserverState>(
@@ -126,76 +126,76 @@ void integral_DO_first_order::loadROSParams()
 
   double calibration_duration;
   if (!observer_nh_.getParam("calibration_duration", calibration_duration)) {
-    ROS_ERROR("calibration_duration in IDO_first_order are not loaded from ros parameter server");
+    ROS_ERROR("calibration_duration in integral_DO_first_order are not loaded from ros parameter server");
     abort();
   }
   calibration_duration_ = ros::Duration(calibration_duration);
 
   if (!observer_nh_.getParam("roll_tau", roll_tau_)) {
-    ROS_ERROR("roll_tau in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("roll_tau in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("roll_gain", roll_gain_)) {
-    ROS_ERROR("roll_gain in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("roll_gain in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("pitch_tau", pitch_tau_)) {
-    ROS_ERROR("pitch_tau in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("pitch_tau in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("pitch_gain", pitch_gain_)) {
-    ROS_ERROR("pitch_gain in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("pitch_gain in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("yaw_tau", yaw_tau_)) {
-    ROS_ERROR("yaw_tau in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("yaw_tau in integral_DO_first_order is not loaded from ros parameter server");
   }
 
   if (!observer_nh_.getParam("yaw_gain", yaw_gain_)) {
-    ROS_ERROR("yaw_gain in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("yaw_gain in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_position", P0_position)) {
-    ROS_ERROR("P0_position in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("P0_position in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_velocity", P0_velocity)) {
-    ROS_ERROR("P0_velocity in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("P0_velocity in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_attitude", P0_attitude)) {
-    ROS_ERROR("P0_attitude in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("P0_attitude in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("P0_force", P0_force)) {
-    ROS_ERROR("P0_force in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("P0_force in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("sampling_time", sampling_time_)) {
-    ROS_ERROR("sampling_time in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("sampling_time in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("external_forces_limit", temporary_external_forces_limit)) {
-    ROS_ERROR("external_forces_limit in IDO_first_order is not loaded from ros parameter server");
+    ROS_ERROR("external_forces_limit in integral_DO_first_order is not loaded from ros parameter server");
     abort();
   }
 
   if (!observer_nh_.getParam("drag_coefficients", temporary_drag)) {
-    ROS_ERROR("drag_coefficients in IDO_first_order are not loaded from ros parameter server");
+    ROS_ERROR("drag_coefficients in integral_DO_first_order are not loaded from ros parameter server");
     abort();
   }
 
-  ROS_INFO("Read IDO_first_order parameters successfully");
+  ROS_INFO("Read integral_DO_first_order parameters successfully");
 
   construct_IDO_matrices(
     temporary_drag, 
@@ -233,7 +233,7 @@ void integral_DO_first_order::construct_IDO_matrices(
 
   F_ = (sampling_time_ * F_continous_time).exp().sparseView();
 
-  ROS_INFO("IDO_first_order F_matrix initialized successfully");
+  ROS_INFO("integral_DO_first_order F_matrix initialized successfully");
 
   // First 9x9 (=measurement size) block is identity, rest is zero.
   //ROS_INFO_STREAM("\nH_ init:\n" << H_);
@@ -253,7 +253,7 @@ void integral_DO_first_order::construct_IDO_matrices(
 
   state_covariance_ = initial_state_covariance_.asDiagonal();
 
-  ROS_INFO_STREAM("IDO_first_order state_covariance_: \n" << state_covariance_);
+  ROS_INFO_STREAM("integral_DO_first_order state_covariance_: \n" << state_covariance_);
 
   Eigen::Map<Eigen::Vector3d> external_forces_limit_map(temporary_external_forces_limit.data(), 3,
                                                         1);
@@ -266,7 +266,7 @@ void integral_DO_first_order::construct_IDO_matrices(
   for (int i = 0; i < 3; i++) {
     drag_coefficients_matrix_(i, i) = temporary_drag.at(i);
   }
-  ROS_INFO("Updated IDO_first_order Matrices successfully");
+  ROS_INFO("Updated integral_DO_first_order Matrices successfully");
 }
 
 void integral_DO_first_order::DynConfigCallback(
@@ -326,7 +326,7 @@ void integral_DO_first_order::DynConfigCallback(
     P0_force
   );
 
-  ROS_INFO("integral_disturbance_observer_first_order:IDO_first_order dynamic config is called successfully");
+  ROS_INFO("integral_disturbance_observer_first_order:integral_DO_first_order dynamic config is called successfully");
 
 }
 
@@ -456,7 +456,7 @@ bool integral_DO_first_order::updateEstimator()
   state_.segment(9, 3) << external_forces;
 
   if (is_calibrating_ == true) {
-    ROS_INFO_THROTTLE(1.0, "calibrating IDO_first_order...");
+    ROS_INFO_THROTTLE(1.0, "calibrating integral_DO_first_order...");
     forces_offset_ += external_forces;
     calibration_counter_++;
 

@@ -18,11 +18,12 @@ from math import cos
 from math import sin
 
 class Path_Publisher(object):
-    def __init__(self, mav_name, uav_num, circle_r, altitude, vel_mag, ref_time_step, publish_interval):
+    def __init__(self, mav_name, uav_num, midpoint, circle_r, altitude, vel_mag, ref_time_step, publish_interval):
         rospy.init_node('publish_full_circle_path' + uav_num, anonymous=False)
         self.pub = rospy.Publisher(
             '/' + mav_name + uav_num + '/command/trajectory', MultiDOFJointTrajectory, queue_size=1
         )
+        self.midpoint = midpoint
         self.circle_r = circle_r
         self.altitude = altitude
         self.vel_scale_factor = vel_mag/circle_r
@@ -71,9 +72,9 @@ class Path_Publisher(object):
                 # generate 2 * points required before next publish interval
                 for i in range(self.N):
                     t = t_since_start + (i * self.ref_time_step)
-                    p_ref = Vector3(d*cos(mu*t), d*sin(mu*t), self.altitude)
-                    v_ref = Vector3(-mu*d*sin(mu*t), mu*d*cos(mu*t), 0.0)
-                    a_ref = Vector3(-mu**2*d*cos(mu*t), -mu**2*d*sin(mu*t), 0.0)
+                    p_ref = Vector3(0, 0, self.midpoint + d*cos(mu*t))
+                    v_ref = Vector3(0, 0, -mu*d*sin(mu*t))
+                    a_ref = Vector3(0, 0, -mu**2*d*cos(mu*t))
                     #roll = 0
                     #pitch = 0
                     #yaw = math.atan2(v_ref[1],v_ref[0])
@@ -100,14 +101,16 @@ uav_num = str(myargs[2])
 if __name__ == '__main__':
     print('-----------------------')
     print("Launching " + myargs[0] + '...')
-    circle_r = 0.7
+    midpoint = 3.0
+    circle_r = 1.0
     altitude = 1.0
-    vel_mag = 0.5
+    vel_mag = 1.0
     publish_interval = 2.0 #s
     ref_time_step = 0.01 #s
     publisher_obj = Path_Publisher(
         mav_name, 
         uav_num, 
+        midpoint,
         circle_r, 
         altitude, 
         vel_mag, 

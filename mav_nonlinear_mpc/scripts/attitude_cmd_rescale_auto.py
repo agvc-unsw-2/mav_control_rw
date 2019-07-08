@@ -53,6 +53,7 @@ class Echo_From_Vrep(object):
         self.msg_to_publish = msg
         self.msg_to_publish = self.scale_msg(self.msg_to_publish)
         #print("Scaled RC message")
+        #self.msg_to_publish.yaw_rate *= -1 # flip yawrate
         self.pub.publish(self.msg_to_publish)
 
     def dyn_config_callback(self, config, level):

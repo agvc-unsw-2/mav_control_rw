@@ -100,9 +100,9 @@ uav_num = str(myargs[2])
 if __name__ == '__main__':
     print('-----------------------')
     print("Launching " + myargs[0] + '...')
-    circle_r = 0.7
+    circle_r = 2.0
     altitude = 1.0
-    vel_mag = 0.5
+    vel_mag = 3.0
     publish_interval = 2.0 #s
     ref_time_step = 0.01 #s
     publisher_obj = Path_Publisher(

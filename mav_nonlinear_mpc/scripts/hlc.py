@@ -22,14 +22,13 @@ from std_msgs.msg import Bool
 
 # Does not check for collisions while testing
 
-class tester():
+class High_Level_Controller():
     __initialized = False
     def __init__(self, mav_name, uav_num):
-        if tester.__initialized:
-            raise Exception("Tester already initialised")
-        tester.__initialized = True
-        tester.name = "tester"
-        tester.retVal = 0
+        if self.__initialized:
+            raise Exception("High_Level_Controller already initialised")
+        self.__initialized = True
+        self.retVal = 0
 
         self.search_height = 1.0
         self.hover_height = 1.0
@@ -45,19 +44,36 @@ class tester():
     def goToWaypoint(self, pose_cmd):
         self.pose_pubber.publish(pose_cmd)
         while(not at_waypoint(pose_cmd, self.odom_subber.msg)):
-            time.sleep(0.1)
+            #print("At: ")
+            #print(self.odom_subber.msg)
+            position = copy.deepcopy(self.odom_subber.msg.pose.pose.position)
+            print("At [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z)) + ']'
+            self.pose_pubber.publish(pose_cmd)
+            time.sleep(0.5)
         time.sleep(self.wait_time) # Wait
     
     # Same as goToPose but position Point msg instead of Pose cmd
     def goToPosition(self, position):
+        print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z)) + ']'
         orientation = Quaternion(0.0, 0.0, 0.0, 1.0) # For rotation
         pose_cmd = Pose(position, orientation)
         self.goToWaypoint(pose_cmd)
 
-    def followTraj(self, traj_time):
+    def publishPositionForTime(self, position, pos_hold_time):
+        now_secs = rospy.get_time()
+        end_time = now_secs + pos_hold_time
+        print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z)) + ']'
+        orientation = Quaternion(0.0, 0.0, 0.0, 1.0) # For rotation
+        pose_cmd = Pose(position, orientation)
+        self.pose_pubber.publish(pose_cmd)
+        print(pose_cmd)
+        while(rospy.get_time() < end_time):
+            time.sleep(0.1)
+
+    def followTraj(self, traj_msg, traj_time):
         # PUBLISH_TRAJ_CMD
-        self.traj_pubber.publish(self.traj_msg)
-        final_point = self.traj_msg.points[-1].transforms[0].translation
+        self.traj_pubber.publish(traj_msg)
+        final_point = traj_msg.points[-1].transforms[0].translation
         now_secs = rospy.get_time()
         now_obj = rospy.get_rostime()
         # Wait required time
@@ -74,26 +90,12 @@ class tester():
         position = copy.deepcopy(self.odom_subber.msg.pose.pose.position)
         orientation = Quaternion(0.0, 0.0, 0.0, 1.0) # For rotation
         pose_cmd = Pose(position, orientation)
+        print("Going to hover waypoint:")
         self.goToWaypoint(pose_cmd)
-
-    def move_in_square(self):
-        time_before_start = 2.0
-        print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z))
-        position = Point(-1, -1, self.hover_height)
-        self.goToPosition(position)
-        time.sleep(time_before_start - self.wait_time)
-        position = Point(1, -1, self.hover_height)
-        print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z))
-        self.goToPosition(position)
-        position = Point(1, 1, self.hover_height)
-        print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z))
-        self.goToPosition(position)
-        position = Point(-1, 1, self.hover_height)
-        print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z))
-        self.goToPosition(position)
-        position = Point(-1, -1, self.hover_height)
-        print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z))
-        self.goToPosition(position)
+        #position = Point(0, 0, self.hover_height)
+        #print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z)) + ']'
+        #self.publishPositionForTime(position, self.wait_time)
+        print("Hover finished")
 
     def land(self):
         orientation = Quaternion(0.0, 0.0, 0.0, 1.0) # For rotation
@@ -203,42 +205,6 @@ class traj_publisher:
         self.setpoint.points = traj_points
         self.pub.publish(self.setpoint)
 
-    def generate_circle_path(self, r, vel_mag):
-        r = self.circle_r
-        mu = vel_mag/r # velocity scale factor
-        zero_vec = Vector3(0.0, 0.0, 0.0) # For angular velocity and acceleration
-        rotation = Quaternion(0.0, 0.0, 0.0, 1.0) # For rotation
-        now_secs = rospy.get_time()
-        now_obj = rospy.get_rostime()
-        traj_time = vel_mag * (2.0 * math.pi * r) # t = speed * distance
-        num_points = int((float(traj_time) / float(ref_time_step))) + 1 # + 1 just in case
-        if now_secs <= 0: # simulation hasn't started
-            # Hover in space
-            return False # failed generation
-        else:
-            #print(now_secs)
-            if self.t0 == -1.0:
-                self.t0 = now_secs
-            t_since_start = now_secs - self.t0
-            # Account for time moving backwards
-            if t_since_start < 0:
-                self.t0 = now_secs
-                t_since_start = 0.0
-            rotation = Quaternion(0.0, 0.0, 0.0, 1.0)
-            for i in range(num_points):
-                t = t_since_start + (i * self.ref_time_step)
-                p_ref = Vector3(r*cos(mu*t), r*sin(mu*t), self.altitude)
-                v_ref = Vector3(-mu*r*sin(mu*t), mu*r*cos(mu*t), 0.0)
-                a_ref = Vector3(-(mu*mu)*r*cos(mu*t), -(mu*mu)*r*sin(mu*t), 0.0)
-                self.traj_msg.points[i].transforms = [Transform(p_ref, rotation)]
-                self.traj_msg.points[i].velocities = [Twist(v_ref, zero_vec)]
-                self.traj_msg.points[i].accelerations = [Twist(a_ref, zero_vec)]
-                self.traj_msg.points[i].time_from_start = rospy.Time.from_sec(t)
-            self.traj_msg.header.stamp = now_obj
-            self.t_last_published = t_since_start
-            return True
-        return False # You shouldn't reach this line
-
 class gripper_controller:
     def __init__(self, mav_name, uav_num):
         # Initialise ros publisher
@@ -251,24 +217,3 @@ class gripper_controller:
         self.status.data = msgData
         self.pub.publish(self.status)
 
-def main(mav_name, uav_num):
-    
-    print("Initialising tester")
-    rospy.init_node('python_hlc', anonymous=True)
-    hlc = tester(mav_name, uav_num)
-    print("Hovering")
-    hlc.hover()
-    print("Moving in square")
-    hlc.move_in_square()
-    print("Landing")
-    hlc.land()
-
-if __name__ == "__main__":
-    if(len(sys.argv) == 1):
-        mav_name = "vrep_hex"
-        uav_num = "1"
-    elif (len(sys.argv) == 3):
-        mav_name = str(sys.argv[0])
-        uav_num = str(sys.argv[1])
-
-    main(mav_name, uav_num)

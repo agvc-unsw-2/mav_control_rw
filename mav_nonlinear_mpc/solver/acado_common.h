@@ -42,6 +42,7 @@ extern "C"
 #define ACADO_QPDUNES  3
 /** HPMPC QP solver indicator. */
 #define ACADO_HPMPC    4
+#define ACADO_GENERIC    5
 
 /** Indicator for determining the QP solver used by the ACADO solver code. */
 #define ACADO_QP_SOLVER ACADO_QPOASES
@@ -61,10 +62,11 @@ extern "C"
 /** Indicator for fixed initial state. */
 #define ACADO_INITIAL_STATE_FIXED 1
 /** Number of control/estimation intervals. */
-//#define ACADO_N 20 // default
 #define ACADO_N 20
 /** Number of online data values. */
 #define ACADO_NOD 9
+/** Number of path constraints. */
+#define ACADO_NPAC 0
 /** Number of control variables. */
 #define ACADO_NU 3
 /** Number of differential variables. */
@@ -80,7 +82,7 @@ extern "C"
 /** Total number of QP optimization variables. */
 #define ACADO_QP_NV 60
 /** Number of integration steps per shooting interval. */
-#define ACADO_RK_NIS 1
+#define ACADO_RK_NIS 2
 /** Number of Runge-Kutta stages per integration step. */
 #define ACADO_RK_NSTAGES 1
 /** Providing interface for arrival cost. */
@@ -167,8 +169,8 @@ real_t ubValues[ 60 ];
  */
 typedef struct ACADOworkspace_
 {
-/** Column vector of size: 62 */
-real_t rhs_aux[ 62 ];
+/** Column vector of size: 75 */
+real_t rhs_aux[ 75 ];
 
 /** Column vector of size: 180 */
 real_t d[ 180 ];

@@ -20,12 +20,13 @@ USING_NAMESPACE_ACADO
 
 int main( )
 {
-
     double Ts = 0.1;  // prediction sampling time
     double N  = 20;   // Prediction horizon
     double g = 9.8066;
     double PI = 3.1415926535897932;
 
+    // States (x)
+    // (TODO: CHANGE)
     DifferentialState velocity1; //velocity x_w
     DifferentialState velocity2; //velocity y_w
     DifferentialState velocity3; //velocity z_w
@@ -35,10 +36,14 @@ int main( )
     DifferentialState position1; //x_w
     DifferentialState position2; //y_w
     DifferentialState position3; //z_w
+
+    // Control inputs (u) (DO NOT CHANGE)
     Control roll_ref;
     Control pitch_ref;
     Control thrust;
 
+    // Parameters (from launch file for calculations)
+    // TODO: CHANGE
     OnlineData roll_tau;
     OnlineData roll_gain;
     OnlineData pitch_tau;
@@ -49,7 +54,7 @@ int main( )
     OnlineData external_forces2;
     OnlineData external_forces3;
 
-    // Non-linear drag
+    // Non-linear drag equations (DO NOT CHANGE)
     IntermediateState dragacc1 =   sin(pitch)*linear_drag_coefficient1*thrust*velocity3
                                  + cos(pitch)*cos(yaw)*linear_drag_coefficient1*thrust*velocity1
                                  - cos(pitch)*linear_drag_coefficient1*sin(yaw)*thrust*velocity2;
@@ -58,6 +63,7 @@ int main( )
                                  - cos(pitch)*linear_drag_coefficient2*sin(roll)*thrust*velocity3;
 
     // Model equations:
+    // TODO: CHANGE
     DifferentialEquation f;
 
     f << dot(velocity1)   == ((cos(roll)*cos(yaw)*sin(pitch) + sin(roll)*sin(yaw))*thrust - dragacc1 + external_forces1);
@@ -71,13 +77,18 @@ int main( )
     f << dot( position3 ) == velocity3;
 
     // Reference functions and weighting matrices:
+    // TODO: Decipher and change
     Function h;
+    // Add states
     h << position1 << position2 << position3;
     h << velocity1 << velocity2 << velocity3;
     h << roll      << pitch;
+    // Add control inputs
     h << roll_ref  << pitch_ref << (cos(pitch)*cos(roll)*thrust - g);
 
+    // Reference for terminal state
     Function hN;
+    // Add other states
     hN << position1 << position2 << position3;
     hN << velocity1 << velocity2 << velocity3;
 
@@ -90,7 +101,9 @@ int main( )
 
     ocp.subjectTo(f);
 
+    // LQR main
     ocp.minimizeLSQ(W, h);
+    // LQR terminal error
     ocp.minimizeLSQEndTerm(WN, hN);
 
     // Dummy constraints, real ones set online

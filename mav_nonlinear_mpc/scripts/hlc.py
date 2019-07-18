@@ -73,12 +73,20 @@ class High_Level_Controller():
     def followTraj(self, traj_msg, traj_time):
         # PUBLISH_TRAJ_CMD
         self.traj_pubber.publish(traj_msg)
-        final_point = traj_msg.points[-1].transforms[0].translation
+        first_point = MultiDOFJointTrajectoryPoint_to_Pose_Cmd(traj_msg.points[0])
+        final_point = MultiDOFJointTrajectoryPoint_to_Pose_Cmd(traj_msg.points[-1])
+        print("First point:")
+        print(first_point)
+        print("Final point:")
+        print(final_point)
         now_secs = rospy.get_time()
         now_obj = rospy.get_rostime()
         # Wait required time
-        while(rospy.get_time() < now_secs + traj_time):
+        # minus 1 to check a bit early
+        while(rospy.get_time() < now_secs + (traj_time - 1.0)):
+            #self.traj_pubber.publish(traj_msg)
             time.sleep(0.1)
+        print("Checking for final position")
         # Check at final point
         while(not at_waypoint(final_point, self.odom_subber.msg)):
             time.sleep(0.1)
@@ -92,17 +100,20 @@ class High_Level_Controller():
         pose_cmd = Pose(position, orientation)
         print("Going to hover waypoint:")
         self.goToWaypoint(pose_cmd)
-        #position = Point(0, 0, self.hover_height)
-        #print("Moving to [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z)) + ']'
-        #self.publishPositionForTime(position, self.wait_time)
         print("Hover finished")
 
     def land(self):
-        orientation = Quaternion(0.0, 0.0, 0.0, 1.0) # For rotation
+        print("Landing")
         self.hover()
         position = Point(0, 0, self.hover_height)
         self.goToPosition(position)
         position = Point(0, 0, self.land_height)
+        self.goToPosition(position)
+
+    def takeoff(self):
+        print("Taking off")
+        position = copy.deepcopy(self.odom_subber.msg.pose.pose.position)
+        position.z = self.hover_height
         self.goToPosition(position)
 
 # Check if value in range
@@ -128,6 +139,13 @@ def at_quat(q1, q2, threshold):
                 if inRange(q1.w, q2.w, threshold):
                     is_at_quat = True
     return is_at_quat
+
+def MultiDOFJointTrajectoryPoint_to_Pose_Cmd(multiDofPoint):
+    pose_cmd = Pose()
+    position = multiDofPoint.transforms[0].translation
+    pose_cmd.position = Point(position.x, position.y, position.z)
+    pose_cmd.orientation = copy.deepcopy(multiDofPoint.transforms[0].rotation)
+    return pose_cmd
 
 def at_waypoint(pose_cmd, odom):
     is_at_waypoint = True
@@ -199,10 +217,10 @@ class traj_publisher:
         self.setpoint = MultiDOFJointTrajectory()
         self.t0 = -1.0
 
-    def publish(self, traj_points):
+    def publish(self, traj_msg):
         self.setpoint.header.stamp = rospy.get_rostime()
         self.setpoint.header.seq += 1
-        self.setpoint.points = traj_points
+        self.setpoint.points = traj_msg.points
         self.pub.publish(self.setpoint)
 
 class gripper_controller:

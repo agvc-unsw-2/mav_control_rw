@@ -26,7 +26,6 @@ int main( )
     double PI = 3.1415926535897932;
 
     // States (x)
-    // (TODO: CHANGE)
     DifferentialState velocity1; //velocity x_w
     DifferentialState velocity2; //velocity y_w
     DifferentialState velocity3; //velocity z_w
@@ -47,7 +46,6 @@ int main( )
     Control thrust;
 
     // Parameters (from launch file for calculations)
-    // TODO: CHANGE
     /*OnlineData roll_tau;
     OnlineData roll_gain;
     OnlineData pitch_tau;
@@ -82,7 +80,6 @@ int main( )
                                  - cos(pitch)*linear_drag_coefficient2*sin(roll)*thrust*velocity3;
 
     // Model equations:
-    // TODO: CHANGE
     DifferentialEquation f;
     // Ax = -drag_acc
     // Bu = rot_matrix * thrust
@@ -101,18 +98,16 @@ int main( )
     f << dot( position2 ) == velocity2;
     f << dot( position3 ) == velocity3;
     // New f dot states
-    // TODO Check disturbance observer state estimation and port here
     // rpy frame is local so don't need rotation matrix
     // Ax = -((omega_n^2 * roll) + ((2 * zeta * omega_n) * roll_dot)
     // Bu = omega_n^2 * (gain * ref_command)
     // Bd * d = external_moments
-    // roll_dot_dot = roll_accel = 
+    // roll_dot_dot = roll_accel = Ax + Bu + Bd
     f << dot( roll_dot ) == (roll_gain * roll_omega * roll_omega) * roll_ref - (2 * roll_damping * roll_omega * roll_dot + roll_omega * roll_omega * roll);
     f << dot( pitch_dot ) == (pitch_gain * pitch_omega * pitch_omega) * pitch_ref - (2 * pitch_damping * pitch_omega * pitch_dot + pitch_omega * pitch_omega * pitch);;
     f << dot( yaw_dot ) == 0;
 
     // Reference functions and weighting matrices:
-    // TODO: Decipher and change
     Function h;
     // Add states
     h << position1 << position2 << position3;

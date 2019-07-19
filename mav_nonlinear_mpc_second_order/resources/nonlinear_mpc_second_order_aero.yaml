@@ -61,7 +61,6 @@ q_vz : 100
 q_roll : 10
 q_pitch: 10
 
-# TODO make sure this is incorporated into the actual cost calcs
 q_roll_dot : 10
 q_pitch_dot: 10
 

@@ -486,10 +486,11 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
       empty_2d.transpose(), // set roll_dot and pitch_dot ref to 0
       feed_forward_rp.transpose(), // roll and pitch ref (as input)
       acceleration_ref_[i].z() - estimated_disturbances(2);
-    acado_online_data_.block(i, ACADO_NOD - kDisturbanceSize, 1, kDisturbanceSize) << estimated_disturbances.transpose();
+    // TODO: Fix possible off by 1 error?
+    acado_online_data_.block(i, ACADO_NOD - kDisturbanceSize - 1, 1, kDisturbanceSize) << estimated_disturbances.transpose();
   }
   referenceN_ << position_ref_[ACADO_N].transpose(), velocity_ref_[ACADO_N].transpose();
-  acado_online_data_.block(ACADO_N, ACADO_NOD - kDisturbanceSize, 1, kDisturbanceSize) << estimated_disturbances.transpose();
+  acado_online_data_.block(ACADO_N, ACADO_NOD - kDisturbanceSize - 1, 1, kDisturbanceSize) << estimated_disturbances.transpose();
 
   x_0 << odometry_.getVelocityWorld(), current_rpy, odometry_.position_W;
 

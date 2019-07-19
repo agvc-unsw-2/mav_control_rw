@@ -69,17 +69,25 @@ class NonlinearModelPredictiveControl
   {
     mass_ = mass;
   }
-  void setRollTimeConstant(double roll_time_constant)
+  void setRollDamping(double roll_damping)
   {
-    roll_time_constant_ = roll_time_constant;
+    roll_damping_ = roll_damping;
+  }
+  void setRollOmega(double roll_omega)
+  {
+    roll_omega_ = roll_omega;
   }
   void setRollGain(double roll_gain)
   {
     roll_gain_ = roll_gain;
   }
-  void setPitchTimeConstant(double pitch_time_constant)
+  void setPitchDamping(double pitch_damping)
   {
-    pitch_time_constant_ = pitch_time_constant;
+    pitch_damping_ = pitch_damping;
+  }
+  void setPitchOmega(double pitch_omega)
+  {
+    pitch_omega_ = pitch_omega;
   }
   void setPitchGain(double pitch_gain)
   {
@@ -188,7 +196,7 @@ class NonlinearModelPredictiveControl
 
   // constants
   static constexpr double kGravity = 9.8066;
-  static constexpr int kDisturbanceSize = 3;
+  static constexpr int kDisturbanceSize = 6;
 
   // ros node handles
   ros::NodeHandle nh_, private_nh_;
@@ -208,9 +216,11 @@ class NonlinearModelPredictiveControl
 
   // system model parameters
   double mass_;
-  double roll_time_constant_;
+  double roll_damping_;
+  double roll_omega_;
   double roll_gain_;
-  double pitch_time_constant_;
+  double pitch_damping_;
+  double pitch_omega_;
   double pitch_gain_;
   Eigen::Vector3d drag_coefficients_;
 

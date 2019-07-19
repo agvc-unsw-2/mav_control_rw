@@ -1,3 +1,4 @@
+% THIS FILE IS FOR MATLAB ONLY??? NOT SURE IF I NEED TO CHANGE THIS BOI
 clc;
 clear all;
 close all;

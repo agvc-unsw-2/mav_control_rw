@@ -15,15 +15,6 @@
 #roll fit percentage: 78.777678%
 
 ## Controller Parameters:
-# mass: 1.520000
-# roll_time_constant: 0.624196
-# roll_gain: 1.173807
-# pitch_time_constant: 0.549053
-# pitch_gain: 1.136624
-# linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
-# yaw_gain: 1.000000
-
-# Controller Parameters:
 mass: 1.450000
 
 # Time constants for PID gains of 600
@@ -47,14 +38,6 @@ pitch_omega: 6.560188
 yaw_gain: 1.000000
 yaw_damping: 0.950000
 yaw_omega: 5.000000
-
-# Time constants for PDI gains of 60
-#roll_time_constant: 0.635581
-#roll_gain: 1.275039
-#pitch_time_constant: 0.630045
-#pitch_gain: 1.241289
-#linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
-#yaw_gain: 1.000000
 
 # dynamic config default values:
 q_x : 80

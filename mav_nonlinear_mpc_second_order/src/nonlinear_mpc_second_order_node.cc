@@ -97,9 +97,11 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
 
 	  // Update model parameters
   nonlinear_mpc_second_order_.setMass(config.mass);
-  nonlinear_mpc_second_order_.setRollTimeConstant(config.roll_time_constant);
+  nonlinear_mpc_second_order_.setRollDamping(config.roll_damping);
+  nonlinear_mpc_second_order_.setRollOmega(config.roll_omega);
   nonlinear_mpc_second_order_.setRollGain(config.roll_gain);
-  nonlinear_mpc_second_order_.setPitchTimeConstant(config.pitch_time_constant);
+  nonlinear_mpc_second_order_.setPitchDamping(config.pitch_damping);
+  nonlinear_mpc_second_order_.setPitchOmega(config.pitch_omega);
   nonlinear_mpc_second_order_.setPitchGain(config.pitch_gain);
 
   // Update controller parameters

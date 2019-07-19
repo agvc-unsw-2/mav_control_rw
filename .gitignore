@@ -31,3 +31,6 @@
 
 # Solver build files
 */build/*
+
+# Python compile files
+*.pyc

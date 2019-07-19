@@ -379,6 +379,7 @@ void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
   Eigen::Vector3d current_rpy;
   Eigen::Vector3d current_rpy_dot;
   odometry_.getEulerAngles(&current_rpy);
+  current_rpy_dot.setZero()
   current_rpy_dot << 0, 0, 0; // set rpy_dot to zero for now
 
   mpc_queue_.updateQueue();
@@ -496,7 +497,7 @@ void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
 
   // FUARR BRO YOU NEED TO UPDATE THE STATE SOLVER MATRIX
   // TODO: Add current_rpy_dot
-  x_0 << odometry_.getVelocityWorld(), current_rpy, current_rpy_dot, odometry_.position_W;
+  x_0 << odometry_.getVelocityWorld(), current_rpy, odometry_.position_W, current_rpy_dot;
 
   Eigen::Map<Eigen::Matrix<double, ACADO_NX, 1>>(const_cast<double*>(acadoVariables.x0)) = x_0;
   Eigen::Map<Eigen::Matrix<double, ACADO_NY, ACADO_N>>(const_cast<double*>(acadoVariables.y)) =

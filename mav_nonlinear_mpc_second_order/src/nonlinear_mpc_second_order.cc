@@ -34,10 +34,10 @@
 
 namespace mav_control {
 
-constexpr double NonlinearModelPredictiveControl::kGravity;
-constexpr int NonlinearModelPredictiveControl::kDisturbanceSize;
+constexpr double NMPC_Second_Order::kGravity;
+constexpr int NMPC_Second_Order::kDisturbanceSize;
 
-NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::NodeHandle& nh,
+NMPC_Second_Order::NMPC_Second_Order(const ros::NodeHandle& nh,
                                                                  const ros::NodeHandle& private_nh)
     : nh_(nh),
       private_nh_(private_nh),
@@ -65,7 +65,7 @@ NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::Node
   referenceN_.setZero();
 
   reset_integrator_service_server_ = nh_.advertiseService(
-      "reset_integrator", &NonlinearModelPredictiveControl::resetIntegratorServiceCallback, this);
+      "reset_integrator", &NMPC_Second_Order::resetIntegratorServiceCallback, this);
 
   initializeParameters();
 
@@ -73,19 +73,19 @@ NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::Node
 
 }
 
-NonlinearModelPredictiveControl::~NonlinearModelPredictiveControl()
+NMPC_Second_Order::~NMPC_Second_Order()
 {
 
 }
 
-bool NonlinearModelPredictiveControl::resetIntegratorServiceCallback(std_srvs::Empty::Request &req,
+bool NMPC_Second_Order::resetIntegratorServiceCallback(std_srvs::Empty::Request &req,
                                                                      std_srvs::Empty::Response &res)
 {
   position_error_integration_.setZero();
   return true;
 }
 
-void NonlinearModelPredictiveControl::initializeParameters()
+void NMPC_Second_Order::initializeParameters()
 {
   std::vector<double> drag_coefficients;
 
@@ -170,7 +170,7 @@ void NonlinearModelPredictiveControl::initializeParameters()
     abort();
   }
 
-  disturbance_observer_type_ = static_cast<NonlinearModelPredictiveControl::Disturbance_Observer_Types>(disturbance_observer_type_temp);
+  disturbance_observer_type_ = static_cast<NMPC_Second_Order::Disturbance_Observer_Types>(disturbance_observer_type_temp);
 
   constructModelMatrices();
   initialized_parameters_ = true;
@@ -178,7 +178,7 @@ void NonlinearModelPredictiveControl::initializeParameters()
   ROS_INFO("Nonlinear MPC: initialized correctly");
 }
 
-void NonlinearModelPredictiveControl::constructModelMatrices()
+void NMPC_Second_Order::constructModelMatrices()
 {
   for (int i = 0; i < ACADO_N + 1; i++) {
     acado_online_data_.block(i, 0, 1, ACADO_NOD) << 
@@ -204,7 +204,7 @@ void NonlinearModelPredictiveControl::constructModelMatrices()
   ROS_INFO("Updated acado online data");
 }
 
-void NonlinearModelPredictiveControl::applyParameters()
+void NMPC_Second_Order::applyParameters()
 {
   // TODO: Double check and possibly fix this regarding q_attitude_dot_
   W_.block(0, 0, 3, 3) = q_position_.asDiagonal();
@@ -238,7 +238,7 @@ void NonlinearModelPredictiveControl::applyParameters()
   }
 }
 
-void NonlinearModelPredictiveControl::setOdometry(const mav_msgs::EigenOdometry& odometry)
+void NMPC_Second_Order::setOdometry(const mav_msgs::EigenOdometry& odometry)
 {
   static mav_msgs::EigenOdometry previous_odometry = odometry;
 
@@ -302,13 +302,13 @@ void NonlinearModelPredictiveControl::setOdometry(const mav_msgs::EigenOdometry&
   previous_odometry.orientation_W_B = odometry.orientation_W_B;
 }
 
-void NonlinearModelPredictiveControl::setCommandTrajectoryPoint(
+void NMPC_Second_Order::setCommandTrajectoryPoint(
     const mav_msgs::EigenTrajectoryPoint& command_trajectory)
 {
   mpc_queue_.insertReference(command_trajectory);
 }
 
-void NonlinearModelPredictiveControl::setCommandTrajectory(
+void NMPC_Second_Order::setCommandTrajectory(
     const mav_msgs::EigenTrajectoryPointDeque& command_trajectory)
 {
   int array_size = command_trajectory.size();
@@ -318,7 +318,7 @@ void NonlinearModelPredictiveControl::setCommandTrajectory(
   mpc_queue_.insertReferenceTrajectory(command_trajectory);
 }
 
-void NonlinearModelPredictiveControl::initializeAcadoSolver(Eigen::VectorXd x0)
+void NMPC_Second_Order::initializeAcadoSolver(Eigen::VectorXd x0)
 {
   for (int i = 0; i < ACADO_N + 1; i++) {
     state_.block(i, 0, 1, ACADO_NX) << x0.transpose();
@@ -334,35 +334,35 @@ void NonlinearModelPredictiveControl::initializeAcadoSolver(Eigen::VectorXd x0)
       referenceN_.transpose();
 }
 
-void NonlinearModelPredictiveControl::update_KF_DO_first_order_measurements() {
+void NMPC_Second_Order::update_KF_DO_first_order_measurements() {
   KF_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
   KF_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
   KF_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
   KF_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 }
 
-void NonlinearModelPredictiveControl::update_KF_DO_second_order_measurements() {
+void NMPC_Second_Order::update_KF_DO_second_order_measurements() {
   KF_DO_second_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
   KF_DO_second_order_.feedPositionMeasurement(odometry_.position_W);
   KF_DO_second_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
   KF_DO_second_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 }
 
-void NonlinearModelPredictiveControl::update_Integral_DO_first_order_measurements() {
+void NMPC_Second_Order::update_Integral_DO_first_order_measurements() {
   Integral_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
   Integral_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
   Integral_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
   Integral_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 }
 
-void NonlinearModelPredictiveControl::update_integral_DO_first_order_measurements() {
+void NMPC_Second_Order::update_integral_DO_first_order_measurements() {
   integral_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
   integral_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
   integral_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
   integral_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 }
 
-void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
+void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
     Eigen::Vector4d* ref_attitude_thrust)
 {
   assert(ref_attitude_thrust != nullptr);
@@ -379,6 +379,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   Eigen::Vector3d current_rpy;
   Eigen::Vector3d current_rpy_dot;
   odometry_.getEulerAngles(&current_rpy);
+  current_rpy_dot << 0, 0, 0; // set rpy_dot to zero for now
 
   mpc_queue_.updateQueue();
   mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
@@ -386,7 +387,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   bool observer_update_successful = false;
 
   if (disturbance_observer_type_ == KF_DO_first_order__) {
-    NonlinearModelPredictiveControl::update_KF_DO_first_order_measurements();
+    NMPC_Second_Order::update_KF_DO_first_order_measurements();
     observer_update_successful = KF_DO_first_order_.updateEstimator();
     if (!observer_update_successful) {
       ROS_WARN_THROTTLE(1, "KF_DO_first_order_ failed to update estimator. Resetting");
@@ -396,7 +397,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     }
     KF_DO_first_order_.getEstimatedState(&KF_estimated_state);
   } else if (disturbance_observer_type_ == KF_DO_second_order__) {
-    NonlinearModelPredictiveControl::update_KF_DO_second_order_measurements();
+    NMPC_Second_Order::update_KF_DO_second_order_measurements();
     observer_update_successful = KF_DO_second_order_.updateEstimator();
     if (!observer_update_successful) {
       ROS_WARN_THROTTLE(1, "KF_DO_second_order_ failed to update estimator. Resetting");
@@ -407,7 +408,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     }
     KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
   } else if (disturbance_observer_type_ == Integral_DO_first_order__) {
-    NonlinearModelPredictiveControl::update_Integral_DO_first_order_measurements();
+    NMPC_Second_Order::update_Integral_DO_first_order_measurements();
     observer_update_successful = Integral_DO_first_order_.updateEstimator();
     if (!observer_update_successful) {
       ROS_WARN_THROTTLE(1, "Integral_DO_first_order_ failed to update estimator. Resetting");
@@ -575,7 +576,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
 
 }
 
-Eigen::MatrixXd NonlinearModelPredictiveControl::solveCARE(Eigen::MatrixXd Q, Eigen::MatrixXd R)
+Eigen::MatrixXd NMPC_Second_Order::solveCARE(Eigen::MatrixXd Q, Eigen::MatrixXd R)
 {
   // Define system matrices
   Eigen::MatrixXd A;
@@ -629,7 +630,7 @@ Eigen::MatrixXd NonlinearModelPredictiveControl::solveCARE(Eigen::MatrixXd Q, Ei
   return U11.jacobiSvd(Eigen::ComputeThinU | Eigen::ComputeThinV).solve(U21).transpose();
 }
 
-bool NonlinearModelPredictiveControl::getCurrentReference(
+bool NMPC_Second_Order::getCurrentReference(
     mav_msgs::EigenTrajectoryPoint* reference) const
 {
   assert(reference != nullptr);
@@ -642,7 +643,7 @@ bool NonlinearModelPredictiveControl::getCurrentReference(
   return true;
 }
 
-bool NonlinearModelPredictiveControl::getCurrentReference(
+bool NMPC_Second_Order::getCurrentReference(
     mav_msgs::EigenTrajectoryPointDeque* reference) const
 {
   assert(reference != nullptr);
@@ -660,7 +661,7 @@ bool NonlinearModelPredictiveControl::getCurrentReference(
   return true;
 }
 
-bool NonlinearModelPredictiveControl::getPredictedState(
+bool NMPC_Second_Order::getPredictedState(
     mav_msgs::EigenTrajectoryPointDeque* predicted_state) const
 {
   assert(predicted_state != nullptr);

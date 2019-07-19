@@ -36,37 +36,37 @@
 
 namespace mav_control {
 
-NonLinearModelPredictiveControllerNode::NonLinearModelPredictiveControllerNode(
+NMPC_Second_Order_Node::NMPC_Second_Order_Node(
     const ros::NodeHandle& nh, const ros::NodeHandle& private_nh)
     : nonlinear_mpc_second_order_(nh, private_nh),
       controller_dyn_config_server_(private_nh)
 {
   dynamic_reconfigure::Server<mav_nonlinear_mpc_second_order::NonLinearMPCConfig>::CallbackType f_controller;
-  f_controller = boost::bind(&NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback,
+  f_controller = boost::bind(&NMPC_Second_Order_Node::ControllerDynConfigCallback,
                              this, _1, _2);
   controller_dyn_config_server_.setCallback(f_controller);
 }
 
-NonLinearModelPredictiveControllerNode::~NonLinearModelPredictiveControllerNode()
+NMPC_Second_Order_Node::~NMPC_Second_Order_Node()
 {
 
 }
 
-bool NonLinearModelPredictiveControllerNode::setReferenceArray(
+bool NMPC_Second_Order_Node::setReferenceArray(
     const mav_msgs::EigenTrajectoryPointDeque& reference_array)
 {
   nonlinear_mpc_second_order_.setCommandTrajectory(reference_array);
   return true;
 }
 
-bool NonLinearModelPredictiveControllerNode::setReference(
+bool NMPC_Second_Order_Node::setReference(
     const mav_msgs::EigenTrajectoryPoint& reference)
 {
   nonlinear_mpc_second_order_.setCommandTrajectoryPoint(reference);
   return true;
 }
 
-void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
+void NMPC_Second_Order_Node::ControllerDynConfigCallback(
     mav_nonlinear_mpc_second_order::NonLinearMPCConfig &config, uint32_t level)
 {
   ROS_INFO(
@@ -132,20 +132,20 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
 
 
 
-bool NonLinearModelPredictiveControllerNode::setOdometry(const mav_msgs::EigenOdometry& odometry)
+bool NMPC_Second_Order_Node::setOdometry(const mav_msgs::EigenOdometry& odometry)
 {
   nonlinear_mpc_second_order_.setOdometry(odometry);
   return true;
 }
 
-bool NonLinearModelPredictiveControllerNode::calculateAttitudeThrustCommand(
+bool NMPC_Second_Order_Node::calculateAttitudeThrustCommand(
     mav_msgs::EigenAttitudeThrust* attitude_thrust_command)
 {
   ROS_WARN("calculateAttitudeThrustCommand not implemented");
   return false;
 }
 
-bool NonLinearModelPredictiveControllerNode::calculateRollPitchYawrateThrustCommand(mav_msgs::EigenRollPitchYawrateThrust* attitude_thrust_command){
+bool NMPC_Second_Order_Node::calculateRollPitchYawrateThrustCommand(mav_msgs::EigenRollPitchYawrateThrust* attitude_thrust_command){
   Eigen::Vector4d rpy_thrust;
   nonlinear_mpc_second_order_.calculateRollPitchYawrateThrustCommand(&rpy_thrust);
   attitude_thrust_command->roll = rpy_thrust(0);
@@ -155,21 +155,21 @@ bool NonLinearModelPredictiveControllerNode::calculateRollPitchYawrateThrustComm
   return true;
 }
 
-bool NonLinearModelPredictiveControllerNode::getCurrentReference(
+bool NMPC_Second_Order_Node::getCurrentReference(
     mav_msgs::EigenTrajectoryPoint* reference) const
 {
   assert(reference != nullptr);
   return nonlinear_mpc_second_order_.getCurrentReference(reference);
 }
 
-bool NonLinearModelPredictiveControllerNode::getCurrentReference(
+bool NMPC_Second_Order_Node::getCurrentReference(
     mav_msgs::EigenTrajectoryPointDeque* reference) const
 {
   assert(reference != nullptr);
   return nonlinear_mpc_second_order_.getCurrentReference(reference);
 }
 
-bool NonLinearModelPredictiveControllerNode::getPredictedState(
+bool NMPC_Second_Order_Node::getPredictedState(
     mav_msgs::EigenTrajectoryPointDeque* predicted_state) const
 {
   assert(predicted_state != nullptr);
@@ -180,12 +180,12 @@ bool NonLinearModelPredictiveControllerNode::getPredictedState(
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "NonLinearModelPredictiveControllerNode");
+  ros::init(argc, argv, "NMPC_Second_Order_Node");
 
   ros::NodeHandle nh, private_nh("~");
 
-  std::shared_ptr<mav_control::NonLinearModelPredictiveControllerNode> mpc(
-      new mav_control::NonLinearModelPredictiveControllerNode(nh, private_nh));
+  std::shared_ptr<mav_control::NMPC_Second_Order_Node> mpc(
+      new mav_control::NMPC_Second_Order_Node(nh, private_nh));
 
   std::shared_ptr<mav_control_interface::RcInterfaceAci> rc(
       new mav_control_interface::RcInterfaceAci(nh));

@@ -56,17 +56,17 @@
 
 namespace mav_control {
 
-class NonLinearModelPredictiveControllerNode : public mav_control_interface::PositionControllerInterface
+class NMPC_Second_Order_Node : public mav_control_interface::PositionControllerInterface
 {
  public:
-  NonLinearModelPredictiveControllerNode(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
-  ~NonLinearModelPredictiveControllerNode();
+  NMPC_Second_Order_Node(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
+  ~NMPC_Second_Order_Node();
 
   void InitializeParams();
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  private:
-  NonlinearModelPredictiveControl nonlinear_mpc_second_order_;
+  NMPC_Second_Order nonlinear_mpc_second_order_;
 
   dynamic_reconfigure::Server<mav_nonlinear_mpc_second_order::NonLinearMPCConfig> controller_dyn_config_server_;
 

@@ -57,11 +57,11 @@ lapack_logical select_lhp(const double *real, const double *imag)
   return *real < 0.0;
 }
 
-class NonlinearModelPredictiveControl
+class NMPC_Second_Order
 {
  public:
-  NonlinearModelPredictiveControl(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
-  ~NonlinearModelPredictiveControl();
+  NMPC_Second_Order(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
+  ~NMPC_Second_Order();
 
   // Model parameters added as dynamic parameters
   
@@ -147,7 +147,7 @@ class NonlinearModelPredictiveControl
 
   void setDisturbanceObserverType(int disturbance_observer_type)
   {
-    disturbance_observer_type_ = static_cast<NonlinearModelPredictiveControl::Disturbance_Observer_Types>(disturbance_observer_type);
+    disturbance_observer_type_ = static_cast<NMPC_Second_Order::Disturbance_Observer_Types>(disturbance_observer_type);
   }
 
   void setEnableIntegrator(bool enable_integrator)

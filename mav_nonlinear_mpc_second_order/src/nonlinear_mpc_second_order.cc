@@ -515,6 +515,8 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
 
   if (std::isnan(roll_ref) || std::isnan(pitch_ref) || std::isnan(thrust_ref)
       || acado_status != 0) {
+    ROS_ERROR_STREAM("roll_ref: " << roll_ref << ", pitch_ref: " << pitch_ref << ", thrust_ref" << thrust_ref);
+    ROS_ERROR_STREAM("solve_time_average_: " << solve_time_average_);
     ROS_WARN_STREAM("Nonlinear MPC: Solver failed with status: " << acado_status);
     ROS_WARN("reinitializing...");
     initializeAcadoSolver (x_0);

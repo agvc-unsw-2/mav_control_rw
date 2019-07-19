@@ -377,6 +377,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   Eigen::Matrix<double, ACADO_NX, 1> x_0;
 
   Eigen::Vector3d current_rpy;
+  Eigen::Vector3d current_rpy_dot;
   odometry_.getEulerAngles(&current_rpy);
 
   mpc_queue_.updateQueue();
@@ -492,7 +493,9 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   referenceN_ << position_ref_[ACADO_N].transpose(), velocity_ref_[ACADO_N].transpose();
   acado_online_data_.block(ACADO_N, ACADO_NOD - kDisturbanceSize - 1, 1, kDisturbanceSize) << estimated_disturbances.transpose();
 
-  x_0 << odometry_.getVelocityWorld(), current_rpy, odometry_.position_W;
+  // FUARR BRO YOU NEED TO UPDATE THE STATE SOLVER MATRIX
+  // TODO: Add current_rpy_dot
+  x_0 << odometry_.getVelocityWorld(), current_rpy, current_rpy_dot, odometry_.position_W;
 
   Eigen::Map<Eigen::Matrix<double, ACADO_NX, 1>>(const_cast<double*>(acadoVariables.x0)) = x_0;
   Eigen::Map<Eigen::Matrix<double, ACADO_NY, ACADO_N>>(const_cast<double*>(acadoVariables.y)) =

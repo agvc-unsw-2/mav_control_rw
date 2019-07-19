@@ -15,40 +15,30 @@
 #roll fit percentage: 78.777678%
 
 ## Controller Parameters:
-# mass: 1.520000
-# roll_time_constant: 0.624196
-# roll_gain: 1.173807
-# pitch_time_constant: 0.549053
-# pitch_gain: 1.136624
-# linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
-# yaw_gain: 1.000000
-
-# Controller Parameters:
 mass: 1.450000
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 
 # Time constants for PID gains of 600
-roll_time_constant: 0.105595
-roll_gain: 1.145387
-pitch_time_constant: 0.105172
-pitch_gain: 1.114824
-linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
-yaw_gain: 1.000000
+# roll_gain: 1.000298
+# roll_damping: 0.463114
+# roll_omega: 11.336867
+# pitch_gain: 1.008354
+# pitch_damping: 0.476652
+# pitch_omega: 11.264051
+# yaw_gain: 1.000000
+# yaw_damping: 0.950000
+# yaw_omega: 5.000000
 
 # Time constants for PID gains of 200
-# roll_time_constant: 0.318522
-# roll_gain: 1.214172
-# pitch_time_constant: 0.312873
-# pitch_gain: 1.127141
-# linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
-# yaw_gain: 1.000000
-
-# Time constants for PDI gains of 60
-#roll_time_constant: 0.635581
-#roll_gain: 1.275039
-#pitch_time_constant: 0.630045
-#pitch_gain: 1.241289
-#linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
-#yaw_gain: 1.000000
+roll_gain: 1.007134
+roll_damping: 0.839112
+roll_omega: 6.639183
+pitch_gain: 0.999276
+pitch_damping: 0.847333
+pitch_omega: 6.560188
+yaw_gain: 1.000000
+yaw_damping: 0.950000
+yaw_omega: 5.000000
 
 # dynamic config default values:
 q_x : 80
@@ -61,6 +51,9 @@ q_vz : 100
 
 q_roll : 10
 q_pitch: 10
+
+q_roll_dot : 10
+q_pitch_dot: 10
 
 r_roll  : 50
 r_pitch : 50
@@ -79,7 +72,7 @@ Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : true
+enable_disturbance_observer : false
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

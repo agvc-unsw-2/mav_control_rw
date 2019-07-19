@@ -34,3 +34,6 @@
 
 # Python compile files
 *.pyc
+
+# ACADO solver generated files
+#*/solver/acado*

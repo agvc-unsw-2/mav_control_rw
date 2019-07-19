@@ -26,7 +26,6 @@ int main( )
     double PI = 3.1415926535897932;
 
     // States (x)
-    // (TODO: CHANGE)
     DifferentialState velocity1; //velocity x_w
     DifferentialState velocity2; //velocity y_w
     DifferentialState velocity3; //velocity z_w
@@ -36,6 +35,10 @@ int main( )
     DifferentialState position1; //x_w
     DifferentialState position2; //y_w
     DifferentialState position3; //z_w
+    // New states
+    DifferentialState roll_dot;
+    DifferentialState pitch_dot;
+    DifferentialState yaw_dot;
 
     // Control inputs (u) (DO NOT CHANGE)
     Control roll_ref;
@@ -43,8 +46,7 @@ int main( )
     Control thrust;
 
     // Parameters (from launch file for calculations)
-    // TODO: CHANGE
-    OnlineData roll_tau;
+    /*OnlineData roll_tau;
     OnlineData roll_gain;
     OnlineData pitch_tau;
     OnlineData pitch_gain;
@@ -53,6 +55,21 @@ int main( )
     OnlineData external_forces1;
     OnlineData external_forces2;
     OnlineData external_forces3;
+    */
+    OnlineData roll_damping;
+    OnlineData roll_omega;
+    OnlineData roll_gain;
+    OnlineData pitch_damping;
+    OnlineData pitch_omega;
+    OnlineData pitch_gain;
+    OnlineData linear_drag_coefficient1;
+    OnlineData linear_drag_coefficient2;
+    OnlineData external_forces1;
+    OnlineData external_forces2;
+    OnlineData external_forces3;
+    OnlineData external_moments1;
+    OnlineData external_moments2;
+    OnlineData external_moments3;
 
     // Non-linear drag equations (DO NOT CHANGE)
     IntermediateState dragacc1 =   sin(pitch)*linear_drag_coefficient1*thrust*velocity3
@@ -63,26 +80,41 @@ int main( )
                                  - cos(pitch)*linear_drag_coefficient2*sin(roll)*thrust*velocity3;
 
     // Model equations:
-    // TODO: CHANGE
     DifferentialEquation f;
-
+    // Ax = -drag_acc
+    // Bu = rot_matrix * thrust
+    // Bd * d = external_forces
+    // vel_dot = accel = rot_matrix * thrust - drag_acc + external_forces
+    // Need rotation matrix to account for thrust contribution and tilt of drone
     f << dot(velocity1)   == ((cos(roll)*cos(yaw)*sin(pitch) + sin(roll)*sin(yaw))*thrust - dragacc1 + external_forces1);
     f << dot(velocity2)   == ((cos(roll)*sin(pitch)*sin(yaw) - cos(yaw)*sin(roll))*thrust - dragacc2 + external_forces2);
     f << dot(velocity3)   == (-g + cos(pitch)*cos(roll)*thrust + external_forces3);
-    f << dot( roll )      == (roll_gain*roll_ref - roll)/roll_tau;
-    f << dot( pitch )     == (pitch_gain*pitch_ref - pitch)/pitch_tau;
-    f << dot( yaw )       == 0;
+    //f << dot( roll )      == (roll_gain*roll_ref - roll)/roll_tau;
+    //f << dot( pitch )     == (pitch_gain*pitch_ref - pitch)/pitch_tau;
+    f << dot( roll )      == roll_dot;
+    f << dot( pitch )     == pitch_dot;
+    f << dot( yaw )       == yaw_dot;
     f << dot( position1 ) == velocity1;
     f << dot( position2 ) == velocity2;
     f << dot( position3 ) == velocity3;
+    // New f dot states
+    // rpy frame is local so don't need rotation matrix
+    // Ax = -((omega_n^2 * roll) + ((2 * zeta * omega_n) * roll_dot)
+    // Bu = omega_n^2 * (gain * ref_command)
+    // Bd * d = external_moments
+    // roll_dot_dot = roll_accel = Ax + Bu + Bd
+    f << dot( roll_dot ) == (roll_gain * roll_omega * roll_omega) * roll_ref - (2 * roll_damping * roll_omega * roll_dot + roll_omega * roll_omega * roll);
+    f << dot( pitch_dot ) == (pitch_gain * pitch_omega * pitch_omega) * pitch_ref - (2 * pitch_damping * pitch_omega * pitch_dot + pitch_omega * pitch_omega * pitch);;
+    f << dot( yaw_dot ) == 0;
 
     // Reference functions and weighting matrices:
-    // TODO: Decipher and change
     Function h;
     // Add states
     h << position1 << position2 << position3;
     h << velocity1 << velocity2 << velocity3;
     h << roll      << pitch;
+    // New states
+    h << roll_dot  << pitch_dot;
     // Add control inputs
     h << roll_ref  << pitch_ref << (cos(pitch)*cos(roll)*thrust - g);
 

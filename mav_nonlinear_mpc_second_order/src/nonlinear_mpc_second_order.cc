@@ -93,36 +93,48 @@ void NonlinearModelPredictiveControl::initializeParameters()
   private_nh_.param<bool>("verbose", verbose_, true);
 
   if (!private_nh_.getParam("mass", mass_)) {
-    ROS_ERROR("mass in nonlinear MPC controller is not loaded from ros parameter "
+    ROS_ERROR("mass in nonlinear second order MPC is not loaded from ros parameter "
               "server");
     abort();
   }
 
-  if (!private_nh_.getParam("roll_time_constant", roll_time_constant_)) {
+  if (!private_nh_.getParam("roll_damping", roll_damping_)) {
     ROS_ERROR(
-        "roll_time_constant in nonlinear MPC controller is not loaded from ros parameter server");
+        "roll_damping in nonlinear second order MPC is not loaded from ros parameter server");
+    abort();
+  }
+
+  if (!private_nh_.getParam("roll_omega", roll_omega_)) {
+    ROS_ERROR(
+        "roll_omega in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("roll_gain", roll_gain_)) {
-    ROS_ERROR("roll_gain in nonlinear MPC controller is not loaded from ros parameter server");
+    ROS_ERROR("roll_gain in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
-  if (!private_nh_.getParam("pitch_time_constant", pitch_time_constant_)) {
+  if (!private_nh_.getParam("pitch_damping", pitch_damping_)) {
     ROS_ERROR(
-        "pitch_time_constant in nonlinear MPC controller is not loaded from ros parameter server");
+        "pitch_damping in nonlinear second order MPC is not loaded from ros parameter server");
+    abort();
+  }
+
+  if (!private_nh_.getParam("pitch_omega", pitch_omega_)) {
+    ROS_ERROR(
+        "pitch_omega in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("pitch_gain", pitch_gain_)) {
-    ROS_ERROR("pitch_gain in nonlinear MPC controller is not loaded from ros parameter server");
+    ROS_ERROR("pitch_gain in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("linear_drag_coefficients", drag_coefficients)) {
     ROS_ERROR(
-        "linear_drag_coefficients in nonlinear MPC controller is not loaded from ros parameter server");
+        "linear_drag_coefficients in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
@@ -130,31 +142,31 @@ void NonlinearModelPredictiveControl::initializeParameters()
 
   if (!private_nh_.getParam("antiwindup_ball", antiwindup_ball_)) {
     ROS_ERROR(
-        "antiwindup_ball in nonlinear MPC controller is not loaded from ros parameter server");
+        "antiwindup_ball in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("position_error_integration_limit",
                             position_error_integration_limit_)) {
     ROS_ERROR(
-        "position_error_integration_limit in nonlinear MPC is not loaded from ros parameter server");
+        "position_error_integration_limit in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("sampling_time", sampling_time_)) {
-    ROS_ERROR("sampling_time in nonlinear MPC is not loaded from ros parameter server");
+    ROS_ERROR("sampling_time in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("prediction_sampling_time", prediction_sampling_time_)) {
-    ROS_ERROR("prediction_sampling_time in nonlinear MPC is not loaded from ros parameter server");
+    ROS_ERROR("prediction_sampling_time in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   int disturbance_observer_type_temp;
 
   if (!private_nh_.getParam("disturbance_observer_type", disturbance_observer_type_temp)) {
-    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    ROS_ERROR("observer_type in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
@@ -169,8 +181,18 @@ void NonlinearModelPredictiveControl::initializeParameters()
 void NonlinearModelPredictiveControl::constructModelMatrices()
 {
   for (int i = 0; i < ACADO_N + 1; i++) {
-    acado_online_data_.block(i, 0, 1, ACADO_NOD) << roll_time_constant_, roll_gain_, pitch_time_constant_, pitch_gain_, drag_coefficients_(
-        0), drag_coefficients_(1), 0, 0, 0;
+    acado_online_data_.block(i, 0, 1, ACADO_NOD) << 
+      roll_damping_, 
+      roll_omega_, 
+      roll_gain_, 
+      pitch_damping_, 
+      pitch_omega_, 
+      pitch_gain_, 
+      drag_coefficients_(0), 
+      drag_coefficients_(1), 
+      0, 0, 0, 
+      0, 0, 0;
+      // last 6 states (6 zeros) are: 3 for external forces, 3 for external moments
   }
 
   Eigen::Map<Eigen::Matrix<double, ACADO_NOD, ACADO_N + 1>>(const_cast<double*>(acadoVariables.od)) =
@@ -184,10 +206,12 @@ void NonlinearModelPredictiveControl::constructModelMatrices()
 
 void NonlinearModelPredictiveControl::applyParameters()
 {
+  // TODO: Double check and possibly fix this regarding q_attitude_dot_
   W_.block(0, 0, 3, 3) = q_position_.asDiagonal();
   W_.block(3, 3, 3, 3) = q_velocity_.asDiagonal();
   W_.block(6, 6, 2, 2) = q_attitude_.asDiagonal();
-  W_.block(8, 8, 3, 3) = r_command_.asDiagonal();
+  W_.block(8, 8, 2, 2) = q_attitude_dot_.asDiagonal();
+  W_.block(10, 10, 3, 3) = r_command_.asDiagonal();
 
   WN_ = solveCARE((Eigen::VectorXd(6) << q_position_, q_velocity_).finished().asDiagonal(),
                   r_command_.asDiagonal());
@@ -347,7 +371,9 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
 
   Eigen::VectorXd KF_estimated_state;
   Eigen::VectorXd Integral_DO_estimated_disturbance;
-  Eigen::Vector3d estimated_disturbances;
+  // Vector3d is typedef'd as Matrix< double, 3, 1>
+  // Therefore Vector6d is Matrix<double, 6, 1>
+  Eigen::Matrix<double, kDisturbanceSize, 1> estimated_disturbances;
   Eigen::Matrix<double, ACADO_NX, 1> x_0;
 
   Eigen::Vector3d current_rpy;
@@ -398,11 +424,12 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
 
   if (enable_disturbance_observer_ == true) {
     if (disturbance_observer_type_ == KF_DO_first_order__) {
-      estimated_disturbances = KF_estimated_state.segment(9, kDisturbanceSize);
+      estimated_disturbances.segment(0, 3) = KF_estimated_state.segment(9, 3);
     } else if (disturbance_observer_type_ == KF_DO_second_order__) {
       estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
     } else if (disturbance_observer_type_ == Integral_DO_first_order__) {
-      estimated_disturbances = Integral_DO_estimated_disturbance.segment(0, kDisturbanceSize);
+      estimated_disturbances.segment(0, 3) = Integral_DO_estimated_disturbance.segment(0, 3);
+      // } else if integral 2nd order
     } else {
       ROS_ERROR("Invalid disturbance observer type in use");
       abort();
@@ -427,34 +454,42 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
         Eigen::Vector3d(position_error_integration_limit_, position_error_integration_limit_,
                         position_error_integration_limit_));
 
-    estimated_disturbances -= Eigen::Vector3d(Ki_xy_, Ki_xy_, Ki_altitude_).asDiagonal()
-        * position_error_integration_;
+    estimated_disturbances.segment(0, 3) -= Eigen::Vector3d(
+      Ki_xy_, Ki_xy_, Ki_altitude_
+    ).asDiagonal() * position_error_integration_;
   }
 
   double current_yaw = odometry_.getYaw();
 
-  Eigen::Vector3d estimated_disturbances_B =
-      odometry_.orientation_W_B.toRotationMatrix().transpose() * estimated_disturbances;
+  Eigen::Vector3d estimated_forces_B =
+      odometry_.orientation_W_B.toRotationMatrix().transpose() * estimated_disturbances.segment(0, 3);
 
   for (size_t i = 0; i < ACADO_N; i++) {
     Eigen::Vector3d acceleration_ref_B = odometry_.orientation_W_B.toRotationMatrix().transpose()
         * acceleration_ref_[i];
 
-    Eigen::Vector2d feed_forward(
-      (
-        -(acceleration_ref_B(1) - estimated_disturbances_B(1)) / kGravity),
-        ((acceleration_ref_B(0) - estimated_disturbances_B(0)) / kGravity)
-      );
+    Eigen::Vector2d feed_forward_rp(
+      -((acceleration_ref_B(1) - estimated_forces_B(1)) / kGravity),
+      ((acceleration_ref_B(0) - estimated_forces_B(0)) / kGravity)
+    );
+    // TODO: Fix this as necessary. Maybe swap indexes or signs?
+    Eigen::Vector2d feed_forward_rp_dot(
+      estimated_disturbances(3),
+      estimated_disturbances(4)
+    );
+    Eigen::Vector2d empty_2d(0, 0);
     reference_.block(i, 0, 1, ACADO_NY) << 
-      position_ref_[i].transpose(), 
-      velocity_ref_[i].transpose(), 
-      feed_forward.transpose(), 
-      feed_forward.transpose(), 
+      position_ref_[i].transpose(), // position
+      velocity_ref_[i].transpose(), // velocity
+      feed_forward_rp.transpose(), // roll and pitch ref (as state)
+      //feed_forward_rp_dot.transpose(), // roll_dot and pitch_dot ref
+      empty_2d.transpose(), // set roll_dot and pitch_dot ref to 0
+      feed_forward_rp.transpose(), // roll and pitch ref (as input)
       acceleration_ref_[i].z() - estimated_disturbances(2);
-    acado_online_data_.block(i, ACADO_NOD - 3, 1, 3) << estimated_disturbances.transpose();
+    acado_online_data_.block(i, ACADO_NOD - kDisturbanceSize, 1, kDisturbanceSize) << estimated_disturbances.transpose();
   }
   referenceN_ << position_ref_[ACADO_N].transpose(), velocity_ref_[ACADO_N].transpose();
-  acado_online_data_.block(ACADO_N, ACADO_NOD - 3, 1, 3) << estimated_disturbances.transpose();
+  acado_online_data_.block(ACADO_N, ACADO_NOD - kDisturbanceSize, 1, kDisturbanceSize) << estimated_disturbances.transpose();
 
   x_0 << odometry_.getVelocityWorld(), current_rpy, odometry_.position_W;
 
@@ -480,10 +515,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
 
   if (std::isnan(roll_ref) || std::isnan(pitch_ref) || std::isnan(thrust_ref)
       || acado_status != 0) {
-    ROS_ERROR_STREAM("roll_ref: " << roll_ref << ", pitch_ref: " << pitch_ref << ", thrust_ref" << thrust_ref);
-    ROS_ERROR_STREAM("solve_time_average_: " << solve_time_average_);
     ROS_WARN_STREAM("Nonlinear MPC: Solver failed with status: " << acado_status);
-    ROS_WARN_STREAM("Error: " << acado_getErrorString(acado_status));
     ROS_WARN("reinitializing...");
     initializeAcadoSolver (x_0);
     *ref_attitude_thrust << 0, 0, 0, kGravity * mass_;

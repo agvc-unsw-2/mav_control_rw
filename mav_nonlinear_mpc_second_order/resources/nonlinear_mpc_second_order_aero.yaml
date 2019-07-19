@@ -37,17 +37,20 @@
 # New sysID
 mass: 1.000000
 
-roll_gain: 0.731289
-roll_damping: 0.593308
-roll_omega: 11.732979
-pitch_gain: 0.536179
-pitch_damping: 0.417839
-pitch_omega: 10.549021
-yaw_gain: 1.000000
-yaw_damping: 0.950000
-yaw_omega: 5.000000
-
+roll_time_constant: 0.110846
+roll_gain: 0.788517
+pitch_time_constant: 0.095241
+pitch_gain: 0.576213
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+yaw_gain: 1.000000
+
+# With LPE
+#roll_time_constant: 0.126858
+#roll_gain: 0.904591
+#pitch_time_constant: 0.119135
+#pitch_gain: 0.804236
+#linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
+#yaw_gain: 1.000000
 
 # dynamic config default values:
 q_x : 80
@@ -60,9 +63,6 @@ q_vz : 100
 
 q_roll : 10
 q_pitch: 10
-
-q_roll_dot : 10
-q_pitch_dot: 10
 
 r_roll  : 50
 r_pitch : 50

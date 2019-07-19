@@ -28,8 +28,8 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef INCLUDE_MAV_NONLINEAR_MPC_SECOND_ORDER_NONLINEAR_MPC_H_
-#define INCLUDE_MAV_NONLINEAR_MPC_SECOND_ORDER_NONLINEAR_MPC_H_
+#ifndef INCLUDE_mav_nonlinear_mpc_second_order_NONLINEAR_MPC_SECOND_ORDER_H_
+#define INCLUDE_mav_nonlinear_mpc_second_order_NONLINEAR_MPC_SECOND_ORDER_H_
 
 #include <ros/ros.h>
 #include <Eigen/Eigen>
@@ -69,25 +69,17 @@ class NonlinearModelPredictiveControl
   {
     mass_ = mass;
   }
-  void setRollDamping(double roll_damping)
+  void setRollTimeConstant(double roll_time_constant)
   {
-    roll_damping_ = roll_damping;
-  }
-  void setRollOmega(double roll_omega)
-  {
-    roll_omega_ = roll_omega;
+    roll_time_constant_ = roll_time_constant;
   }
   void setRollGain(double roll_gain)
   {
     roll_gain_ = roll_gain;
   }
-  void setPitchDamping(double pitch_damping)
+  void setPitchTimeConstant(double pitch_time_constant)
   {
-    pitch_damping_ = pitch_damping;
-  }
-  void setPitchOmega(double pitch_omega)
-  {
-    pitch_omega_ = pitch_omega;
+    pitch_time_constant_ = pitch_time_constant;
   }
   void setPitchGain(double pitch_gain)
   {
@@ -115,10 +107,6 @@ class NonlinearModelPredictiveControl
   void setAttitudePenality(const Eigen::Vector2d& q_attitude)
   {
     q_attitude_ = q_attitude;
-  }
-  void setAttitudeDotPenality(const Eigen::Vector2d& q_attitude_dot)
-  {
-    q_attitude_dot_ = q_attitude_dot;
   }
   void setCommandPenality(const Eigen::Vector3d& r_command)
   {
@@ -196,7 +184,7 @@ class NonlinearModelPredictiveControl
 
   // constants
   static constexpr double kGravity = 9.8066;
-  static constexpr int kDisturbanceSize = 6;
+  static constexpr int kDisturbanceSize = 3;
 
   // ros node handles
   ros::NodeHandle nh_, private_nh_;
@@ -216,11 +204,9 @@ class NonlinearModelPredictiveControl
 
   // system model parameters
   double mass_;
-  double roll_damping_;
-  double roll_omega_;
+  double roll_time_constant_;
   double roll_gain_;
-  double pitch_damping_;
-  double pitch_omega_;
+  double pitch_time_constant_;
   double pitch_gain_;
   Eigen::Vector3d drag_coefficients_;
 
@@ -229,7 +215,6 @@ class NonlinearModelPredictiveControl
   Eigen::Vector3d q_position_;
   Eigen::Vector3d q_velocity_;
   Eigen::Vector2d q_attitude_;
-  Eigen::Vector2d q_attitude_dot_;
 
   // control penalty
   Eigen::Vector3d r_command_;
@@ -312,4 +297,4 @@ class NonlinearModelPredictiveControl
 
 }
 
-#endif /* INCLUDE_MAV_NONLINEAR_MPC_SECOND_ORDER_NONLINEAR_MPC_H_ */
+#endif /* INCLUDE_mav_nonlinear_mpc_second_order_NONLINEAR_MPC_SECOND_ORDER_H_ */

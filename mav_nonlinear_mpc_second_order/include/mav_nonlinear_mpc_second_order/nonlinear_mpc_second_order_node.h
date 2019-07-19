@@ -27,8 +27,8 @@
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef INCLUDE_MAV_NONLINEAR_MPC_SECOND_ORDER_NONLINEAR_MPC_NODE_H_
-#define INCLUDE_MAV_NONLINEAR_MPC_SECOND_ORDER_NONLINEAR_MPC_NODE_H_
+#ifndef INCLUDE_mav_nonlinear_mpc_second_order_NONLINEAR_MPC_SECOND_ORDER_NODE_H_
+#define INCLUDE_mav_nonlinear_mpc_second_order_NONLINEAR_MPC_SECOND_ORDER_NODE_H_
 
 #include <boost/bind.hpp>
 #include <Eigen/Eigen>
@@ -66,7 +66,7 @@ class NonLinearModelPredictiveControllerNode : public mav_control_interface::Pos
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  private:
-  NonlinearModelPredictiveControl nonlinear_mpc_second_order_;
+  NonlinearModelPredictiveControl nonlinear_mpc_;
 
   dynamic_reconfigure::Server<mav_nonlinear_mpc_second_order::NonLinearMPCConfig> controller_dyn_config_server_;
 
@@ -83,7 +83,7 @@ class NonLinearModelPredictiveControllerNode : public mav_control_interface::Pos
   }
 
   virtual double getMass() const {
-    return nonlinear_mpc_second_order_.getMass();
+    return nonlinear_mpc_.getMass();
   }
 
   virtual bool setReference(const mav_msgs::EigenTrajectoryPoint& reference);
@@ -110,4 +110,4 @@ class NonLinearModelPredictiveControllerNode : public mav_control_interface::Pos
 }
 
 
-#endif /* INCLUDE_MAV_NONLINEAR_MPC_SECOND_ORDER_NONLINEAR_MPC_NODE_H_ */
+#endif /* INCLUDE_mav_nonlinear_mpc_second_order_NONLINEAR_MPC_SECOND_ORDER_NODE_H_ */

@@ -38,7 +38,7 @@ namespace mav_control {
 
 NonLinearModelPredictiveControllerNode::NonLinearModelPredictiveControllerNode(
     const ros::NodeHandle& nh, const ros::NodeHandle& private_nh)
-    : nonlinear_mpc_second_order_(nh, private_nh),
+    : nonlinear_mpc_(nh, private_nh),
       controller_dyn_config_server_(private_nh)
 {
   dynamic_reconfigure::Server<mav_nonlinear_mpc_second_order::NonLinearMPCConfig>::CallbackType f_controller;
@@ -55,14 +55,14 @@ NonLinearModelPredictiveControllerNode::~NonLinearModelPredictiveControllerNode(
 bool NonLinearModelPredictiveControllerNode::setReferenceArray(
     const mav_msgs::EigenTrajectoryPointDeque& reference_array)
 {
-  nonlinear_mpc_second_order_.setCommandTrajectory(reference_array);
+  nonlinear_mpc_.setCommandTrajectory(reference_array);
   return true;
 }
 
 bool NonLinearModelPredictiveControllerNode::setReference(
     const mav_msgs::EigenTrajectoryPoint& reference)
 {
-  nonlinear_mpc_second_order_.setCommandTrajectoryPoint(reference);
+  nonlinear_mpc_.setCommandTrajectoryPoint(reference);
   return true;
 }
 
@@ -75,7 +75,6 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   Eigen::Vector3d q_position;
   Eigen::Vector3d q_velocity;
   Eigen::Vector2d q_attitude;
-  Eigen::Vector2d q_attitude_dot;
 
   Eigen::Vector3d r_command;
   Eigen::VectorXd control_limits(5);
@@ -84,7 +83,6 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   q_position << config.q_x, config.q_y, config.q_z;
   q_velocity << config.q_vx, config.q_vy, config.q_vz;
   q_attitude << config.q_roll, config.q_pitch;
-  q_attitude_dot << config.q_roll_dot, config.q_pitch_dot;
 
   r_command << config.r_roll, config.r_pitch, config.r_thrust;
 
@@ -96,45 +94,42 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_z;
 
 	  // Update model parameters
-  nonlinear_mpc_second_order_.setMass(config.mass);
-  nonlinear_mpc_second_order_.setRollDamping(config.roll_damping);
-  nonlinear_mpc_second_order_.setRollOmega(config.roll_omega);
-  nonlinear_mpc_second_order_.setRollGain(config.roll_gain);
-  nonlinear_mpc_second_order_.setPitchDamping(config.pitch_damping);
-  nonlinear_mpc_second_order_.setPitchOmega(config.pitch_omega);
-  nonlinear_mpc_second_order_.setPitchGain(config.pitch_gain);
+  nonlinear_mpc_.setMass(config.mass);
+  nonlinear_mpc_.setRollTimeConstant(config.roll_time_constant);
+  nonlinear_mpc_.setRollGain(config.roll_gain);
+  nonlinear_mpc_.setPitchTimeConstant(config.pitch_time_constant);
+  nonlinear_mpc_.setPitchGain(config.pitch_gain);
 
   // Update controller parameters
-  nonlinear_mpc_second_order_.setPositionErrorIntegrationLimit(config.position_error_integration_limit);
-  nonlinear_mpc_second_order_.setAntiWindupBall(config.antiwindup_ball);
+  nonlinear_mpc_.setPositionErrorIntegrationLimit(config.position_error_integration_limit);
+  nonlinear_mpc_.setAntiWindupBall(config.antiwindup_ball);
 
   // Update dynamic parameters
-  nonlinear_mpc_second_order_.setPositionPenality(q_position);
-  nonlinear_mpc_second_order_.setVelocityPenality(q_velocity);
-  nonlinear_mpc_second_order_.setAttitudePenality(q_attitude);
-  nonlinear_mpc_second_order_.setAttitudeDotPenality(q_attitude_dot);
-  nonlinear_mpc_second_order_.setCommandPenality(r_command);
-  nonlinear_mpc_second_order_.setYawGain(config.K_yaw);
-  nonlinear_mpc_second_order_.setControlLimits(control_limits);
+  nonlinear_mpc_.setPositionPenality(q_position);
+  nonlinear_mpc_.setVelocityPenality(q_velocity);
+  nonlinear_mpc_.setAttitudePenality(q_attitude);
+  nonlinear_mpc_.setCommandPenality(r_command);
+  nonlinear_mpc_.setYawGain(config.K_yaw);
+  nonlinear_mpc_.setControlLimits(control_limits);
 
-  nonlinear_mpc_second_order_.setAltitudeIntratorGain(config.Ki_altitude);
-  nonlinear_mpc_second_order_.setXYIntratorGain(config.Ki_xy);
+  nonlinear_mpc_.setAltitudeIntratorGain(config.Ki_altitude);
+  nonlinear_mpc_.setXYIntratorGain(config.Ki_xy);
 
-  nonlinear_mpc_second_order_.setDragCoefficients(drag_coefficients);
+  nonlinear_mpc_.setDragCoefficients(drag_coefficients);
 
-  nonlinear_mpc_second_order_.setEnableIntegrator(config.enable_integrator);
-  nonlinear_mpc_second_order_.setEnableDisturbanceObserver(config.enable_disturbance_observer);
-  nonlinear_mpc_second_order_.setDisturbanceObserverType(config.disturbance_observer_type);
+  nonlinear_mpc_.setEnableIntegrator(config.enable_integrator);
+  nonlinear_mpc_.setEnableDisturbanceObserver(config.enable_disturbance_observer);
+  nonlinear_mpc_.setDisturbanceObserverType(config.disturbance_observer_type);
 
-  nonlinear_mpc_second_order_.applyParameters();
-  nonlinear_mpc_second_order_.constructModelMatrices();
+  nonlinear_mpc_.applyParameters();
+  nonlinear_mpc_.constructModelMatrices();
 }
 
 
 
 bool NonLinearModelPredictiveControllerNode::setOdometry(const mav_msgs::EigenOdometry& odometry)
 {
-  nonlinear_mpc_second_order_.setOdometry(odometry);
+  nonlinear_mpc_.setOdometry(odometry);
   return true;
 }
 
@@ -147,7 +142,7 @@ bool NonLinearModelPredictiveControllerNode::calculateAttitudeThrustCommand(
 
 bool NonLinearModelPredictiveControllerNode::calculateRollPitchYawrateThrustCommand(mav_msgs::EigenRollPitchYawrateThrust* attitude_thrust_command){
   Eigen::Vector4d rpy_thrust;
-  nonlinear_mpc_second_order_.calculateRollPitchYawrateThrustCommand(&rpy_thrust);
+  nonlinear_mpc_.calculateRollPitchYawrateThrustCommand(&rpy_thrust);
   attitude_thrust_command->roll = rpy_thrust(0);
   attitude_thrust_command->pitch = rpy_thrust(1);
   attitude_thrust_command->yaw_rate = rpy_thrust(2);
@@ -159,21 +154,21 @@ bool NonLinearModelPredictiveControllerNode::getCurrentReference(
     mav_msgs::EigenTrajectoryPoint* reference) const
 {
   assert(reference != nullptr);
-  return nonlinear_mpc_second_order_.getCurrentReference(reference);
+  return nonlinear_mpc_.getCurrentReference(reference);
 }
 
 bool NonLinearModelPredictiveControllerNode::getCurrentReference(
     mav_msgs::EigenTrajectoryPointDeque* reference) const
 {
   assert(reference != nullptr);
-  return nonlinear_mpc_second_order_.getCurrentReference(reference);
+  return nonlinear_mpc_.getCurrentReference(reference);
 }
 
 bool NonLinearModelPredictiveControllerNode::getPredictedState(
     mav_msgs::EigenTrajectoryPointDeque* predicted_state) const
 {
   assert(predicted_state != nullptr);
-  return nonlinear_mpc_second_order_.getPredictedState(predicted_state);
+  return nonlinear_mpc_.getPredictedState(predicted_state);
 }
 
 };

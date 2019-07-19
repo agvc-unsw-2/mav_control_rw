@@ -19,15 +19,18 @@ mass: 1.650000
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 
 # Parameters for PID P gain of 500:
-roll_gain: 1.000981
-roll_damping: 0.750533
-roll_omega: 15.985684
-pitch_gain: 1.004625
-pitch_damping: 0.903276
-pitch_omega: 18.495585
+roll_time_constant: 0.105720
+roll_gain: 1.090762
+pitch_time_constant: 0.104006
+pitch_gain: 1.050036
 yaw_gain: 1.000000
-yaw_damping: 0.950000
-yaw_omega: 5.000000
+
+# Paramaters for PID P gain of 70:
+# roll_time_constant: 0.624196
+# roll_gain: 1.173807
+# pitch_time_constant: 0.549053
+# pitch_gain: 1.136624
+# yaw_gain: 1.000000
 
 # dynamic config default values:
 q_x : 80
@@ -40,9 +43,6 @@ q_vz : 100
 
 q_roll : 10
 q_pitch: 10
-
-q_roll_dot : 10
-q_pitch_dot: 10
 
 r_roll  : 50
 r_pitch : 50

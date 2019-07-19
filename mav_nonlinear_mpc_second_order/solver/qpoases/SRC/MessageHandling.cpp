@@ -71,7 +71,7 @@ MessageHandling::ReturnValueList returnValueList[] =
 { RET_SETUP_CONSTRAINT_FAILED, "Setting up constraint index failed", VS_VISIBLE },
 { RET_MOVING_BOUND_FAILED, "Moving bound between index sets failed", VS_VISIBLE },
 { RET_MOVING_CONSTRAINT_FAILED, "Moving constraint between index sets failed", VS_VISIBLE },
-/* QProblem */
+/* QProblem */ // 26 up to here
 { RET_QP_ALREADY_INITIALISED, "QProblem has already been initialised", VS_VISIBLE },
 { RET_NO_INIT_WITH_STANDARD_SOLVER, "Initialisation via extern QP solver is not yet implemented", VS_VISIBLE },
 { RET_RESET_FAILED, "Reset failed", VS_VISIBLE },

@@ -16,6 +16,7 @@
 
 ## Controller Parameters:
 mass: 1.450000
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 
 # Time constants for PID gains of 600
 # roll_gain: 1.000298
@@ -71,7 +72,7 @@ Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : true
+enable_disturbance_observer : false
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

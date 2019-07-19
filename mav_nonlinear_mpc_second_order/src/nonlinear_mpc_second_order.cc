@@ -475,7 +475,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     // TODO: Fix this as necessary. Maybe swap indexes or signs?
     Eigen::Vector2d feed_forward_rp_dot(
       estimated_disturbances(3),
-      -estimated_disturbances(4)
+      estimated_disturbances(4)
     );
     reference_.block(i, 0, 1, ACADO_NY) << 
       position_ref_[i].transpose(), // position

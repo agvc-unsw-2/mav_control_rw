@@ -1,0 +1,76 @@
+#==================================================================================================================
+#
+# Project:	MPC for multirotor systems.
+#
+# function:	MPC Position controller parameters
+#
+# Author:	Mina Kamel	mina.kamel@ethz.ch
+#
+# Ge:nerated:	03-Apr-2015 13:11:59
+#
+#==================================================================================================================
+
+# Controller Parameters:
+mass: 1.450000
+
+# Time constants for PID gains of 600
+roll_time_constant: 0.105595
+roll_gain: 1.145387
+pitch_time_constant: 0.105172
+pitch_gain: 1.114824
+drag_coefficients: [0.010000, 0.010000, 0.000000]
+yaw_gain: 1.000000
+
+# Time constants for PID gains of 200
+# roll_time_constant: 0.318522
+# roll_gain: 1.214172
+# pitch_time_constant: 0.312873
+# pitch_gain: 1.127141
+# linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+# yaw_gain: 1.000000
+
+# Time constants for PDI gains of 60
+#roll_time_constant: 0.635581
+#roll_gain: 1.275039
+#pitch_time_constant: 0.630045
+#pitch_gain: 1.241289
+#linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
+#yaw_gain: 1.000000
+
+q_x : 80
+q_y : 80
+q_z : 120
+
+q_vx : 80
+q_vy : 80
+q_vz : 100
+
+q_roll: 10
+q_pitch: 10
+
+r_roll: 50
+r_pitch: 50
+r_thrust: 1
+
+r_droll: 0.3
+r_dpitch: 0.3
+r_dthrust: 0.0025
+
+roll_max: deg(45.0)
+pitch_max: deg(45.0)
+yaw_rate_max: deg(90)
+thrust_min: 0.1
+thrust_max: 50
+
+K_yaw: 1.8
+
+Ki_xy: 0.2
+Ki_z: 0.3
+position_error_integration_limit: 2
+antiwindup_ball: 0.4
+
+enable_disturbance_observer : false
+enable_integrator : false
+
+sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
+prediction_sampling_time: 0.1

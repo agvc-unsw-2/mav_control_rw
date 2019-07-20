@@ -38,30 +38,33 @@
 
 namespace mav_control {
 
-class SteadyStateCalculation
+class SteadyStateCalculationSecondOrder
 {
  private:
-  static constexpr int kStateSize = 8;
+  static constexpr int kStateSize = 10;
+  static constexpr int kOutputSize = 6;
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
-  static constexpr int kDisturbanceSize = 3;
+  static constexpr int kDisturbanceSize = 6;
 
  public:
-  SteadyStateCalculation(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
-  ~SteadyStateCalculation();
+  SteadyStateCalculationSecondOrder(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);
+  ~SteadyStateCalculationSecondOrder();
 
   void initialize(const Eigen::MatrixXd& A, const Eigen::MatrixXd& B, const Eigen::MatrixXd& Bd);
 
-  void computeSteadyState(const Eigen::Vector3d &estimated_disturbance,
-                          const Eigen::Matrix<double, kMeasurementSize, 1> &reference,
-                          Eigen::Matrix<double, kStateSize, 1>* steadystate_state,
-                          Eigen::Matrix<double, kInputSize, 1>* steadystate_input);
+  void computeSteadyState(
+    const Eigen::Matrix<double, kDisturbanceSize, 1> &estimated_disturbance,
+    const Eigen::Matrix<double, kMeasurementSize, 1> &reference,
+    Eigen::Matrix<double, kStateSize, 1>* steadystate_state,
+    Eigen::Matrix<double, kInputSize, 1>* steadystate_input
+  );
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  private:
   ros::NodeHandle nh_, private_nh_, controller_nh_;
   bool initialized_params_;
-  Eigen::Matrix<double, kStateSize, kInputSize> Bd_;
+  Eigen::Matrix<double, kStateSize, kDisturbanceSize> Bd_;
   Eigen::Matrix<double, kStateSize + kInputSize, kStateSize + kMeasurementSize> pseudo_inverse_left_hand_side_;
 
 };

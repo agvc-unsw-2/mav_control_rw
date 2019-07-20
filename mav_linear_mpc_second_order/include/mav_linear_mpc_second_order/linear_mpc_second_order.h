@@ -190,10 +190,10 @@ class LMPC_Second_Order_Controller
 
   // constants
   // TODO Update constants appropriately
-  static constexpr int kStateSize = 8;
+  static constexpr int kStateSize = 10;
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
-  static constexpr int kDisturbanceSize = 3;
+  static constexpr int kDisturbanceSize = 6;
   static constexpr int kPredictionHorizonSteps = 20;
   static constexpr double kGravity = 9.8066;
 
@@ -279,7 +279,7 @@ class LMPC_Second_Order_Controller
   Eigen::Vector3d linearized_command_roll_pitch_thrust_;
 
   // steady state calculation
-  SteadyStateCalculation steady_state_calculation_second_order_;
+  SteadyStateCalculationSecondOrder steady_state_calculation_second_order_;
 
   // debug info
   bool verbose_;

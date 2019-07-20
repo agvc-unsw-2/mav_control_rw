@@ -67,6 +67,7 @@ void LMPC_Second_Order_Node::DynConfigCallback(mav_linear_mpc_second_order::Line
   Eigen::Vector3d q_position;
   Eigen::Vector3d q_velocity;
   Eigen::Vector2d q_attitude;
+  Eigen::Vector2d q_attitude_dot;
 
   Eigen::Vector3d r_command;
   Eigen::Vector3d r_delta_command;

@@ -160,32 +160,44 @@ void LMPC_Second_Order_Controller::initializeParameters()
 void LMPC_Second_Order_Controller::constructModelMatrices()
 {
   //construct model matrices
-  // TODO Change to 2nd order model
-  Eigen::MatrixXd A_continous_time(kStateSize, kStateSize);
+  Eigen::MatrixXd A_continous_time;
   A_continous_time = Eigen::MatrixXd::Zero(kStateSize, kStateSize);
   Eigen::MatrixXd B_continous_time;
   B_continous_time = Eigen::MatrixXd::Zero(kStateSize, kInputSize);
   Eigen::MatrixXd Bd_continous_time;
   Bd_continous_time = Eigen::MatrixXd::Zero(kStateSize, kDisturbanceSize);
 
-  A_continous_time(0, 3) = 1;
-  A_continous_time(1, 4) = 1;
-  A_continous_time(2, 5) = 1;
-  A_continous_time(3, 3) = -drag_coefficients_(0);
-  A_continous_time(3, 7) = kGravity;
-  A_continous_time(4, 4) = -drag_coefficients_(1);
-  A_continous_time(4, 6) = -kGravity;
-  A_continous_time(5, 5) = -drag_coefficients_(2);
-  A_continous_time(6, 6) = -1.0 / roll_time_constant_;
-  A_continous_time(7, 7) = -1.0 / pitch_time_constant_;
+  A_continous_time.block<3, 3>(0, 3) = Eigen::MatrixXd::Identity(3, 3);
+  A_continous_time.block<3, 3>(3, 3) = -1.0 * Eigen::DiagonalMatrix<double, 3>(
+    drag_coefficients_(0), 
+    drag_coefficients_(1),
+    drag_coefficients_(2)
+  );
+  A_continous_time.block<2, 2>(6, 8) = Eigen::MatrixXd::Identity(2, 2);
 
+  A_continous_time.block<2, 2>(8, 6) = -1.0 * Eigen::DiagonalMatrix<double, 2>(
+    roll_omega_ * roll_omega_, 
+    pitch_omega_ * pitch_omega_
+  );
+  A_continous_time.block<2, 2>(8, 8) = -2.0 * Eigen::DiagonalMatrix<double, 2>(
+    roll_omega_ * roll_damping_, 
+    pitch_omega_ * pitch_damping_
+  );
+
+  B_continous_time.block<2, 2>(6, 0) = -1.0 * Eigen::DiagonalMatrix<double, 2>(
+    roll_omega_ * roll_omega_ * roll_gain_, 
+    pitch_omega_ * pitch_omega_ * pitch_gain_
+  );
+  B_continous_time.block<2, 2>(8, 0) = -2.0 * Eigen::DiagonalMatrix<double, 2>(
+    roll_damping_ * roll_omega_ * roll_gain_, 
+    pitch_damping_ * pitch_omega_ * pitch_gain_
+  );
+  //B_continous_time.block<1, 1>(5, 2) = Eigen::DiagonalMatrix<double, 1>(1.0);
   B_continous_time(5, 2) = 1.0;
-  B_continous_time(6, 0) = roll_gain_ / roll_time_constant_;
-  B_continous_time(7, 1) = pitch_gain_ / pitch_time_constant_;
 
-  Bd_continous_time(3, 0) = 1.0;
-  Bd_continous_time(4, 1) = 1.0;
-  Bd_continous_time(5, 2) = 1.0;
+  Bd_continous_time.block<3, 3>(3, 0) = Eigen::MatrixXd::Identity(3, 3);
+  // TODO: Quadruple check this
+  Bd_continous_time.block<2, 2>(8, 3) = Eigen::MatrixXd::Identity(2, 2);
 
   model_A_ = (prediction_sampling_time_ * A_continous_time).exp();
 
@@ -229,7 +241,6 @@ void LMPC_Second_Order_Controller::constructModelMatrices()
 
 void LMPC_Second_Order_Controller::applyParameters()
 {
-  // TODO Update kStateSize etc to accomodate
   Eigen::Matrix<double, kStateSize, kStateSize> Q;
   Eigen::Matrix<double, kStateSize, kStateSize> Q_final;
   Eigen::Matrix<double, kInputSize, kInputSize> R;
@@ -386,6 +397,9 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   disturbance_observer_.feedPositionMeasurement(odometry_.position_W);
   disturbance_observer_.feedVelocityMeasurement(odometry_.getVelocityWorld());
   disturbance_observer_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+  //TODO add feed angular velocity to 2nd order disturbance observer using getAngularVelocity()
+  // create angular velocity function using odometry_.angular_velocity_b
+  //disturbance_observer_.feedAngularVelocity(odometry_.angular_velocity_B);
 
   bool observer_update_successful = disturbance_observer_.updateEstimator();
 
@@ -421,10 +435,9 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
         Eigen::Vector3d(position_error_integration_limit_, position_error_integration_limit_,
                         position_error_integration_limit_));
 
-    estimated_disturbances -= Eigen::Vector3d(Ki_xy_, Ki_xy_, Ki_altitude_).asDiagonal()
+    estimated_disturbances.segment(0, 3) -= Eigen::Vector3d(Ki_xy_, Ki_xy_, Ki_altitude_).asDiagonal()
         * position_error_integration_;
   }
-
 
   Eigen::Matrix<double, kStateSize, 1> target_state;
   Eigen::Matrix<double, kInputSize, 1> target_input;
@@ -466,6 +479,7 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   roll_pitch_inertial_frame << -sin(yaw) * pitch + cos(yaw) * roll, cos(yaw) * pitch
       + sin(yaw) * roll;
   // load x_0 state
+  // TODO: Add rp_inertial_frame_dot
   x_0 << odometry_.position_W, odometry_.getVelocityWorld(), roll_pitch_inertial_frame;
 
   //Solve using CVXGEN

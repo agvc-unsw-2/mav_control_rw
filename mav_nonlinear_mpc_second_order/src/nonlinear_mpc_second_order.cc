@@ -289,6 +289,7 @@ void NMPC_Second_Order::setOdometry(const mav_msgs::EigenOdometry& odometry)
     previous_odometry.velocity_B = odometry.velocity_B;
   }
 
+  // TODO: Use this to get angular velocity measurements
   if (odometry.angular_velocity_B.allFinite() == false) {
     odometry_.angular_velocity_B = previous_odometry.angular_velocity_B;
     ROS_WARN("Odometry.angular_velocity has a non finite element");

@@ -88,23 +88,37 @@ void LMPC_Second_Order_Controller::initializeParameters()
     abort();
   }
 
-  if (!private_nh_.getParam("roll_time_constant", roll_time_constant_)) {
-    ROS_ERROR("roll_time_constant in MPC is not loaded from ros parameter server");
+  if (!private_nh_.getParam("roll_damping", roll_damping_)) {
+    ROS_ERROR(
+        "roll_damping in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
-  if (!private_nh_.getParam("pitch_time_constant", pitch_time_constant_)) {
-    ROS_ERROR("pitch_time_constant in MPC is not loaded from ros parameter server");
+  if (!private_nh_.getParam("roll_omega", roll_omega_)) {
+    ROS_ERROR(
+        "roll_omega in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("roll_gain", roll_gain_)) {
-    ROS_ERROR("roll_gain in MPC is not loaded from ros parameter server");
+    ROS_ERROR("roll_gain in nonlinear second order MPC is not loaded from ros parameter server");
+    abort();
+  }
+
+  if (!private_nh_.getParam("pitch_damping", pitch_damping_)) {
+    ROS_ERROR(
+        "pitch_damping in nonlinear second order MPC is not loaded from ros parameter server");
+    abort();
+  }
+
+  if (!private_nh_.getParam("pitch_omega", pitch_omega_)) {
+    ROS_ERROR(
+        "pitch_omega in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
   if (!private_nh_.getParam("pitch_gain", pitch_gain_)) {
-    ROS_ERROR("pitch_gain in MPC is not loaded from ros parameter server");
+    ROS_ERROR("pitch_gain in nonlinear second order MPC is not loaded from ros parameter server");
     abort();
   }
 
@@ -146,6 +160,7 @@ void LMPC_Second_Order_Controller::initializeParameters()
 void LMPC_Second_Order_Controller::constructModelMatrices()
 {
   //construct model matrices
+  // TODO Change to 2nd order model
   Eigen::MatrixXd A_continous_time(kStateSize, kStateSize);
   A_continous_time = Eigen::MatrixXd::Zero(kStateSize, kStateSize);
   Eigen::MatrixXd B_continous_time;
@@ -214,6 +229,7 @@ void LMPC_Second_Order_Controller::constructModelMatrices()
 
 void LMPC_Second_Order_Controller::applyParameters()
 {
+  // TODO Update kStateSize etc to accomodate
   Eigen::Matrix<double, kStateSize, kStateSize> Q;
   Eigen::Matrix<double, kStateSize, kStateSize> Q_final;
   Eigen::Matrix<double, kInputSize, kInputSize> R;
@@ -227,6 +243,9 @@ void LMPC_Second_Order_Controller::applyParameters()
   Q.block(0, 0, 3, 3) = q_position_.asDiagonal();
   Q.block(3, 3, 3, 3) = q_velocity_.asDiagonal();
   Q.block(6, 6, 2, 2) = q_attitude_.asDiagonal();
+
+  // TODO: Remove from cost function if necessary
+  Q.block(8, 8, 2, 2) = q_attitude_dot_.asDiagonal();
 
   R = r_command_.asDiagonal();
 
@@ -348,6 +367,11 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   Eigen::Vector3d current_rpy;
   odometry_.getEulerAngles(&current_rpy);
 
+  // TODO get euler rpy dot. Maybe calc as difference between previous?
+  Eigen::Vector3d current_rpy_dot;
+  current_rpy_dot.setZero();
+  // odometry_.getAngularVelocity(&current_rpy_dot); // This function doesn't exist
+
   double roll;
   double pitch;
   double yaw;
@@ -374,6 +398,7 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   disturbance_observer_.getEstimatedState(&KF_estimated_state);
 
+  // TODO: Change this disturbance observer appropriately
   if (enable_disturbance_observer_ == true) {
     estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
   } else {
@@ -405,6 +430,7 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   Eigen::Matrix<double, kInputSize, 1> target_input;
   Eigen::VectorXd ref(kMeasurementSize);
 
+  // TODO modify this as appropriate
   CVXGEN_queue_.clear();
   // calculate target_state and target_input for each step in the prediction horizon
   // except the last step

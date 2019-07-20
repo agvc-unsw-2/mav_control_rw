@@ -14,28 +14,15 @@
 mass: 1.450000
 
 # Time constants for PID gains of 600
-roll_time_constant: 0.105595
-roll_gain: 1.145387
-pitch_time_constant: 0.105172
-pitch_gain: 1.114824
-drag_coefficients: [0.010000, 0.010000, 0.000000]
+roll_gain: 1.000298
+roll_damping: 0.463114
+roll_omega: 11.336867
+pitch_gain: 1.008354
+pitch_damping: 0.476652
+pitch_omega: 11.264051
 yaw_gain: 1.000000
-
-# Time constants for PID gains of 200
-# roll_time_constant: 0.318522
-# roll_gain: 1.214172
-# pitch_time_constant: 0.312873
-# pitch_gain: 1.127141
-# linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
-# yaw_gain: 1.000000
-
-# Time constants for PDI gains of 60
-#roll_time_constant: 0.635581
-#roll_gain: 1.275039
-#pitch_time_constant: 0.630045
-#pitch_gain: 1.241289
-#linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
-#yaw_gain: 1.000000
+yaw_damping: 0.950000
+yaw_omega: 5.000000
 
 q_x : 80
 q_y : 80
@@ -47,6 +34,9 @@ q_vz : 100
 
 q_roll: 10
 q_pitch: 10
+
+q_roll_dot: 0
+q_pitch_dot: 0
 
 r_roll: 50
 r_pitch: 50

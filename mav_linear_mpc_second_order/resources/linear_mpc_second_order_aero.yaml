@@ -30,19 +30,18 @@
 # px4 subscribes to roll pitch yawrate thrust
 # mpc doesn't subscribe to odometry of quadcopter to prevent weird behaviour with switching to altitude hold
 # Record roll pitch yawrate thrust and actual roll pitch yawrate thrust
-#roll_time_constant: 0.25
-#pitch_time_constant: 0.255
-#roll_gain: 0.9
-#pitch_gain: 0.9
-#drag_coefficients: [ 0.010000 , 0.010000, 0.0000]
 
 mass: 1.000000
-roll_time_constant: 0.126858
-roll_gain: 0.904591
-pitch_time_constant: 0.119135
-pitch_gain: 0.804236
-linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
+
+roll_gain: 0.731289
+roll_damping: 0.593308
+roll_omega: 11.732979
+pitch_gain: 0.536179
+pitch_damping: 0.417839
+pitch_omega: 10.549021
 yaw_gain: 1.000000
+yaw_damping: 0.950000
+yaw_omega: 5.000000
 
 q_x: 40
 q_y: 40
@@ -54,6 +53,9 @@ q_vz: 25
 
 q_roll: 20
 q_pitch: 20
+
+q_roll_dot: 0
+q_pitch_dot: 0
 
 r_roll: 35
 r_pitch: 35
@@ -77,8 +79,8 @@ Ki_altitude: 0.3 # Replace Ki_z
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : true
-enable_integrator : true
+enable_disturbance_observer : false
+enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1

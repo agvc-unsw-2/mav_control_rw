@@ -76,6 +76,7 @@ void LMPC_Second_Order_Node::DynConfigCallback(mav_linear_mpc_second_order::Line
   q_position << config.q_x, config.q_y, config.q_z;
   q_velocity << config.q_vx, config.q_vy, config.q_vz;
   q_attitude << config.q_roll, config.q_pitch;
+  q_attitude_dot << config.q_roll_dot, config.q_pitch_dot;
 
   r_command << config.r_roll, config.r_pitch, config.r_thrust;
   r_delta_command << config.r_droll, config.r_dpitch, config.r_dthrust;
@@ -88,9 +89,11 @@ void LMPC_Second_Order_Node::DynConfigCallback(mav_linear_mpc_second_order::Line
 
   // Update model parameters
   linear_mpc_second_order_.setMass(config.mass);
-  linear_mpc_second_order_.setRollTimeConstant(config.roll_time_constant);
+  linear_mpc_second_order_.setRollDamping(config.roll_damping);
+  linear_mpc_second_order_.setRollOmega(config.roll_omega);
   linear_mpc_second_order_.setRollGain(config.roll_gain);
-  linear_mpc_second_order_.setPitchTimeConstant(config.pitch_time_constant);
+  linear_mpc_second_order_.setPitchDamping(config.pitch_damping);
+  linear_mpc_second_order_.setPitchOmega(config.pitch_omega);
   linear_mpc_second_order_.setPitchGain(config.pitch_gain);
 
   // Update controller parameters
@@ -101,6 +104,7 @@ void LMPC_Second_Order_Node::DynConfigCallback(mav_linear_mpc_second_order::Line
   linear_mpc_second_order_.setPositionPenality(q_position);
   linear_mpc_second_order_.setVelocityPenality(q_velocity);
   linear_mpc_second_order_.setAttitudePenality(q_attitude);
+  linear_mpc_second_order_.setAttitudeDotPenality(q_attitude_dot);
   linear_mpc_second_order_.setCommandPenality(r_command);
   linear_mpc_second_order_.setDeltaCommandPenality(r_delta_command);
   linear_mpc_second_order_.setYawGain(config.K_yaw);

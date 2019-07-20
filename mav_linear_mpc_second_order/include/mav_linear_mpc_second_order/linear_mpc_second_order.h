@@ -64,17 +64,25 @@ class LMPC_Second_Order_Controller
   {
     mass_ = mass;
   }
-  void setRollTimeConstant(double roll_time_constant)
+  void setRollDamping(double roll_damping)
   {
-    roll_time_constant_ = roll_time_constant;
+    roll_damping_ = roll_damping;
+  }
+  void setRollOmega(double roll_omega)
+  {
+    roll_omega_ = roll_omega;
   }
   void setRollGain(double roll_gain)
   {
     roll_gain_ = roll_gain;
   }
-  void setPitchTimeConstant(double pitch_time_constant)
+  void setPitchDamping(double pitch_damping)
   {
-    pitch_time_constant_ = pitch_time_constant;
+    pitch_damping_ = pitch_damping;
+  }
+  void setPitchOmega(double pitch_omega)
+  {
+    pitch_omega_ = pitch_omega;
   }
   void setPitchGain(double pitch_gain)
   {
@@ -103,6 +111,10 @@ class LMPC_Second_Order_Controller
   void setAttitudePenality(const Eigen::Vector2d& q_attitude)
   {
     q_attitude_ = q_attitude;
+  }
+  void setAttitudeDotPenality(const Eigen::Vector2d& q_attitude_dot)
+  {
+    q_attitude_dot_ = q_attitude_dot;
   }
   void setCommandPenality(const Eigen::Vector3d& r_command)
   {
@@ -177,6 +189,7 @@ class LMPC_Second_Order_Controller
  private:
 
   // constants
+  // TODO Update constants appropriately
   static constexpr int kStateSize = 8;
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
@@ -207,10 +220,14 @@ class LMPC_Second_Order_Controller
   Eigen::Matrix<double, kStateSize, kStateSize> model_A_;   //dynamics matrix
   Eigen::Matrix<double, kStateSize, kInputSize> model_B_;   //transfer matrix
   Eigen::Matrix<double, kStateSize, kInputSize> model_Bd_;  //Disturbance transfer matrix
-  double roll_time_constant_;
+
+  double roll_damping_;
+  double roll_omega_;
   double roll_gain_;
-  double pitch_time_constant_;
+  double pitch_damping_;
+  double pitch_omega_;
   double pitch_gain_;
+
   Eigen::Vector3d drag_coefficients_;
   double mass_;
 
@@ -219,6 +236,7 @@ class LMPC_Second_Order_Controller
   Eigen::Vector3d q_position_;
   Eigen::Vector3d q_velocity_;
   Eigen::Vector2d q_attitude_;
+  Eigen::Vector2d q_attitude_dot_;
 
   // control penalty
   Eigen::Vector3d r_command_;

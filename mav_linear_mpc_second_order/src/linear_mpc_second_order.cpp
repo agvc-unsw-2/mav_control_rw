@@ -372,6 +372,7 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   Eigen::Matrix<double, kMeasurementSize, 1> reference;
   Eigen::VectorXd KF_estimated_state;
   Eigen::Vector2d roll_pitch_inertial_frame;
+  Eigen::Vector2d roll_pitch_dot_inertial_frame;
   Eigen::Matrix<double, kDisturbanceSize, 1> estimated_disturbances;
   Eigen::Matrix<double, kStateSize, 1> x_0;
 
@@ -380,12 +381,15 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   // TODO get euler rpy dot. Maybe calc as difference between previous?
   Eigen::Vector3d current_rpy_dot;
-  current_rpy_dot.setZero();
-  // odometry_.getAngularVelocity(&current_rpy_dot); // This function doesn't exist
+  //current_rpy_dot.setZero();
+  current_rpy_dot = odometry_.angular_velocity_B;
 
   double roll;
   double pitch;
   double yaw;
+
+  double roll_dot;
+  double pitch_dot;
 
   // update mpc queue
   mpc_queue_.updateQueue();
@@ -478,9 +482,14 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   roll_pitch_inertial_frame << -sin(yaw) * pitch + cos(yaw) * roll, cos(yaw) * pitch
       + sin(yaw) * roll;
+
+  roll_dot = current_rpy_dot(0);
+  pitch_dot = current_rpy_dot(1);
+
+  roll_pitch_dot_inertial_frame << -sin(yaw) * pitch_dot + cos(yaw) * roll_dot, 
+                                  cos(yaw) * pitch_dot + sin(yaw) * roll_dot;
   // load x_0 state
-  // TODO: Add rp_inertial_frame_dot
-  x_0 << odometry_.position_W, odometry_.getVelocityWorld(), roll_pitch_inertial_frame;
+  x_0 << odometry_.position_W, odometry_.getVelocityWorld(), roll_pitch_inertial_frame, roll_pitch_dot_inertial_frame;
 
   //Solve using CVXGEN
   Eigen::Map<Eigen::Matrix<double, kDisturbanceSize, 1>>(const_cast<double*>(params.d)) =

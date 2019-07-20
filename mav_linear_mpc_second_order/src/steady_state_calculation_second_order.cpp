@@ -52,6 +52,7 @@ void SteadyStateCalculationSecondOrder::initialize(const Eigen::MatrixXd& A, con
   left_hand_side.resize(kStateSize + kMeasurementSize, kStateSize + kInputSize);
 
   Bd_ = Bd;
+  // TODO: Possible update measurement size to incorporate other states?
   Eigen::MatrixXd C(kMeasurementSize, kStateSize); // Define 6x8 dynamic-size matrix
   C.setIdentity();
 

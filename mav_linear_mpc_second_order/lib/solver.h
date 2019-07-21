@@ -33,43 +33,51 @@
 #include <math.h>
 #define pm(A, m, n) printmatrix(#A, A, m, n, 1)
 #endif
+
+// TODO: Change all of these hard coded variables as appropriate
+
+#define STATE_SIZE 10
+#define INPUT_SIZE 3
+#define DISTURBANCE_SIZE 5
+#define PREDICTION_HORIZON 20
 typedef struct Params_t {
-  double x_0[8];
-  double x_ss_0[8];
-  double Q[64];
-  double u_ss[3];
-  double R[9];
-  double u_prev[3];
-  double R_omega[9];
-  double x_ss_1[8];
-  double x_ss_2[8];
-  double x_ss_3[8];
-  double x_ss_4[8];
-  double x_ss_5[8];
-  double x_ss_6[8];
-  double x_ss_7[8];
-  double x_ss_8[8];
-  double x_ss_9[8];
-  double x_ss_10[8];
-  double x_ss_11[8];
-  double x_ss_12[8];
-  double x_ss_13[8];
-  double x_ss_14[8];
-  double x_ss_15[8];
-  double x_ss_16[8];
-  double x_ss_17[8];
-  double x_ss_18[8];
-  double x_ss_19[8];
-  double Q_final[64];
-  double A[64];
-  double B[24];
-  double Bd[24];
-  double d[3];
-  double u_min[3];
-  double u_max[3];
+  double x_0[STATE_SIZE];
+  double x_ss_0[STATE_SIZE];
+  double Q[STATE_SIZE * STATE_SIZE];
+  double u_ss[INPUT_SIZE];
+  double R[INPUT_SIZE * INPUT_SIZE];
+  double u_prev[INPUT_SIZE];
+  double R_omega[INPUT_SIZE * INPUT_SIZE];
+  double x_ss_1[STATE_SIZE];
+  double x_ss_2[STATE_SIZE];
+  double x_ss_3[STATE_SIZE];
+  double x_ss_4[STATE_SIZE];
+  double x_ss_5[STATE_SIZE];
+  double x_ss_6[STATE_SIZE];
+  double x_ss_7[STATE_SIZE];
+  double x_ss_8[STATE_SIZE];
+  double x_ss_9[STATE_SIZE];
+  double x_ss_10[STATE_SIZE];
+  double x_ss_11[STATE_SIZE];
+  double x_ss_12[STATE_SIZE];
+  double x_ss_13[STATE_SIZE];
+  double x_ss_14[STATE_SIZE];
+  double x_ss_15[STATE_SIZE];
+  double x_ss_16[STATE_SIZE];
+  double x_ss_17[STATE_SIZE];
+  double x_ss_18[STATE_SIZE];
+  double x_ss_19[STATE_SIZE];
+  double Q_final[STATE_SIZE * STATE_SIZE];
+  double A[STATE_SIZE * STATE_SIZE];
+  double B[STATE_SIZE * INPUT_SIZE];
+  double Bd[STATE_SIZE * DISTURBANCE_SIZE];
+  double d[DISTURBANCE_SIZE];
+  double u_min[INPUT_SIZE];
+  double u_max[INPUT_SIZE];
   double *x[1];
-  double *x_ss[20];
+  double *x_ss[PREDICTION_HORIZON];
 } Params;
+// TODO: Change these comments because they are obsolete
 typedef struct Vars_t {
   double *u_0; /* 3 rows. */
   double *x_1; /* 8 rows. */
@@ -127,8 +135,8 @@ typedef struct Vars_t {
   double *u_18; /* 3 rows. */
   double *t_18; /* 3 rows. */
   double *x_19; /* 8 rows. */
-  double *u[19];
-  double *x[20];
+  double *u[PREDICTION_HORIZON - 1];
+  double *x[PREDICTION_HORIZON];
 } Vars;
 typedef struct Workspace_t {
   double h[114];

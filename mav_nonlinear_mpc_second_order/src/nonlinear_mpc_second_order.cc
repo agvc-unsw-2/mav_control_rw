@@ -180,8 +180,11 @@ void NMPC_Second_Order::initializeParameters()
 
 void NMPC_Second_Order::constructModelMatrices()
 {
-  for (int i = 0; i < ACADO_N + 1; i++) {
-    acado_online_data_.block(i, 0, 1, ACADO_NOD) << 
+  acado_online_data_.setZero();
+  // Insert from row i, column 0, blocks of size <1, ACADO_NOD>
+  for (int i = 0; i < ACADO_N + 1; i += 1) {
+    //acado_online_data_.block(i, 0, 1, ACADO_NOD) << 
+    acado_online_data_.block<1, ACADO_NOD>(i, 0) << 
       roll_damping_, 
       roll_omega_, 
       roll_gain_, 
@@ -193,7 +196,21 @@ void NMPC_Second_Order::constructModelMatrices()
       0, 0, 0, 
       0, 0, 0;
       // last 6 states (6 zeros) are: 3 for external forces, 3 for external moments
+    //std::cout << "acado online data[" << i << "] = " << std::endl;
+    //std::cout << acado_online_data_ << std::endl;
   }
+  // Made one last line due to a weird bug with eigen not pushing block properly
+  // acado_online_data_.block(0, 0, 1, ACADO_NOD) << 
+  //   roll_damping_, 
+  //   roll_omega_, 
+  //   roll_gain_, 
+  //   pitch_damping_, 
+  //   pitch_omega_, 
+  //   pitch_gain_, 
+  //   drag_coefficients_(0), 
+  //   drag_coefficients_(1), 
+  //   0, 0, 0, 
+  //   0, 0, 0;
 
   Eigen::Map<Eigen::Matrix<double, ACADO_NOD, ACADO_N + 1>>(const_cast<double*>(acadoVariables.od)) =
       acado_online_data_.transpose();
@@ -378,9 +395,9 @@ void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
   Eigen::Matrix<double, ACADO_NX, 1> x_0;
 
   Eigen::Vector3d current_rpy;
-  Eigen::Vector3d current_rpy_dot;
   odometry_.getEulerAngles(&current_rpy);
 
+  Eigen::Vector3d current_rpy_dot;
   current_rpy_dot.setZero();
   //current_rpy_dot << 0, 0, 0; // set rpy_dot to zero for now
 
@@ -493,13 +510,14 @@ void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
       acceleration_ref_[i].z() - estimated_disturbances(2);
     // TODO: Fix possible off by 1 error?
     acado_online_data_.block(i, ACADO_NOD - kDisturbanceSize - 1, 1, kDisturbanceSize) << estimated_disturbances.transpose();
+  
   }
+
   referenceN_ << position_ref_[ACADO_N].transpose(), velocity_ref_[ACADO_N].transpose();
   acado_online_data_.block(ACADO_N, ACADO_NOD - kDisturbanceSize - 1, 1, kDisturbanceSize) << estimated_disturbances.transpose();
 
   // TODO: Add current_rpy_dot properly
   x_0 << odometry_.getVelocityWorld(), current_rpy, odometry_.position_W, current_rpy_dot;
-
   Eigen::Map<Eigen::Matrix<double, ACADO_NX, 1>>(const_cast<double*>(acadoVariables.x0)) = x_0;
   Eigen::Map<Eigen::Matrix<double, ACADO_NY, ACADO_N>>(const_cast<double*>(acadoVariables.y)) =
       reference_.transpose();
@@ -507,6 +525,11 @@ void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
       referenceN_.transpose();
   Eigen::Map<Eigen::Matrix<double, ACADO_NOD, ACADO_N + 1>>(const_cast<double*>(acadoVariables.od)) =
       acado_online_data_.transpose();
+
+  ROS_INFO_STREAM_THROTTLE(1.0, "x_0: \n" << std::endl << x_0);
+  ROS_INFO_STREAM_THROTTLE(1.0, "y: \n" << std::endl << reference_.transpose());
+  ROS_INFO_STREAM_THROTTLE(1.0, "yN: \n" << std::endl << referenceN_.transpose());
+  ROS_INFO_STREAM_THROTTLE(1.0, "od: \n" << std::endl << acado_online_data_.transpose());
 
   ros::WallTime time_before_solving = ros::WallTime::now();
 

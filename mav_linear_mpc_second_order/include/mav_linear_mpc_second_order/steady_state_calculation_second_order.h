@@ -45,7 +45,7 @@ class SteadyStateCalculationSecondOrder
   static constexpr int kOutputSize = 6;
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
-  static constexpr int kDisturbanceSize = 6;
+  static constexpr int kDisturbanceSize = 5;
 
  public:
   SteadyStateCalculationSecondOrder(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh);

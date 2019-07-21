@@ -77,6 +77,7 @@ void SteadyStateCalculationSecondOrder::computeSteadyState(
   assert(steadystate_input);
   assert(initialized_params_);
 
+  //ROS_INFO_STREAM("SS_Calc: Starting steady state calc\n");
   Eigen::Matrix<double, kStateSize + kInputSize, 1> target_state_and_input;
   Eigen::Matrix<double, kStateSize + kMeasurementSize, 1> right_hand_side;
 
@@ -86,6 +87,8 @@ void SteadyStateCalculationSecondOrder::computeSteadyState(
 
   *steadystate_state = target_state_and_input.segment(0, kStateSize);
   *steadystate_input = target_state_and_input.segment(kStateSize, kInputSize);
+
+  //ROS_INFO_STREAM("SS_Calc: Finished steady state calc\n");
 }
 
 }

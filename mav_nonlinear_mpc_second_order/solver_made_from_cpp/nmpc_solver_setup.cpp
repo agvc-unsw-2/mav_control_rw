@@ -89,8 +89,10 @@ int main( )
     f << dot(velocity1)   == ((cos(roll)*cos(yaw)*sin(pitch) + sin(roll)*sin(yaw))*thrust - dragacc1 + external_forces1);
     f << dot(velocity2)   == ((cos(roll)*sin(pitch)*sin(yaw) - cos(yaw)*sin(roll))*thrust - dragacc2 + external_forces2);
     f << dot(velocity3)   == (-g + cos(pitch)*cos(roll)*thrust + external_forces3);
+    // For debugging
     //f << dot( roll )      == (roll_gain*roll_ref - roll)/roll_tau;
     //f << dot( pitch )     == (pitch_gain*pitch_ref - pitch)/pitch_tau;
+    //f << dot( yaw )       == 0;
     f << dot( roll )      == roll_dot;
     f << dot( pitch )     == pitch_dot;
     f << dot( yaw )       == yaw_dot;
@@ -103,9 +105,14 @@ int main( )
     // Bu = omega_n^2 * (gain * ref_command)
     // Bd * d = external_moments
     // roll_dot_dot = roll_accel = Ax + Bu + Bd
-    f << dot( roll_dot ) == (roll_gain * roll_omega * roll_omega) * roll_ref - (2 * roll_damping * roll_omega * roll_dot + roll_omega * roll_omega * roll);
-    f << dot( pitch_dot ) == (pitch_gain * pitch_omega * pitch_omega) * pitch_ref - (2 * pitch_damping * pitch_omega * pitch_dot + pitch_omega * pitch_omega * pitch);;
-    f << dot( yaw_dot ) == 0;
+    f << dot( roll_dot ) == (roll_gain * roll_omega * roll_omega) * roll_ref - (2 * roll_damping * roll_omega * roll_dot + roll_omega * roll_omega * roll) + external_moments1;
+    f << dot( pitch_dot ) == (pitch_gain * pitch_omega * pitch_omega) * pitch_ref - (2 * pitch_damping * pitch_omega * pitch_dot + pitch_omega * pitch_omega * pitch) + external_moments2;
+    f << dot( yaw_dot ) == 0 + external_moments3;
+    
+    // For debugging
+    //f << dot( roll_dot ) == 0;
+    //f << dot( pitch_dot ) == 0;
+    //f << dot( yaw_dot ) == 0;
 
     // Reference functions and weighting matrices:
     Function h;

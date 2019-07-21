@@ -13,6 +13,8 @@
 # Controller Parameters:
 mass: 1.450000
 
+drag_coefficients: [ 0.000000 , 0.000000, 0.0000]
+
 # Time constants for PID gains of 600
 roll_gain: 1.000298
 roll_damping: 0.463114

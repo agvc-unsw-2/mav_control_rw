@@ -30,8 +30,8 @@ real_t auxVar[ 71 ];
 
 real_t rk_ttt;
 
-/** Row vector of size: 26 */
-real_t rk_xxx[ 26 ];
+/** Row vector of size: 29 */
+real_t rk_xxx[ 29 ];
 
 /** Column vector of size: 12 */
 real_t rk_kkk[ 12 ];
@@ -113,9 +113,9 @@ out[5] = xd[11];
 out[6] = xd[0];
 out[7] = xd[1];
 out[8] = xd[2];
-out[9] = ((((od[2]*od[1])*od[1])*u[0])-(((((real_t)(2.0000000000000000e+00)*od[0])*od[1])*xd[9])+((od[1]*od[1])*xd[3])));
-out[10] = ((((od[5]*od[4])*od[4])*u[1])-(((((real_t)(2.0000000000000000e+00)*od[3])*od[4])*xd[10])+((od[4]*od[4])*xd[4])));
-out[11] = (real_t)(0.0000000000000000e+00);
+out[9] = (((((od[2]*od[1])*od[1])*u[0])-(((((real_t)(2.0000000000000000e+00)*od[0])*od[1])*xd[9])+((od[1]*od[1])*xd[3])))+od[11]);
+out[10] = (((((od[5]*od[4])*od[4])*u[1])-(((((real_t)(2.0000000000000000e+00)*od[3])*od[4])*xd[10])+((od[4]*od[4])*xd[4])))+od[12]);
+out[11] = od[13];
 }
 
 
@@ -674,6 +674,9 @@ rk_xxx[22] = rk_eta[202];
 rk_xxx[23] = rk_eta[203];
 rk_xxx[24] = rk_eta[204];
 rk_xxx[25] = rk_eta[205];
+rk_xxx[26] = rk_eta[206];
+rk_xxx[27] = rk_eta[207];
+rk_xxx[28] = rk_eta[208];
 
 for (run = 0; run < 2; ++run)
 {

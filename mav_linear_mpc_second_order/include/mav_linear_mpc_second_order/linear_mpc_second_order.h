@@ -193,7 +193,7 @@ class LMPC_Second_Order_Controller
   static constexpr int kStateSize = 10;
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
-  static constexpr int kDisturbanceSize = 6;
+  static constexpr int kDisturbanceSize = 5;
   static constexpr int kPredictionHorizonSteps = 20;
   static constexpr double kGravity = 9.8066;
 
@@ -219,7 +219,7 @@ class LMPC_Second_Order_Controller
   // x(k+1) = A*x(k) + B*u(k) + Bd*d(k)
   Eigen::Matrix<double, kStateSize, kStateSize> model_A_;   //dynamics matrix
   Eigen::Matrix<double, kStateSize, kInputSize> model_B_;   //transfer matrix
-  Eigen::Matrix<double, kStateSize, kInputSize> model_Bd_;  //Disturbance transfer matrix
+  Eigen::Matrix<double, kStateSize, kDisturbanceSize> model_Bd_;  //Disturbance transfer matrix
 
   double roll_damping_;
   double roll_omega_;

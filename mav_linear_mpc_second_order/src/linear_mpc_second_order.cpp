@@ -366,6 +366,7 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 {
   assert(ref_attitude_thrust != nullptr);
   assert(initialized_parameters_ == true);
+  ROS_INFO_STREAM("Calculating rpy_thrust\n");
   ros::WallTime starting_time = ros::WallTime::now();
 
   //Declare variables
@@ -447,6 +448,7 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   Eigen::Matrix<double, kInputSize, 1> target_input;
   Eigen::VectorXd ref(kMeasurementSize);
 
+  ROS_INFO_STREAM("Calculating steady states\n");
   // TODO modify this as appropriate
   CVXGEN_queue_.clear();
   // calculate target_state and target_input for each step in the prediction horizon
@@ -461,6 +463,8 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
           target_input;
     }
   }
+
+  ROS_INFO_STREAM("Calculating terminal state\n");
   // calculate target state and target input for last step in prediction horizon
   // (terminal state)
   ref << position_ref_.at(kPredictionHorizonSteps - 1), velocity_ref_.at(
@@ -470,12 +474,16 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
                                                &target_input);
   CVXGEN_queue_.push_back(target_state);
 
+  ROS_INFO_STREAM("Pushing target states to queue\n");
   // push 'steady state' target states for every step in prediction horizon to queue
   for (int i = 0; i < kPredictionHorizonSteps; i++) {
+    ROS_INFO_STREAM("CVXGEN_queue_[" << i << "] = " << CVXGEN_queue_[i]);
+    ROS_INFO_STREAM("params.x_ss[" << i << "] = " << params.x_ss[i]);
     Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
         CVXGEN_queue_[i];
   }
 
+  ROS_INFO_STREAM("Calculating rpy and rpy_dot inertial frames\n");
   roll = current_rpy(0);
   pitch = current_rpy(1);
   yaw = current_rpy(2);
@@ -491,6 +499,8 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   // load x_0 state
   x_0 << odometry_.position_W, odometry_.getVelocityWorld(), roll_pitch_inertial_frame, roll_pitch_dot_inertial_frame;
 
+  ROS_INFO_STREAM("Solving with CVXGEN\n");
+
   //Solve using CVXGEN
   Eigen::Map<Eigen::Matrix<double, kDisturbanceSize, 1>>(const_cast<double*>(params.d)) =
       estimated_disturbances; // constant disturbance
@@ -504,6 +514,8 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   linearized_command_roll_pitch_thrust_ << vars.u_0[0], vars.u_0[1], vars.u_0[2];
 
+  ROS_INFO_STREAM("Finished calculating\n");
+
   if (solver_status < 0) {
     ROS_WARN("Linear MPC: Solver faild, use LQR backup");
     linearized_command_roll_pitch_thrust_ = LQR_K_ * (target_state - x_0);
@@ -512,6 +524,8 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
     linearized_command_roll_pitch_thrust_ = linearized_command_roll_pitch_thrust_.cwiseMin(
         Eigen::Vector3d(roll_limit_, pitch_limit_, thrust_max_));
   }
+
+  ROS_INFO_STREAM("Converting commands to body frame\n");
 
   command_roll_pitch_yaw_thrust_(3) = (linearized_command_roll_pitch_thrust_(2) + kGravity)
       / (cos(roll) * cos(pitch));

@@ -77,6 +77,10 @@ input_thrust_scaling_factor = float(myargs[3])
 if __name__ == '__main__':
     print('-----------------------')
     print("Launching " + myargs[0] + '...')
+    print("==================================")
+    print("WARNING: THIS SCRIPT WILL NOT WORK AS INTENDED WITHOUT BUILDING APPROPRIATE CFG FILE.")
+    print("THE CFG FILE IS NOT BUILT BY DEFAULT BECAUSE OF ISSUES WITH HAVING 2 CFG FILES")
+    print("==================================")
     add_input_delay = False
     input_delay = 0.15
     rospy.init_node('attitude_cmd_echo_' + uav_num, anonymous=False)
@@ -87,6 +91,5 @@ if __name__ == '__main__':
         input_thrust_scaling_factor
     )
     srv = Server(ThrustRescalerConfig, echo_node.dyn_config_callback)
-    
 
     rospy.spin()

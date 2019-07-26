@@ -548,6 +548,7 @@ void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
     ROS_ERROR_STREAM("roll_ref: " << roll_ref << ", pitch_ref: " << pitch_ref << ", thrust_ref" << thrust_ref);
     ROS_ERROR_STREAM("solve_time_average_: " << solve_time_average_);
     ROS_WARN_STREAM("Nonlinear MPC: Solver failed with status: " << acado_status);
+    ROS_WARN_STREAM("Error: " << acado_getErrorString(acado_status));
     ROS_WARN("reinitializing...");
     initializeAcadoSolver (x_0);
     *ref_attitude_thrust << 0, 0, 0, kGravity * mass_;

@@ -36,6 +36,8 @@ class Echo_From_Vrep(object):
             thrust_scaling_factor
         ):
         self.thrust_scaling_factor = thrust_scaling_factor
+        print("thrust_scaling_factor:")
+        print(self.thrust_scaling_factor)
         self.scale_factors_initialized = True
 
     def scale_msg(self, msg):
@@ -58,7 +60,7 @@ class Echo_From_Vrep(object):
 
     def dyn_config_callback(self, config, level):
         print("Received reconfigure request")
-        print("thrust_scaling_factor:")
+        print("Config thrust_scaling_factor:")
         print(config.thrust_scaling_factor)
         self.thrust_scaling_factor = config.thrust_scaling_factor
         return config
@@ -87,9 +89,10 @@ if __name__ == '__main__':
 
     echo_node = Echo_From_Vrep(mav_name, uav_num, add_input_delay, input_delay)
 
+    srv = Server(ThrustRescalerConfig, echo_node.dyn_config_callback)
+
     echo_node.initialise_scale_factors(
         input_thrust_scaling_factor
     )
-    srv = Server(ThrustRescalerConfig, echo_node.dyn_config_callback)
 
     rospy.spin()

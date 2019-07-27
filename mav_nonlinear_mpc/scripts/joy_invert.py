@@ -22,7 +22,7 @@ class JoyEcho(object):
         #self.pub = rospy.Publisher('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
         #rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
         rospy.Subscriber('/mavros/rc/in_remapped/', Joy, self.read_callback)
-        self.invert_arr = invert_arr
+        self.invert_axes = invert_arr
 
     def invert_msg(self, msg):
         for axis in self.invert_axes:

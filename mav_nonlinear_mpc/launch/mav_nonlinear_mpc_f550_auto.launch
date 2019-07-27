@@ -22,7 +22,7 @@
 
   <node pkg="mav_nonlinear_mpc"
     name="joy_invert"
-    args="$(arg mav_name) $(arg uav_num) 2"
+    args="$(arg mav_name) $(arg uav_num) 0 1 2 3"
     output="screen"
     type="joy_invert.py"/>
 

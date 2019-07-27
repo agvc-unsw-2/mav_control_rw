@@ -25,8 +25,10 @@ class JoyEcho(object):
         self.invert_axes = invert_arr
 
     def invert_msg(self, msg):
+        axes_list = list(deepcopy(msg.axes))
         for axis in self.invert_axes:
-            msg.axes[axis] = -msg.axes[axis]
+            axes_list[axis] = -axes_list[axis]
+        msg.axes = tuple(axes_list)
         return msg
     
     def read_callback(self, msg):

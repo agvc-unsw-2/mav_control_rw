@@ -37,10 +37,19 @@
 # New sysID
 mass: 1.000000
 
-roll_time_constant: 0.110846
-roll_gain: 0.788517
-pitch_time_constant: 0.095241
-pitch_gain: 0.576213
+#roll_time_constant: 0.110846
+#roll_gain: 0.788517
+#pitch_time_constant: 0.095241
+#pitch_gain: 0.576213
+#linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+#yaw_gain: 1.000000
+
+# Fixed MATLAB Script
+
+roll_time_constant: 0.075201
+roll_gain: 0.961149
+pitch_time_constant: 0.075037
+pitch_gain: 0.975368
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
 

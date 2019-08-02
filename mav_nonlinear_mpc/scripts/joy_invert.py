@@ -8,6 +8,8 @@ from std_msgs.msg import Time
 from sensor_msgs.msg import Joy
 import std_msgs.msg
 
+from copy import deepcopy
+
 from mav_nonlinear_mpc.cfg import ThrustRescalerConfig
 
 class JoyEcho(object):
@@ -37,6 +39,8 @@ class JoyEcho(object):
         self.msg_to_publish = self.invert_msg(self.msg_to_publish)
         #print("Scaled RC message")
         #self.msg_to_publish.yaw_rate *= -1 # flip yawrate
+        #print("Publishing")
+        #print(self.msg_to_publish)
         self.pub.publish(self.msg_to_publish)
 
 myargs = rospy.myargv(argv=sys.argv)

@@ -29,6 +29,8 @@ class Echo_From_Vrep(object):
         rospy.Subscriber('/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N', RollPitchYawrateThrust, self.read_callback)
 
         self.scale_factors_initialized = False
+        self.ignore_first_dyn_config_callback = True
+        self.first_dyn_config_callback = True
 
     # Input in degrees for simplicity
     def initialise_scale_factors(
@@ -59,6 +61,15 @@ class Echo_From_Vrep(object):
         self.pub.publish(self.msg_to_publish)
 
     def dyn_config_callback(self, config, level):
+        if(self.ignore_first_dyn_config_callback):
+            if (self.first_dyn_config_callback):
+                print("Ignoring first dyn_config callback")
+                self.first_dyn_config_callback = False
+                return config
+            else:
+                pass #continue to below
+        else:
+            pass #continue to below
         print("Received reconfigure request")
         print("Config thrust_scaling_factor:")
         print(config.thrust_scaling_factor)
@@ -80,7 +91,7 @@ if __name__ == '__main__':
     print('-----------------------')
     print("Launching " + myargs[0] + '...')
     print("==================================")
-    print("WARNING: THIS SCRIPT WILL NOT WORK AS INTENDED WITHOUT BUILDING APPROPRIATE CFG FILE.")
+    print("WARNING: THIS SCRIPT MAY NOT WORK AS INTENDED WITHOUT BUILDING WITH APPROPRIATE CFG FILE.")
     print("THE CFG FILE IS NOT BUILT BY DEFAULT BECAUSE OF ISSUES WITH HAVING 2 CFG FILES")
     print("==================================")
     add_input_delay = False

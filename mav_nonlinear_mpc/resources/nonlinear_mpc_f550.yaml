@@ -35,13 +35,12 @@
 #yaw_gain: 1.000000
 
 mass: 1.000000
-linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 
-# WARNING: CURRENTLY COPIED DATA FROM VREP_HEX. UNCALIBRATED
-roll_time_constant: 0.105720
-roll_gain: 1.090762
-pitch_time_constant: 0.104006
-pitch_gain: 1.050036
+roll_time_constant: 0.085605
+roll_gain: 0.983039
+pitch_time_constant: 0.084477
+pitch_gain: 0.999616
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
 
 # dynamic config default values:
@@ -73,7 +72,7 @@ Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : true
+enable_disturbance_observer : false
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

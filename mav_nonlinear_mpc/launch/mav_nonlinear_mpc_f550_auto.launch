@@ -10,7 +10,7 @@
   <!-- <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/$(arg namespace)$(arg uav_num)/joy" /> -->
 
   <!-- From mavros for mav_nonlinear_mpc code-->
-  <remap from="/$(arg namespace)$(arg uav_num)/rc/in_remapped" to="/mavros/rc/in_remapped_and_inverted" />
+  <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/mavros/rc/in_remapped_and_inverted" />
    
   <!-- TODO: CHECK TARANIS REMAPPINGS -->
   <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" output="screen" type="joystick_remapper.py" >

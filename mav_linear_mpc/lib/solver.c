@@ -1,6 +1,6 @@
-/* Produced by CVXGEN, 2019-08-02 01:12:37 -0400.  */
-/* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
-/* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
+/* Produced by CVXGEN, 2015-02-11 07:30:06 -0500.  */
+/* CVXGEN is Copyright (C) 2006-2012 Jacob Mattingley, jem@cvxgen.com. */
+/* The code in this file is Copyright (C) 2006-2012 Jacob Mattingley. */
 /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
 /* applications without prior written permission from Jacob Mattingley. */
 
@@ -82,43 +82,24 @@ void setup_indexed_params(void) {
   /* is undefined. */
   params.x[0] = params.x_0;
   params.x_ss[0] = params.x_ss_0;
-  params.u_ss[0] = params.u_ss_0;
   params.x_ss[1] = params.x_ss_1;
-  params.u_ss[1] = params.u_ss_1;
   params.x_ss[2] = params.x_ss_2;
-  params.u_ss[2] = params.u_ss_2;
   params.x_ss[3] = params.x_ss_3;
-  params.u_ss[3] = params.u_ss_3;
   params.x_ss[4] = params.x_ss_4;
-  params.u_ss[4] = params.u_ss_4;
   params.x_ss[5] = params.x_ss_5;
-  params.u_ss[5] = params.u_ss_5;
   params.x_ss[6] = params.x_ss_6;
-  params.u_ss[6] = params.u_ss_6;
   params.x_ss[7] = params.x_ss_7;
-  params.u_ss[7] = params.u_ss_7;
   params.x_ss[8] = params.x_ss_8;
-  params.u_ss[8] = params.u_ss_8;
   params.x_ss[9] = params.x_ss_9;
-  params.u_ss[9] = params.u_ss_9;
   params.x_ss[10] = params.x_ss_10;
-  params.u_ss[10] = params.u_ss_10;
   params.x_ss[11] = params.x_ss_11;
-  params.u_ss[11] = params.u_ss_11;
   params.x_ss[12] = params.x_ss_12;
-  params.u_ss[12] = params.u_ss_12;
   params.x_ss[13] = params.x_ss_13;
-  params.u_ss[13] = params.u_ss_13;
   params.x_ss[14] = params.x_ss_14;
-  params.u_ss[14] = params.u_ss_14;
   params.x_ss[15] = params.x_ss_15;
-  params.u_ss[15] = params.u_ss_15;
   params.x_ss[16] = params.x_ss_16;
-  params.u_ss[16] = params.u_ss_16;
   params.x_ss[17] = params.x_ss_17;
-  params.u_ss[17] = params.u_ss_17;
   params.x_ss[18] = params.x_ss_18;
-  params.u_ss[18] = params.u_ss_18;
   params.x_ss[19] = params.x_ss_19;
 }
 void setup_indexed_optvars(void) {
@@ -196,7 +177,7 @@ double eval_objv(void) {
   objv *= 0.5;
   for (i = 0; i < 263; i++)
     objv += work.q[i]*work.x[i];
-  objv += work.quad_345851330560[0]+work.quad_503357964288[0]+work.quad_689417555968[0]+work.quad_590025695232[0]+work.quad_24887435264[0]+work.quad_373406756864[0]+work.quad_282534416384[0]+work.quad_569492807680[0]+work.quad_658085392384[0]+work.quad_268442972160[0]+work.quad_212760903680[0]+work.quad_604237524992[0]+work.quad_899615596544[0]+work.quad_9807298560[0]+work.quad_730290806784[0]+work.quad_691068739584[0]+work.quad_512929845248[0]+work.quad_46428270592[0]+work.quad_907958816768[0]+work.quad_364190564352[0]+work.quad_603410014208[0]+work.quad_253294055424[0]+work.quad_406480764928[0]+work.quad_450189660160[0]+work.quad_622448181248[0]+work.quad_135073144832[0]+work.quad_512757641216[0]+work.quad_265658822656[0]+work.quad_225439469568[0]+work.quad_611752235008[0]+work.quad_945124098048[0]+work.quad_625116979200[0]+work.quad_566313590784[0]+work.quad_323441446912[0]+work.quad_589385719808[0]+work.quad_920610275328[0]+work.quad_700597231616[0]+work.quad_379984363520[0]+work.quad_438523551744[0]+work.quad_677275955200[0];
+  objv += work.quad_203336859648[0]+work.quad_830833205248[0]+work.quad_295866224640[0]+work.quad_600568381440[0]+work.quad_830833205248[0]+work.quad_898851794944[0]+work.quad_830833205248[0]+work.quad_88433618944[0]+work.quad_830833205248[0]+work.quad_240204779520[0]+work.quad_830833205248[0]+work.quad_635618762752[0]+work.quad_830833205248[0]+work.quad_732753989632[0]+work.quad_830833205248[0]+work.quad_427523055616[0]+work.quad_830833205248[0]+work.quad_976046530560[0]+work.quad_830833205248[0]+work.quad_688550678528[0]+work.quad_830833205248[0]+work.quad_304816418816[0]+work.quad_830833205248[0]+work.quad_819339411456[0]+work.quad_830833205248[0]+work.quad_101800079360[0]+work.quad_830833205248[0]+work.quad_976903761920[0]+work.quad_830833205248[0]+work.quad_141299838976[0]+work.quad_830833205248[0]+work.quad_343404097536[0]+work.quad_830833205248[0]+work.quad_815806124032[0]+work.quad_830833205248[0]+work.quad_997002137600[0]+work.quad_830833205248[0]+work.quad_141630619648[0]+work.quad_830833205248[0]+work.quad_854393544704[0];
   return objv;
 }
 void fillrhs_aff(void) {

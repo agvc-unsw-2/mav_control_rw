@@ -18,7 +18,7 @@ roll_time_constant: 0.105595
 roll_gain: 1.145387
 pitch_time_constant: 0.105172
 pitch_gain: 1.114824
-linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
 
 # Time constants for PID gains of 200

@@ -1,4 +1,4 @@
-/* Produced by CVXGEN, 2019-08-02 01:12:37 -0400.  */
+/* Produced by CVXGEN, 2019-08-07 00:07:14 -0400.  */
 /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
 /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
 /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
@@ -21,10 +21,9 @@
 #endif
 #endif
 
-#ifdef __cplusplus		
-  extern "C" {		
+#ifdef __cplusplus
+ extern "C" {
 #endif
-
 /* Space must be allocated somewhere (testsolver.c, csolve.c or your own */
 /* program) for the global variables vars, params, work and settings. */
 /* At the bottom of this file, they are externed. */
@@ -61,22 +60,6 @@ typedef struct Params_t {
   double x_ss_10[8];
   double u_ss_10[3];
   double x_ss_11[8];
-  double u_ss_11[3];
-  double x_ss_12[8];
-  double u_ss_12[3];
-  double x_ss_13[8];
-  double u_ss_13[3];
-  double x_ss_14[8];
-  double u_ss_14[3];
-  double x_ss_15[8];
-  double u_ss_15[3];
-  double x_ss_16[8];
-  double u_ss_16[3];
-  double x_ss_17[8];
-  double u_ss_17[3];
-  double x_ss_18[8];
-  double u_ss_18[3];
-  double x_ss_19[8];
   double Q_final[64];
   double A[64];
   double B[24];
@@ -85,8 +68,8 @@ typedef struct Params_t {
   double u_min[3];
   double u_max[3];
   double *x[1];
-  double *x_ss[20];
-  double *u_ss[19];
+  double *x_ss[12];
+  double *u_ss[11];
 } Params;
 typedef struct Vars_t {
   double *u_0; /* 3 rows. */
@@ -121,53 +104,29 @@ typedef struct Vars_t {
   double *u_10; /* 3 rows. */
   double *t_10; /* 3 rows. */
   double *x_11; /* 8 rows. */
-  double *u_11; /* 3 rows. */
-  double *t_11; /* 3 rows. */
-  double *x_12; /* 8 rows. */
-  double *u_12; /* 3 rows. */
-  double *t_12; /* 3 rows. */
-  double *x_13; /* 8 rows. */
-  double *u_13; /* 3 rows. */
-  double *t_13; /* 3 rows. */
-  double *x_14; /* 8 rows. */
-  double *u_14; /* 3 rows. */
-  double *t_14; /* 3 rows. */
-  double *x_15; /* 8 rows. */
-  double *u_15; /* 3 rows. */
-  double *t_15; /* 3 rows. */
-  double *x_16; /* 8 rows. */
-  double *u_16; /* 3 rows. */
-  double *t_16; /* 3 rows. */
-  double *x_17; /* 8 rows. */
-  double *u_17; /* 3 rows. */
-  double *t_17; /* 3 rows. */
-  double *x_18; /* 8 rows. */
-  double *u_18; /* 3 rows. */
-  double *t_18; /* 3 rows. */
-  double *x_19; /* 8 rows. */
-  double *u[19];
-  double *x[20];
+  double *u[11];
+  double *x[12];
 } Vars;
 typedef struct Workspace_t {
-  double h[114];
-  double s_inv[114];
-  double s_inv_z[114];
-  double b[206];
-  double q[263];
-  double rhs[697];
-  double x[697];
+  double h[66];
+  double s_inv[66];
+  double s_inv_z[66];
+  double b[118];
+  double q[151];
+  double rhs[401];
+  double x[401];
   double *s;
   double *z;
   double *y;
-  double lhs_aff[697];
-  double lhs_cc[697];
-  double buffer[697];
-  double buffer2[697];
-  double KKT[3284];
-  double L[5723];
-  double d[697];
-  double v[697];
-  double d_inv[697];
+  double lhs_aff[401];
+  double lhs_cc[401];
+  double buffer[401];
+  double buffer2[401];
+  double KKT[1868];
+  double L[3195];
+  double d[401];
+  double v[401];
+  double d_inv[401];
   double gap;
   double optval;
   double ineq_resid_squared;
@@ -197,23 +156,7 @@ typedef struct Workspace_t {
   double quad_603410014208[1];
   double quad_253294055424[1];
   double quad_406480764928[1];
-  double quad_450189660160[1];
-  double quad_622448181248[1];
-  double quad_135073144832[1];
-  double quad_512757641216[1];
-  double quad_265658822656[1];
-  double quad_225439469568[1];
-  double quad_611752235008[1];
-  double quad_945124098048[1];
-  double quad_625116979200[1];
-  double quad_566313590784[1];
-  double quad_323441446912[1];
-  double quad_589385719808[1];
-  double quad_920610275328[1];
-  double quad_700597231616[1];
-  double quad_379984363520[1];
-  double quad_438523551744[1];
-  double quad_677275955200[1];
+  double quad_811896348672[1];
   int converged;
 } Workspace;
 typedef struct Settings_t {
@@ -288,8 +231,8 @@ float randn_internal(long *idum, int reset);
 double randn(void);
 void reset_rand(void);
 
-#ifdef __cplusplus		
-}		
+#ifdef __cplusplus
+ }
 #endif
 
 #endif

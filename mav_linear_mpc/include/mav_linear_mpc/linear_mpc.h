@@ -181,7 +181,7 @@ class LinearModelPredictiveController
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
   static constexpr int kDisturbanceSize = 3;
-  static constexpr int kPredictionHorizonSteps = 20;
+  static constexpr int kPredictionHorizonSteps = 12;
   static constexpr double kGravity = 9.8066;
 
   // ros node handles

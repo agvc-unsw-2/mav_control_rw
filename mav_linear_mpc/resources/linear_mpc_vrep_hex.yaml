@@ -15,11 +15,11 @@ mass: 1.650000
 
 drag_coefficients: [ 0.000000 , 0.000000, 0.0000]
 
-# Time constatns for PID P gains of 600
-roll_time_constant: 0.105595
-roll_gain: 1.145387
-pitch_time_constant: 0.105172
-pitch_gain: 1.114824
+# Parameters for PID P gain of 500:
+roll_time_constant: 0.105720
+roll_gain: 1.090762
+pitch_time_constant: 0.104006
+pitch_gain: 1.050036
 yaw_gain: 1.000000
 
 # Time constants for PID P gains of 200

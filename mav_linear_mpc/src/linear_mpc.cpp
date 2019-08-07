@@ -414,7 +414,7 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
                                                  &target_input);
     CVXGEN_queue_.push_back(target_state);
     if (i == 0) {
-      Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_ss)) =
+      Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_ss_0)) =
           target_input;
     }
   }

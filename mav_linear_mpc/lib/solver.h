@@ -20,6 +20,11 @@
 #include <stdio.h>
 #endif
 #endif
+
+#ifdef __cplusplus		
+  extern "C" {		
+#endif
+
 /* Space must be allocated somewhere (testsolver.c, csolve.c or your own */
 /* program) for the global variables vars, params, work and settings. */
 /* At the bottom of this file, they are externed. */
@@ -282,5 +287,9 @@ float ran1(long*idum, int reset);
 float randn_internal(long *idum, int reset);
 double randn(void);
 void reset_rand(void);
+
+#ifdef __cplusplus		
+}		
+#endif
 
 #endif

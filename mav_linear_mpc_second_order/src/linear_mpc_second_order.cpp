@@ -396,8 +396,11 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   // Copy out the whole queues
   mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
 
+  Eigen::Vector4d zero4d;
+  zero4d.setZero();
   // update the disturbance observer
-  disturbance_observer_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  disturbance_observer_.feedAttitudeCommand(zero4d);
+  //disturbance_observer_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
   disturbance_observer_.feedPositionMeasurement(odometry_.position_W);
   disturbance_observer_.feedVelocityMeasurement(odometry_.getVelocityWorld());
   disturbance_observer_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
@@ -444,7 +447,9 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   }
 
   Eigen::Matrix<double, kStateSize, 1> target_state;
+  target_state.setZero();
   Eigen::Matrix<double, kInputSize, 1> target_input;
+  target_state.setZero();
   Eigen::VectorXd ref(kMeasurementSize);
 
   static int counter = 0;
@@ -463,7 +468,8 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
           target_input;
     }
     if (counter % 100 == 0) {
-      ROS_INFO_STREAM("target_input, i = " << i << ": " << target_input);
+      ROS_INFO_STREAM("target_state[" << i << "]:\n" << target_state);
+      ROS_INFO_STREAM("target_input, i = " << i << ":\n" << target_input);
     }
   }
 
@@ -477,22 +483,22 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
                                                &target_input);
   CVXGEN_queue_.push_back(target_state);
   if (counter % 100 == 0) {
-    ROS_INFO_STREAM("target_input, i = " << (kPredictionHorizonSteps - 1) << ": " << target_input);
+    ROS_INFO_STREAM("target_state[" << (kPredictionHorizonSteps - 1) << "]:\n" << target_state);
+    ROS_INFO_STREAM("target_input, i = " << (kPredictionHorizonSteps - 1) << ":\n" << target_input);
   }
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Pushing target states to queue\n");
-  ROS_INFO_STREAM_THROTTLE(1.0, "params.u_ss_0: " << params.u_ss_0);
-  // push 'steady state' target states for every step in prediction horizon to queue
   if (counter % 100 == 0) {
-    for (int i = 0; i < kPredictionHorizonSteps; i++) {
-      ROS_INFO_STREAM("params.x_ss[" << i << "] = " << params.x_ss[i]);
-      ROS_INFO_STREAM("CVXGEN_queue_[" << i << "]: \n" << CVXGEN_queue_[i]);
-      Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
-          CVXGEN_queue_[i];
-    }
+    ROS_INFO_STREAM("Pushing target states to queue\n");
+  }
+  // push 'steady state' target states for every step in prediction horizon to queue
+  for (int i = 0; i < kPredictionHorizonSteps; i++) {
+    Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
+        CVXGEN_queue_[i];
   }
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Calculating rpy and rpy_dot inertial frames\n");
+  if (counter % 100 == 0) {
+    ROS_INFO_STREAM("Calculating rpy and rpy_dot inertial frames\n");
+  }
   roll = current_rpy(0);
   pitch = current_rpy(1);
   yaw = current_rpy(2);
@@ -506,14 +512,20 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   roll_pitch_dot_inertial_frame << -sin(yaw) * pitch_dot + cos(yaw) * roll_dot, 
                                   cos(yaw) * pitch_dot + sin(yaw) * roll_dot;
   // load x_0 state
+  roll_pitch_dot_inertial_frame.setZero();
   x_0 << odometry_.position_W, odometry_.getVelocityWorld(), roll_pitch_inertial_frame, roll_pitch_dot_inertial_frame;
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Solving with CVXGEN\n");
-
+  if (counter % 100 == 0) {
+    ROS_INFO_STREAM("Solving with CVXGEN\n");
+    ROS_INFO_STREAM("x_0: \n" << x_0);
+    ROS_INFO_STREAM("d: \n" << estimated_disturbances);
+    ROS_INFO_STREAM("u_prev: \n" << linearized_command_roll_pitch_thrust_);
+  }
+  linearized_command_roll_pitch_thrust_.setZero();
   //Solve using CVXGEN
   Eigen::Map<Eigen::Matrix<double, kDisturbanceSize, 1>>(const_cast<double*>(params.d)) =
       estimated_disturbances; // constant disturbance
-  Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_prev)) =
+  Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_prev)) = 
       linearized_command_roll_pitch_thrust_; // initialized as 0
   Eigen::Map<Eigen::Matrix<double, kStateSize, 1>>(const_cast<double*>(params.x_0)) = x_0;
 
@@ -523,8 +535,9 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   linearized_command_roll_pitch_thrust_ << vars.u_0[0], vars.u_0[1], vars.u_0[2];
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Finished calculating\n");
-
+  if (counter % 100 == 0) {
+    ROS_INFO_STREAM("Finished calculating\n");
+  }
   if (solver_status < 0) {
     ROS_WARN("Linear MPC: Solver faild, use LQR backup");
     linearized_command_roll_pitch_thrust_ = LQR_K_ * (target_state - x_0);
@@ -533,9 +546,11 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
     linearized_command_roll_pitch_thrust_ = linearized_command_roll_pitch_thrust_.cwiseMin(
         Eigen::Vector3d(roll_limit_, pitch_limit_, thrust_max_));
   }
-  ROS_INFO_STREAM_THROTTLE(1.0, "Linearized rpt command: \n" << linearized_command_roll_pitch_thrust_);
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Converting commands to body frame\n");
+  if (counter % 100 == 0) {
+    ROS_INFO_STREAM("Linearized rpt command: \n" << linearized_command_roll_pitch_thrust_);
+    ROS_INFO_STREAM("Converting commands to body frame\n");
+  }
 
   command_roll_pitch_yaw_thrust_(3) = (linearized_command_roll_pitch_thrust_(2) + kGravity)
       / (cos(roll) * cos(pitch));
@@ -548,8 +563,9 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   command_roll_pitch_yaw_thrust_(1) = ux * cos(yaw) - uy * sin(yaw);
   command_roll_pitch_yaw_thrust_(2) = yaw_ref_.front();
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Body frame rpt command: \n" << command_roll_pitch_yaw_thrust_);
-
+  if (counter % 100 == 0) {
+    ROS_INFO_STREAM("Body frame rpt command: \n" << command_roll_pitch_yaw_thrust_);
+  }
   // yaw controller
   double yaw_error = command_roll_pitch_yaw_thrust_(2) - yaw;
 

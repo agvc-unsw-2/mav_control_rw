@@ -63,7 +63,8 @@ void SteadyStateCalculationSecondOrder::initialize(const Eigen::MatrixXd& A, con
       * left_hand_side.transpose();
 
   initialized_params_ = true;
-  ROS_INFO("Linear MPC Second Order: Steady State calculation is initialized correctly");
+  ROS_INFO("Linear MPC Second Order: Steady State calculation initialized");
+  ROS_INFO_STREAM("pseudo_inverse_left_hand_side_:\n" << pseudo_inverse_left_hand_side_);
 }
 
 void SteadyStateCalculationSecondOrder::computeSteadyState(

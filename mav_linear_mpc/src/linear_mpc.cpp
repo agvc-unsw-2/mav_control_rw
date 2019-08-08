@@ -402,8 +402,11 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
 
 
   Eigen::Matrix<double, kStateSize, 1> target_state;
+  target_state.setZero();
   Eigen::Matrix<double, kInputSize, 1> target_input;
+  target_input.setZero();
   Eigen::VectorXd ref(kMeasurementSize);
+  ref.setZero();
 
   CVXGEN_queue_.clear();
   // calculate target_state and target_input for each step in the prediction horizon
@@ -419,7 +422,8 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
           target_input;
     }
     if (counter % 100 == 0) {
-      ROS_INFO_STREAM("target_input, i = " << i << ": " << target_input);
+      ROS_INFO_STREAM("target_state[" << i << "]: \n" << target_state);
+      ROS_INFO_STREAM("target_input, i = " << i << ": \n" << target_input);
     }
   }
   // calculate target state and target input for last step in prediction horizon
@@ -430,20 +434,16 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
   steady_state_calculation_.computeSteadyState(estimated_disturbances, ref, &target_state,
                                                &target_input);
   if (counter % 100 == 0) {
-    ROS_INFO_STREAM("target_input, i = " << (kPredictionHorizonSteps - 1) << ": " << target_input);
+    ROS_INFO_STREAM("target_state[" << (kPredictionHorizonSteps - 1) << "]: \n" << target_state);
+    ROS_INFO_STREAM("target_input, i = " << (kPredictionHorizonSteps - 1) << ": \n" << target_input);
   }
   CVXGEN_queue_.push_back(target_state);
 
   ROS_INFO_STREAM_THROTTLE(1.0, "Pushing target states to queue\n");
-  ROS_INFO_STREAM_THROTTLE(1.0, "params.u_ss_0: " << params.u_ss_0);
   // push 'steady state' target states for every step in prediction horizon to queue
-  if (counter % 100 == 0) {
-    for (int i = 0; i < kPredictionHorizonSteps; i++) {
-      ROS_INFO_STREAM("params.x_ss[" << i << "] = " << params.x_ss[i]);
-      ROS_INFO_STREAM("CVXGEN_queue_[" << i << "]: \n" << CVXGEN_queue_[i]);
-      Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
-          CVXGEN_queue_[i];
-    }
+  for (int i = 0; i < kPredictionHorizonSteps; i++) {
+    Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
+        CVXGEN_queue_[i];
   }
 
   // push 'steady state' target states for every step in prediction horizon to queue

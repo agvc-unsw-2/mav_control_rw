@@ -20,7 +20,7 @@ cs_add_library(mav_linear_mpc_second_order
   src/steady_state_calculation_second_order.cpp
 )
 
-cs_add_library(cvxgen_solver 
+cs_add_library(cvxgen_solver_second_order 
   lib/ldl.c
   lib/solver.c
   lib/matrix_support.c
@@ -29,7 +29,7 @@ cs_add_library(cvxgen_solver
 )
 
 
-target_link_libraries(mav_linear_mpc_second_order cvxgen_solver)
+target_link_libraries(mav_linear_mpc_second_order cvxgen_solver_second_order)
 
 
 ############

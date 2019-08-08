@@ -408,6 +408,7 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
   CVXGEN_queue_.clear();
   // calculate target_state and target_input for each step in the prediction horizon
   // except the last step
+  static int counter = 0;
   for (int i = 0; i < kPredictionHorizonSteps - 1; i++) {
     ref << position_ref_.at(i), velocity_ref_.at(i);
     steady_state_calculation_.computeSteadyState(estimated_disturbances, ref, &target_state,
@@ -417,6 +418,9 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
       Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_ss_0)) =
           target_input;
     }
+    if (counter % 100 == 0) {
+      ROS_INFO_STREAM("target_input, i = " << i << ": " << target_input);
+    }
   }
   // calculate target state and target input for last step in prediction horizon
   // (terminal state)
@@ -425,7 +429,22 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
 
   steady_state_calculation_.computeSteadyState(estimated_disturbances, ref, &target_state,
                                                &target_input);
+  if (counter % 100 == 0) {
+    ROS_INFO_STREAM("target_input, i = " << (kPredictionHorizonSteps - 1) << ": " << target_input);
+  }
   CVXGEN_queue_.push_back(target_state);
+
+  ROS_INFO_STREAM_THROTTLE(1.0, "Pushing target states to queue\n");
+  ROS_INFO_STREAM_THROTTLE(1.0, "params.u_ss_0: " << params.u_ss_0);
+  // push 'steady state' target states for every step in prediction horizon to queue
+  if (counter % 100 == 0) {
+    for (int i = 0; i < kPredictionHorizonSteps; i++) {
+      ROS_INFO_STREAM("params.x_ss[" << i << "] = " << params.x_ss[i]);
+      ROS_INFO_STREAM("CVXGEN_queue_[" << i << "]: \n" << CVXGEN_queue_[i]);
+      Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
+          CVXGEN_queue_[i];
+    }
+  }
 
   // push 'steady state' target states for every step in prediction horizon to queue
   for (int i = 0; i < kPredictionHorizonSteps; i++) {
@@ -464,6 +483,8 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
         Eigen::Vector3d(roll_limit_, pitch_limit_, thrust_max_));
   }
 
+  ROS_INFO_STREAM_THROTTLE(1.0, "Linearized rpt command: \n" << linearized_command_roll_pitch_thrust_);
+
   command_roll_pitch_yaw_thrust_(3) = (linearized_command_roll_pitch_thrust_(2) + kGravity)
       / (cos(roll) * cos(pitch));
   double ux = linearized_command_roll_pitch_thrust_(1)
@@ -474,6 +495,8 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
   command_roll_pitch_yaw_thrust_(0) = ux * sin(yaw) + uy * cos(yaw);
   command_roll_pitch_yaw_thrust_(1) = ux * cos(yaw) - uy * sin(yaw);
   command_roll_pitch_yaw_thrust_(2) = yaw_ref_.front();
+  
+  ROS_INFO_STREAM_THROTTLE(1.0, "Body frame rpt command: \n" << command_roll_pitch_yaw_thrust_);
 
   // yaw controller
   double yaw_error = command_roll_pitch_yaw_thrust_(2) - yaw;
@@ -503,7 +526,6 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
   double diff_time = (ros::WallTime::now() - starting_time).toSec();
 
   if (verbose_) {
-    static int counter = 0;
     if (counter > 100) {
       ROS_INFO_STREAM("average solve time: " << 1000.0 * solve_time_average_ / counter << " ms");
       solve_time_average_ = 0.0;

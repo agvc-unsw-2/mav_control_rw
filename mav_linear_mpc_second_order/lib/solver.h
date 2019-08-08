@@ -1,6 +1,6 @@
-/* Produced by CVXGEN, 2015-02-11 07:30:06 -0500.  */
-/* CVXGEN is Copyright (C) 2006-2012 Jacob Mattingley, jem@cvxgen.com. */
-/* The code in this file is Copyright (C) 2006-2012 Jacob Mattingley. */
+/* Produced by CVXGEN, 2019-08-01 23:42:46 -0400.  */
+/* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
+/* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
 /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
 /* applications without prior written permission from Jacob Mattingley. */
 
@@ -25,7 +25,6 @@
  extern "C" {
 #endif
 
-
 /* Space must be allocated somewhere (testsolver.c, csolve.c or your own */
 /* program) for the global variables vars, params, work and settings. */
 /* At the bottom of this file, they are externed. */
@@ -33,159 +32,153 @@
 #include <math.h>
 #define pm(A, m, n) printmatrix(#A, A, m, n, 1)
 #endif
-
-// TODO: Change all of these hard coded variables as appropriate
-
-#define STATE_SIZE 10
-#define INPUT_SIZE 3
-#define DISTURBANCE_SIZE 5
-#define PREDICTION_HORIZON 20
 typedef struct Params_t {
-  double x_0[STATE_SIZE];
-  double x_ss_0[STATE_SIZE];
-  double Q[STATE_SIZE * STATE_SIZE];
-  double u_ss[INPUT_SIZE];
-  double R[INPUT_SIZE * INPUT_SIZE];
-  double u_prev[INPUT_SIZE];
-  double R_omega[INPUT_SIZE * INPUT_SIZE];
-  double x_ss_1[STATE_SIZE];
-  double x_ss_2[STATE_SIZE];
-  double x_ss_3[STATE_SIZE];
-  double x_ss_4[STATE_SIZE];
-  double x_ss_5[STATE_SIZE];
-  double x_ss_6[STATE_SIZE];
-  double x_ss_7[STATE_SIZE];
-  double x_ss_8[STATE_SIZE];
-  double x_ss_9[STATE_SIZE];
-  double x_ss_10[STATE_SIZE];
-  double x_ss_11[STATE_SIZE];
-  double x_ss_12[STATE_SIZE];
-  double x_ss_13[STATE_SIZE];
-  double x_ss_14[STATE_SIZE];
-  double x_ss_15[STATE_SIZE];
-  double x_ss_16[STATE_SIZE];
-  double x_ss_17[STATE_SIZE];
-  double x_ss_18[STATE_SIZE];
-  double x_ss_19[STATE_SIZE];
-  double Q_final[STATE_SIZE * STATE_SIZE];
-  double A[STATE_SIZE * STATE_SIZE];
-  double B[STATE_SIZE * INPUT_SIZE];
-  double Bd[STATE_SIZE * DISTURBANCE_SIZE];
-  double d[DISTURBANCE_SIZE];
-  double u_min[INPUT_SIZE];
-  double u_max[INPUT_SIZE];
+  double x_0[12];
+  double x_ss_0[12];
+  double Q[144];
+  double u_ss_0[3];
+  double R[9];
+  double u_prev[3];
+  double R_omega[9];
+  double x_ss_1[12];
+  double u_ss_1[3];
+  double x_ss_2[12];
+  double u_ss_2[3];
+  double x_ss_3[12];
+  double u_ss_3[3];
+  double x_ss_4[12];
+  double u_ss_4[3];
+  double x_ss_5[12];
+  double u_ss_5[3];
+  double x_ss_6[12];
+  double u_ss_6[3];
+  double x_ss_7[12];
+  double u_ss_7[3];
+  double x_ss_8[12];
+  double u_ss_8[3];
+  double x_ss_9[12];
+  double u_ss_9[3];
+  double x_ss_10[12];
+  double u_ss_10[3];
+  double x_ss_11[12];
+  double u_ss_11[3];
+  double x_ss_12[12];
+  double u_ss_12[3];
+  double x_ss_13[12];
+  double u_ss_13[3];
+  double x_ss_14[12];
+  double Q_final[144];
+  double A[144];
+  double B[36];
+  double Bd[72];
+  double d[6];
+  double u_min[3];
+  double u_max[3];
   double *x[1];
-  double *x_ss[PREDICTION_HORIZON];
+  double *x_ss[15];
+  double *u_ss[14];
 } Params;
-// TODO: Change these comments because they are obsolete
 typedef struct Vars_t {
   double *u_0; /* 3 rows. */
-  double *x_1; /* 8 rows. */
+  double *x_1; /* 12 rows. */
   double *u_1; /* 3 rows. */
   double *t_01; /* 3 rows. */
-  double *x_2; /* 8 rows. */
+  double *x_2; /* 12 rows. */
   double *u_2; /* 3 rows. */
   double *t_02; /* 3 rows. */
-  double *x_3; /* 8 rows. */
+  double *x_3; /* 12 rows. */
   double *u_3; /* 3 rows. */
   double *t_03; /* 3 rows. */
-  double *x_4; /* 8 rows. */
+  double *x_4; /* 12 rows. */
   double *u_4; /* 3 rows. */
   double *t_04; /* 3 rows. */
-  double *x_5; /* 8 rows. */
+  double *x_5; /* 12 rows. */
   double *u_5; /* 3 rows. */
   double *t_05; /* 3 rows. */
-  double *x_6; /* 8 rows. */
+  double *x_6; /* 12 rows. */
   double *u_6; /* 3 rows. */
   double *t_06; /* 3 rows. */
-  double *x_7; /* 8 rows. */
+  double *x_7; /* 12 rows. */
   double *u_7; /* 3 rows. */
   double *t_07; /* 3 rows. */
-  double *x_8; /* 8 rows. */
+  double *x_8; /* 12 rows. */
   double *u_8; /* 3 rows. */
   double *t_08; /* 3 rows. */
-  double *x_9; /* 8 rows. */
+  double *x_9; /* 12 rows. */
   double *u_9; /* 3 rows. */
   double *t_09; /* 3 rows. */
-  double *x_10; /* 8 rows. */
+  double *x_10; /* 12 rows. */
   double *u_10; /* 3 rows. */
   double *t_10; /* 3 rows. */
-  double *x_11; /* 8 rows. */
+  double *x_11; /* 12 rows. */
   double *u_11; /* 3 rows. */
   double *t_11; /* 3 rows. */
-  double *x_12; /* 8 rows. */
+  double *x_12; /* 12 rows. */
   double *u_12; /* 3 rows. */
   double *t_12; /* 3 rows. */
-  double *x_13; /* 8 rows. */
+  double *x_13; /* 12 rows. */
   double *u_13; /* 3 rows. */
   double *t_13; /* 3 rows. */
-  double *x_14; /* 8 rows. */
-  double *u_14; /* 3 rows. */
-  double *t_14; /* 3 rows. */
-  double *x_15; /* 8 rows. */
-  double *u_15; /* 3 rows. */
-  double *t_15; /* 3 rows. */
-  double *x_16; /* 8 rows. */
-  double *u_16; /* 3 rows. */
-  double *t_16; /* 3 rows. */
-  double *x_17; /* 8 rows. */
-  double *u_17; /* 3 rows. */
-  double *t_17; /* 3 rows. */
-  double *x_18; /* 8 rows. */
-  double *u_18; /* 3 rows. */
-  double *t_18; /* 3 rows. */
-  double *x_19; /* 8 rows. */
-  double *u[PREDICTION_HORIZON - 1];
-  double *x[PREDICTION_HORIZON];
+  double *x_14; /* 12 rows. */
+  double *u[14];
+  double *x[15];
 } Vars;
 typedef struct Workspace_t {
-  double h[114];
-  double s_inv[114];
-  double s_inv_z[114];
-  double b[206];
-  double q[263];
-  double rhs[697];
-  double x[697];
+  double h[84];
+  double s_inv[84];
+  double s_inv_z[84];
+  double b[207];
+  double q[249];
+  double rhs[624];
+  double x[624];
   double *s;
   double *z;
   double *y;
-  double lhs_aff[697];
-  double lhs_cc[697];
-  double buffer[697];
-  double buffer2[697];
-  double KKT[3284];
-  double L[5723];
-  double d[697];
-  double v[697];
-  double d_inv[697];
+  double lhs_aff[624];
+  double lhs_cc[624];
+  double buffer[624];
+  double buffer2[624];
+  double KKT[4251];
+  double L[8055];
+  double d[624];
+  double v[624];
+  double d_inv[624];
   double gap;
   double optval;
   double ineq_resid_squared;
   double eq_resid_squared;
   double block_33[1];
   /* Pre-op symbols. */
-  double quad_203336859648[1];
-  double quad_830833205248[1];
-  double quad_295866224640[1];
-  double quad_600568381440[1];
-  double quad_898851794944[1];
-  double quad_88433618944[1];
-  double quad_240204779520[1];
-  double quad_635618762752[1];
-  double quad_732753989632[1];
-  double quad_427523055616[1];
-  double quad_976046530560[1];
-  double quad_688550678528[1];
-  double quad_304816418816[1];
-  double quad_819339411456[1];
-  double quad_101800079360[1];
-  double quad_976903761920[1];
-  double quad_141299838976[1];
-  double quad_343404097536[1];
-  double quad_815806124032[1];
-  double quad_997002137600[1];
-  double quad_141630619648[1];
-  double quad_854393544704[1];
+  double quad_345851330560[1];
+  double quad_503357964288[1];
+  double quad_689417555968[1];
+  double quad_590025695232[1];
+  double quad_24887435264[1];
+  double quad_373406756864[1];
+  double quad_282534416384[1];
+  double quad_569492807680[1];
+  double quad_658085392384[1];
+  double quad_268442972160[1];
+  double quad_212760903680[1];
+  double quad_604237524992[1];
+  double quad_899615596544[1];
+  double quad_9807298560[1];
+  double quad_730290806784[1];
+  double quad_691068739584[1];
+  double quad_512929845248[1];
+  double quad_46428270592[1];
+  double quad_907958816768[1];
+  double quad_364190564352[1];
+  double quad_603410014208[1];
+  double quad_253294055424[1];
+  double quad_406480764928[1];
+  double quad_450189660160[1];
+  double quad_622448181248[1];
+  double quad_135073144832[1];
+  double quad_512757641216[1];
+  double quad_265658822656[1];
+  double quad_225439469568[1];
+  double quad_282763468800[1];
   int converged;
 } Workspace;
 typedef struct Settings_t {

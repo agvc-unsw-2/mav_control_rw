@@ -641,10 +641,10 @@ b[11] = rk_dim12_bPerm[11];
 
 /** Column vector of size: 1 */
 static const real_t acado_Ah_mat[ 1 ] = 
-{ 2.5000000000000001e-02 };
+{ 8.3333333333333332e-03 };
 
 
-/* Fixed step size:0.05 */
+/* Fixed step size:0.0166667 */
 int acado_integrate( real_t* const rk_eta, int resetIntegrator )
 {
 int error;
@@ -678,7 +678,7 @@ rk_xxx[26] = rk_eta[206];
 rk_xxx[27] = rk_eta[207];
 rk_xxx[28] = rk_eta[208];
 
-for (run = 0; run < 2; ++run)
+for (run = 0; run < 6; ++run)
 {
 if( run > 0 ) {
 for (i = 0; i < 12; ++i)
@@ -870,7 +870,7 @@ rk_diffK[i + 11] = rk_b[i * 12 + 11];
 for (i = 0; i < 12; ++i)
 {
 rk_diffsNew2[(i * 15) + (run1)] = (i == run1-0);
-rk_diffsNew2[(i * 15) + (run1)] += + rk_diffK[i]*(real_t)5.0000000000000003e-02;
+rk_diffsNew2[(i * 15) + (run1)] += + rk_diffK[i]*(real_t)1.6666666666666666e-02;
 }
 }
 for (run1 = 0; run1 < 3; ++run1)
@@ -902,21 +902,21 @@ rk_diffK[i + 11] = rk_b[i * 12 + 11];
 }
 for (i = 0; i < 12; ++i)
 {
-rk_diffsNew2[(i * 15) + (run1 + 12)] = + rk_diffK[i]*(real_t)5.0000000000000003e-02;
+rk_diffsNew2[(i * 15) + (run1 + 12)] = + rk_diffK[i]*(real_t)1.6666666666666666e-02;
 }
 }
-rk_eta[0] += + rk_kkk[0]*(real_t)5.0000000000000003e-02;
-rk_eta[1] += + rk_kkk[1]*(real_t)5.0000000000000003e-02;
-rk_eta[2] += + rk_kkk[2]*(real_t)5.0000000000000003e-02;
-rk_eta[3] += + rk_kkk[3]*(real_t)5.0000000000000003e-02;
-rk_eta[4] += + rk_kkk[4]*(real_t)5.0000000000000003e-02;
-rk_eta[5] += + rk_kkk[5]*(real_t)5.0000000000000003e-02;
-rk_eta[6] += + rk_kkk[6]*(real_t)5.0000000000000003e-02;
-rk_eta[7] += + rk_kkk[7]*(real_t)5.0000000000000003e-02;
-rk_eta[8] += + rk_kkk[8]*(real_t)5.0000000000000003e-02;
-rk_eta[9] += + rk_kkk[9]*(real_t)5.0000000000000003e-02;
-rk_eta[10] += + rk_kkk[10]*(real_t)5.0000000000000003e-02;
-rk_eta[11] += + rk_kkk[11]*(real_t)5.0000000000000003e-02;
+rk_eta[0] += + rk_kkk[0]*(real_t)1.6666666666666666e-02;
+rk_eta[1] += + rk_kkk[1]*(real_t)1.6666666666666666e-02;
+rk_eta[2] += + rk_kkk[2]*(real_t)1.6666666666666666e-02;
+rk_eta[3] += + rk_kkk[3]*(real_t)1.6666666666666666e-02;
+rk_eta[4] += + rk_kkk[4]*(real_t)1.6666666666666666e-02;
+rk_eta[5] += + rk_kkk[5]*(real_t)1.6666666666666666e-02;
+rk_eta[6] += + rk_kkk[6]*(real_t)1.6666666666666666e-02;
+rk_eta[7] += + rk_kkk[7]*(real_t)1.6666666666666666e-02;
+rk_eta[8] += + rk_kkk[8]*(real_t)1.6666666666666666e-02;
+rk_eta[9] += + rk_kkk[9]*(real_t)1.6666666666666666e-02;
+rk_eta[10] += + rk_kkk[10]*(real_t)1.6666666666666666e-02;
+rk_eta[11] += + rk_kkk[11]*(real_t)1.6666666666666666e-02;
 if( run == 0 ) {
 for (i = 0; i < 12; ++i)
 {
@@ -971,7 +971,7 @@ rk_eta[tmp_index2 + 156] += + rk_diffsNew2[i * 15 + 11]*rk_diffsPrev2[j + 177];
 }
 }
 resetIntegrator = 0;
-rk_ttt += 5.0000000000000000e-01;
+rk_ttt += 1.6666666666666666e-01;
 }
 for (i = 0; i < 12; ++i)
 {

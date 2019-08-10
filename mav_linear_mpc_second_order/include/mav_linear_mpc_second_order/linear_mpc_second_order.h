@@ -194,7 +194,7 @@ class LMPC_Second_Order_Controller
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
   static constexpr int kDisturbanceSize = 5;
-  static constexpr int kPredictionHorizonSteps = 15;
+  static constexpr int kPredictionHorizonSteps = 17;
   static constexpr double kGravity = 9.8066;
 
   // ros node handles

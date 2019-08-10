@@ -21,7 +21,7 @@ USING_NAMESPACE_ACADO
 int main( )
 {
     double Ts = 0.1;  // prediction sampling time
-    double N  = 20;   // Prediction horizon
+    double N  = 5;   // Prediction horizon
     double g = 9.8066;
     double PI = 3.1415926535897932;
 

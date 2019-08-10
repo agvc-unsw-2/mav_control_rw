@@ -419,7 +419,8 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   // TODO: Change this disturbance observer appropriately
   if (enable_disturbance_observer_ == true) {
-    estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+    //estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+    estimated_disturbances = KF_estimated_state.segment(12, 3);
   } else {
     estimated_disturbances.setZero();
   }
@@ -467,12 +468,12 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
       Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_ss_0)) =
           target_input;
     }
-    if (verbose_) {
-      if (counter % 100 == 0) {
-        ROS_INFO_STREAM("target_state[" << i << "]:\n" << target_state);
-        ROS_INFO_STREAM("target_input, i = " << i << ":\n" << target_input);
-      }
-    }
+    // if (verbose_) {
+    //   if (counter % 100 == 0) {
+    //     ROS_INFO_STREAM("target_state[" << i << "]:\n" << target_state);
+    //     ROS_INFO_STREAM("target_input, i = " << i << ":\n" << target_input);
+    //   }
+    // }
   }
 
   ROS_INFO_STREAM_THROTTLE(1.0, "Calculating terminal state\n");

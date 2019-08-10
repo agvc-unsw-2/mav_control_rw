@@ -35,6 +35,7 @@ class High_Level_Controller():
         self.land_height = 0.05
         self.suction_height = 0.0 #offset for suction cup
         self.wait_time = 1.0
+        self.goToWaypointTimeout = 10.0
 
         self.odom_subber = odom_subscriber(mav_name, uav_num)
         self.pose_pubber = pose_publisher(mav_name, uav_num)
@@ -43,6 +44,8 @@ class High_Level_Controller():
 
     def goToWaypoint(self, pose_cmd):
         self.pose_pubber.publish(pose_cmd)
+        now_secs = rospy.get_time()
+        end_time = now_secs + self.goToWaypointTimeout
         while(not at_waypoint(pose_cmd, self.odom_subber.msg)):
             #print("At: ")
             #print(self.odom_subber.msg)
@@ -50,6 +53,9 @@ class High_Level_Controller():
             print("At [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z)) + ']'
             self.pose_pubber.publish(pose_cmd)
             time.sleep(0.5)
+            if (rospy.get_time() > end_time):
+                print("Going to waypoint timed out")
+                break
         time.sleep(self.wait_time) # Wait
     
     # Same as goToPose but position Point msg instead of Pose cmd

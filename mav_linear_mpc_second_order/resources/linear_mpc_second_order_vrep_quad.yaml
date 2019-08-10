@@ -37,8 +37,8 @@ q_vz : 100
 q_roll: 10
 q_pitch: 10
 
-q_roll_dot: 0
-q_pitch_dot: 0
+q_roll_dot: 10
+q_pitch_dot: 10
 
 r_roll: 50
 r_pitch: 50

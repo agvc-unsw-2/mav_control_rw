@@ -173,6 +173,8 @@ void LMPC_Second_Order_Controller::constructModelMatrices()
     drag_coefficients_(1),
     drag_coefficients_(2)
   );
+  A_continous_time(3, 7) = kGravity;
+  A_continous_time(4, 6) = -kGravity;
   A_continous_time.block<2, 2>(6, 8) = Eigen::MatrixXd::Identity(2, 2);
 
   A_continous_time.block<2, 2>(8, 6) = -1.0 * Eigen::DiagonalMatrix<double, 2>(
@@ -184,13 +186,9 @@ void LMPC_Second_Order_Controller::constructModelMatrices()
     pitch_omega_ * pitch_damping_
   );
 
-  B_continous_time.block<2, 2>(6, 0) = -1.0 * Eigen::DiagonalMatrix<double, 2>(
+  B_continous_time.block<2, 2>(8, 0) =  Eigen::DiagonalMatrix<double, 2>(
     roll_omega_ * roll_omega_ * roll_gain_, 
     pitch_omega_ * pitch_omega_ * pitch_gain_
-  );
-  B_continous_time.block<2, 2>(8, 0) = -2.0 * Eigen::DiagonalMatrix<double, 2>(
-    roll_damping_ * roll_omega_ * roll_gain_, 
-    pitch_damping_ * pitch_omega_ * pitch_gain_
   );
   //B_continous_time.block<1, 1>(5, 2) = Eigen::DiagonalMatrix<double, 1>(1.0);
   B_continous_time(5, 2) = 1.0;

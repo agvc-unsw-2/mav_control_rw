@@ -602,6 +602,7 @@ void NMPC_Second_Order::calculateRollPitchYawrateThrustCommand(
 
 }
 
+// TODO: Wtf
 Eigen::MatrixXd NMPC_Second_Order::solveCARE(Eigen::MatrixXd Q, Eigen::MatrixXd R)
 {
   // Define system matrices

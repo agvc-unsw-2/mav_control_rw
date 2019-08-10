@@ -1,4 +1,4 @@
-/* Produced by CVXGEN, 2019-08-01 23:42:46 -0400.  */
+/* Produced by CVXGEN, 2019-08-10 00:40:10 -0400.  */
 /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
 /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
 /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
@@ -33,152 +33,166 @@
 #define pm(A, m, n) printmatrix(#A, A, m, n, 1)
 #endif
 typedef struct Params_t {
-  double x_0[12];
-  double x_ss_0[12];
-  double Q[144];
+  double x_0[10];
+  double x_ss_0[10];
+  double Q[100];
   double u_ss_0[3];
   double R[9];
   double u_prev[3];
   double R_omega[9];
-  double x_ss_1[12];
+  double x_ss_1[10];
   double u_ss_1[3];
-  double x_ss_2[12];
+  double x_ss_2[10];
   double u_ss_2[3];
-  double x_ss_3[12];
+  double x_ss_3[10];
   double u_ss_3[3];
-  double x_ss_4[12];
+  double x_ss_4[10];
   double u_ss_4[3];
-  double x_ss_5[12];
+  double x_ss_5[10];
   double u_ss_5[3];
-  double x_ss_6[12];
+  double x_ss_6[10];
   double u_ss_6[3];
-  double x_ss_7[12];
+  double x_ss_7[10];
   double u_ss_7[3];
-  double x_ss_8[12];
+  double x_ss_8[10];
   double u_ss_8[3];
-  double x_ss_9[12];
+  double x_ss_9[10];
   double u_ss_9[3];
-  double x_ss_10[12];
+  double x_ss_10[10];
   double u_ss_10[3];
-  double x_ss_11[12];
+  double x_ss_11[10];
   double u_ss_11[3];
-  double x_ss_12[12];
+  double x_ss_12[10];
   double u_ss_12[3];
-  double x_ss_13[12];
+  double x_ss_13[10];
   double u_ss_13[3];
-  double x_ss_14[12];
-  double Q_final[144];
-  double A[144];
-  double B[36];
-  double Bd[72];
-  double d[6];
+  double x_ss_14[10];
+  double u_ss_14[3];
+  double x_ss_15[10];
+  double u_ss_15[3];
+  double x_ss_16[10];
+  double Q_final[100];
+  double A[100];
+  double B[30];
+  double Bd[50];
+  double d[5];
   double u_min[3];
   double u_max[3];
   double *x[1];
-  double *x_ss[15];
-  double *u_ss[14];
+  double *x_ss[17];
+  double *u_ss[16];
 } Params;
 typedef struct Vars_t {
   double *u_0; /* 3 rows. */
-  double *x_1; /* 12 rows. */
+  double *x_1; /* 10 rows. */
   double *u_1; /* 3 rows. */
   double *t_01; /* 3 rows. */
-  double *x_2; /* 12 rows. */
+  double *x_2; /* 10 rows. */
   double *u_2; /* 3 rows. */
   double *t_02; /* 3 rows. */
-  double *x_3; /* 12 rows. */
+  double *x_3; /* 10 rows. */
   double *u_3; /* 3 rows. */
   double *t_03; /* 3 rows. */
-  double *x_4; /* 12 rows. */
+  double *x_4; /* 10 rows. */
   double *u_4; /* 3 rows. */
   double *t_04; /* 3 rows. */
-  double *x_5; /* 12 rows. */
+  double *x_5; /* 10 rows. */
   double *u_5; /* 3 rows. */
   double *t_05; /* 3 rows. */
-  double *x_6; /* 12 rows. */
+  double *x_6; /* 10 rows. */
   double *u_6; /* 3 rows. */
   double *t_06; /* 3 rows. */
-  double *x_7; /* 12 rows. */
+  double *x_7; /* 10 rows. */
   double *u_7; /* 3 rows. */
   double *t_07; /* 3 rows. */
-  double *x_8; /* 12 rows. */
+  double *x_8; /* 10 rows. */
   double *u_8; /* 3 rows. */
   double *t_08; /* 3 rows. */
-  double *x_9; /* 12 rows. */
+  double *x_9; /* 10 rows. */
   double *u_9; /* 3 rows. */
   double *t_09; /* 3 rows. */
-  double *x_10; /* 12 rows. */
+  double *x_10; /* 10 rows. */
   double *u_10; /* 3 rows. */
   double *t_10; /* 3 rows. */
-  double *x_11; /* 12 rows. */
+  double *x_11; /* 10 rows. */
   double *u_11; /* 3 rows. */
   double *t_11; /* 3 rows. */
-  double *x_12; /* 12 rows. */
+  double *x_12; /* 10 rows. */
   double *u_12; /* 3 rows. */
   double *t_12; /* 3 rows. */
-  double *x_13; /* 12 rows. */
+  double *x_13; /* 10 rows. */
   double *u_13; /* 3 rows. */
   double *t_13; /* 3 rows. */
-  double *x_14; /* 12 rows. */
-  double *u[14];
-  double *x[15];
+  double *x_14; /* 10 rows. */
+  double *u_14; /* 3 rows. */
+  double *t_14; /* 3 rows. */
+  double *x_15; /* 10 rows. */
+  double *u_15; /* 3 rows. */
+  double *t_15; /* 3 rows. */
+  double *x_16; /* 10 rows. */
+  double *u[16];
+  double *x[17];
 } Vars;
 typedef struct Workspace_t {
-  double h[84];
-  double s_inv[84];
-  double s_inv_z[84];
-  double b[207];
-  double q[249];
-  double rhs[624];
-  double x[624];
+  double h[96];
+  double s_inv[96];
+  double s_inv_z[96];
+  double b[205];
+  double q[253];
+  double rhs[650];
+  double x[650];
   double *s;
   double *z;
   double *y;
-  double lhs_aff[624];
-  double lhs_cc[624];
-  double buffer[624];
-  double buffer2[624];
-  double KKT[4251];
-  double L[8055];
-  double d[624];
-  double v[624];
-  double d_inv[624];
+  double lhs_aff[650];
+  double lhs_cc[650];
+  double buffer[650];
+  double buffer2[650];
+  double KKT[3725];
+  double L[6825];
+  double d[650];
+  double v[650];
+  double d_inv[650];
   double gap;
   double optval;
   double ineq_resid_squared;
   double eq_resid_squared;
   double block_33[1];
   /* Pre-op symbols. */
-  double quad_345851330560[1];
-  double quad_503357964288[1];
-  double quad_689417555968[1];
-  double quad_590025695232[1];
-  double quad_24887435264[1];
-  double quad_373406756864[1];
-  double quad_282534416384[1];
-  double quad_569492807680[1];
-  double quad_658085392384[1];
-  double quad_268442972160[1];
-  double quad_212760903680[1];
-  double quad_604237524992[1];
-  double quad_899615596544[1];
-  double quad_9807298560[1];
-  double quad_730290806784[1];
-  double quad_691068739584[1];
-  double quad_512929845248[1];
-  double quad_46428270592[1];
-  double quad_907958816768[1];
-  double quad_364190564352[1];
-  double quad_603410014208[1];
-  double quad_253294055424[1];
-  double quad_406480764928[1];
-  double quad_450189660160[1];
-  double quad_622448181248[1];
-  double quad_135073144832[1];
-  double quad_512757641216[1];
-  double quad_265658822656[1];
-  double quad_225439469568[1];
-  double quad_282763468800[1];
+  double quad_203336859648[1];
+  double quad_447791480832[1];
+  double quad_295866224640[1];
+  double quad_600568381440[1];
+  double quad_885004812288[1];
+  double quad_898851794944[1];
+  double quad_469996625920[1];
+  double quad_88433618944[1];
+  double quad_768722419712[1];
+  double quad_240204779520[1];
+  double quad_757472997376[1];
+  double quad_635618762752[1];
+  double quad_179070365696[1];
+  double quad_732753989632[1];
+  double quad_384536985600[1];
+  double quad_427523055616[1];
+  double quad_498084270080[1];
+  double quad_976046530560[1];
+  double quad_452736155648[1];
+  double quad_688550678528[1];
+  double quad_31005663232[1];
+  double quad_304816418816[1];
+  double quad_68114292736[1];
+  double quad_819339411456[1];
+  double quad_618980339712[1];
+  double quad_101800079360[1];
+  double quad_615069044736[1];
+  double quad_976903761920[1];
+  double quad_374380896256[1];
+  double quad_141299838976[1];
+  double quad_74079137792[1];
+  double quad_343404097536[1];
+  double quad_811402448896[1];
+  double quad_136942120960[1];
   int converged;
 } Workspace;
 typedef struct Settings_t {

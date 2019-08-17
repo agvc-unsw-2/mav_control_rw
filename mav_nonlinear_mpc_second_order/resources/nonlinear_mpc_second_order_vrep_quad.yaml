@@ -15,7 +15,11 @@
 #roll fit percentage: 78.777678%
 
 ## Controller Parameters:
-mass: 1.450000
+yaw_gain: 1.000000
+yaw_damping: 0.950000
+yaw_omega: 5.000000
+
+mass: 1.00000000
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 
 # Time constants for PID gains of 600
@@ -30,15 +34,25 @@ linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 # yaw_omega: 5.000000
 
 # Time constants for PID gains of 200
-roll_gain: 1.007134
-roll_damping: 0.839112
-roll_omega: 6.639183
-pitch_gain: 0.999276
-pitch_damping: 0.847333
-pitch_omega: 6.560188
-yaw_gain: 1.000000
-yaw_damping: 0.950000
-yaw_omega: 5.000000
+# roll_gain: 1.007134
+# roll_damping: 0.839112
+# roll_omega: 6.639183
+# pitch_gain: 0.999276
+# pitch_damping: 0.847333
+# pitch_omega: 6.560188
+
+##################
+# Unbalanced Loads
+##################
+# 400g extra loads (100g forwards, backwards, left and right)
+
+# Time constants for PID gains of 200
+roll_gain: 1.005393
+roll_damping: 0.745251
+roll_omega: 6.211433
+pitch_gain: 0.996316
+pitch_damping: 0.777345
+pitch_omega: 6.000949
 
 # dynamic config default values:
 q_x : 80

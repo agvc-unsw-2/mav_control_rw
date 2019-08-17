@@ -24,21 +24,27 @@ KF_observer_first_order:
   #limits
   external_forces_limit:  [ 5.000000, 5.000000, 3.0000000 ]      #m/s^2
 
+  yaw_gain: 1.000000
+  drag_coefficients: [0.010000, 0.010000, 0.000000]
+
   # Time constants for PID P gain of 600
   roll_time_constant: 0.105595
   roll_gain: 1.145387
   pitch_time_constant: 0.105172
   pitch_gain: 1.114824
-  #linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
-  yaw_gain: 1.000000
 
   # Time constants for PID P gain of 200
   # roll_tau: 0.318522
   # roll_gain: 1.214172
   # pitch_tau: 0.312873
   # pitch_gain: 1.127141
-  # # linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
-  # yaw_gain: 1.000000
 
-  drag_coefficients: [0.010000, 0.010000, 0.000000]
-  #drag_coefficients: [0.00000, 0.00000, 0.000000]
+  #############
+  # Unbalanced Load
+  #############
+  # Constants for PID gains of 200 (~80% fit)
+  roll_time_constant: 0.301281
+  roll_gain: 1.169458
+  pitch_time_constant: 0.326310
+  pitch_gain: 1.170929
+

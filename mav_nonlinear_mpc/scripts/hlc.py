@@ -110,7 +110,7 @@ class High_Level_Controller():
 
     def land(self):
         print("Landing")
-        self.hover()
+        #self.hover()
         position = Point(0, 0, self.hover_height)
         self.goToPosition(position)
         position = Point(0, 0, self.land_height)
@@ -118,8 +118,9 @@ class High_Level_Controller():
 
     def takeoff(self):
         print("Taking off")
-        position = copy.deepcopy(self.odom_subber.msg.pose.pose.position)
-        position.z = self.hover_height
+        #position = copy.deepcopy(self.odom_subber.msg.pose.pose.position)
+        #position.z = self.hover_height
+        position = Point(0, 0, self.hover_height)
         self.goToPosition(position)
 
 # Check if value in range

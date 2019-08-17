@@ -149,6 +149,11 @@ void LMPC_Second_Order_Controller::initializeParameters()
     ROS_ERROR("prediction_sampling_time in MPC is not loaded from ros parameter server");
     abort();
   }
+
+  if (!private_nh_.getParam("enable_moment_disturbances", enable_moment_disturbances_)) {
+    ROS_ERROR("enable_moment_disturbances in MPC is not loaded from ros parameter server");
+    abort();
+  }
   ROS_INFO("Linear MPC: Parameters initialized correctly");
 
   constructModelMatrices();
@@ -419,8 +424,11 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   // TODO: Change this disturbance observer appropriately
   if (enable_disturbance_observer_ == true) {
-    //estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
-    estimated_disturbances = KF_estimated_state.segment(12, 3);
+    if(enable_moment_disturbances_ == true) {
+      estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+    } else {
+      estimated_disturbances = KF_estimated_state.segment(12, 3);
+    }
   } else {
     estimated_disturbances.setZero();
   }

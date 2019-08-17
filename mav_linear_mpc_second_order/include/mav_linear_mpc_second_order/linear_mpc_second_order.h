@@ -149,6 +149,11 @@ class LMPC_Second_Order_Controller
     enable_integrator_ = enable_integrator;
   }
 
+  void setEnableMomentDisturbances(bool enable_moment_disturbances)
+  {
+    enable_moment_disturbances_ = enable_moment_disturbances;
+  }
+
   void setControlLimits(const Eigen::VectorXd& control_limits)
   {
     //roll_max, pitch_max, yaw_rate_max, thrust_min and thrust_max
@@ -213,6 +218,9 @@ class LMPC_Second_Order_Controller
   // sampling time parameters
   double sampling_time_;
   double prediction_sampling_time_;
+
+  // take intoo account moment disturbances;
+  bool enable_moment_disturbances_;
 
   // system model parameters
   // Model: A, B, Bd

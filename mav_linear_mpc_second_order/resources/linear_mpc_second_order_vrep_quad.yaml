@@ -11,20 +11,31 @@
 #==================================================================================================================
 
 # Controller Parameters:
-mass: 1.450000
-
-drag_coefficients: [ 0.000000 , 0.000000, 0.0000]
-
-# Time constants for PID gains of 600
-roll_gain: 1.000298
-roll_damping: 0.463114
-roll_omega: 11.336867
-pitch_gain: 1.008354
-pitch_damping: 0.476652
-pitch_omega: 11.264051
 yaw_gain: 1.000000
 yaw_damping: 0.950000
 yaw_omega: 5.000000
+drag_coefficients: [ 0.000000 , 0.000000, 0.0000]
+mass: 1.0000000
+
+# Time constants for PID gains of 600
+# roll_gain: 1.000298
+# roll_damping: 0.463114
+# roll_omega: 11.336867
+# pitch_gain: 1.008354
+# pitch_damping: 0.476652
+# pitch_omega: 11.264051
+
+#####################
+# Unbalanced Loads
+#####################
+# Time constants for PID gains of 200
+#mass: 1.850000
+roll_gain: 1.005393
+roll_damping: 0.745251
+roll_omega: 6.211433
+pitch_gain: 0.996316
+pitch_damping: 0.777345
+pitch_omega: 6.000949
 
 q_x : 80
 q_y : 80
@@ -63,6 +74,7 @@ antiwindup_ball: 0.4
 
 enable_disturbance_observer : false
 enable_integrator : false
+enable_moment_disturbances : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1

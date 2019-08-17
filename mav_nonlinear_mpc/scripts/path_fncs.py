@@ -185,10 +185,10 @@ def main(mav_name, uav_num):
     print("Initialising tester")
     rospy.init_node('python_hlc', anonymous=False)
     hlc = hlc_lib.High_Level_Controller(mav_name, uav_num)
-    start = 0
-    end = 2
-    period = 5.0
-    cycles = 2
+    start = 0.0
+    end = 2.0
+    period = 8.0
+    cycles = 5
     while(rospy.get_time() < 1.0):
         time.sleep(0.1)
     while(rospy.get_time() < 1.0):

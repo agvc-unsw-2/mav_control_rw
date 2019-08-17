@@ -116,6 +116,7 @@ void LMPC_Second_Order_Node::DynConfigCallback(mav_linear_mpc_second_order::Line
 
   linear_mpc_second_order_.setEnableIntegrator(config.enable_integrator);
   linear_mpc_second_order_.setEnableDisturbanceObserver(config.enable_disturbance_observer);
+  linear_mpc_second_order_.setEnableMomentDisturbances(config.enable_moment_disturbances);
 
   linear_mpc_second_order_.setDragCoefficients(drag_coefficients);
 

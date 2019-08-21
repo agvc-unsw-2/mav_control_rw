@@ -1,4 +1,4 @@
-/* Produced by CVXGEN, 2019-08-07 00:07:14 -0400.  */
+/* Produced by CVXGEN, 2019-08-21 08:14:03 -0400.  */
 /* CVXGEN is Copyright (C) 2006-2017 Jacob Mattingley, jem@cvxgen.com. */
 /* The code in this file is Copyright (C) 2006-2017 Jacob Mattingley. */
 /* CVXGEN, or solvers produced by CVXGEN, cannot be used for commercial */
@@ -24,6 +24,7 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
+
 /* Space must be allocated somewhere (testsolver.c, csolve.c or your own */
 /* program) for the global variables vars, params, work and settings. */
 /* At the bottom of this file, they are externed. */
@@ -34,11 +35,11 @@
 typedef struct Params_t {
   double x_0[8];
   double x_ss_0[8];
-  double Q[64];
+  double Q_x[64];
   double u_ss_0[3];
-  double R[9];
+  double R_u[9];
   double u_prev[3];
-  double R_omega[9];
+  double R_delta[9];
   double x_ss_1[8];
   double u_ss_1[3];
   double x_ss_2[8];
@@ -60,7 +61,17 @@ typedef struct Params_t {
   double x_ss_10[8];
   double u_ss_10[3];
   double x_ss_11[8];
-  double Q_final[64];
+  double u_ss_11[3];
+  double x_ss_12[8];
+  double u_ss_12[3];
+  double x_ss_13[8];
+  double u_ss_13[3];
+  double x_ss_14[8];
+  double u_ss_14[3];
+  double x_ss_15[8];
+  double u_ss_15[3];
+  double x_ss_16[8];
+  double P[64];
   double A[64];
   double B[24];
   double Bd[24];
@@ -68,8 +79,8 @@ typedef struct Params_t {
   double u_min[3];
   double u_max[3];
   double *x[1];
-  double *x_ss[12];
-  double *u_ss[11];
+  double *x_ss[17];
+  double *u_ss[16];
 } Params;
 typedef struct Vars_t {
   double *u_0; /* 3 rows. */
@@ -104,29 +115,44 @@ typedef struct Vars_t {
   double *u_10; /* 3 rows. */
   double *t_10; /* 3 rows. */
   double *x_11; /* 8 rows. */
-  double *u[11];
-  double *x[12];
+  double *u_11; /* 3 rows. */
+  double *t_11; /* 3 rows. */
+  double *x_12; /* 8 rows. */
+  double *u_12; /* 3 rows. */
+  double *t_12; /* 3 rows. */
+  double *x_13; /* 8 rows. */
+  double *u_13; /* 3 rows. */
+  double *t_13; /* 3 rows. */
+  double *x_14; /* 8 rows. */
+  double *u_14; /* 3 rows. */
+  double *t_14; /* 3 rows. */
+  double *x_15; /* 8 rows. */
+  double *u_15; /* 3 rows. */
+  double *t_15; /* 3 rows. */
+  double *x_16; /* 8 rows. */
+  double *u[16];
+  double *x[17];
 } Vars;
 typedef struct Workspace_t {
-  double h[66];
-  double s_inv[66];
-  double s_inv_z[66];
-  double b[118];
-  double q[151];
-  double rhs[401];
-  double x[401];
+  double h[96];
+  double s_inv[96];
+  double s_inv_z[96];
+  double b[173];
+  double q[221];
+  double rhs[586];
+  double x[586];
   double *s;
   double *z;
   double *y;
-  double lhs_aff[401];
-  double lhs_cc[401];
-  double buffer[401];
-  double buffer2[401];
-  double KKT[1868];
-  double L[3195];
-  double d[401];
-  double v[401];
-  double d_inv[401];
+  double lhs_aff[586];
+  double lhs_cc[586];
+  double buffer[586];
+  double buffer2[586];
+  double KKT[2753];
+  double L[4775];
+  double d[586];
+  double v[586];
+  double d_inv[586];
   double gap;
   double optval;
   double ineq_resid_squared;
@@ -156,7 +182,17 @@ typedef struct Workspace_t {
   double quad_603410014208[1];
   double quad_253294055424[1];
   double quad_406480764928[1];
-  double quad_811896348672[1];
+  double quad_450189660160[1];
+  double quad_622448181248[1];
+  double quad_135073144832[1];
+  double quad_512757641216[1];
+  double quad_265658822656[1];
+  double quad_225439469568[1];
+  double quad_611752235008[1];
+  double quad_945124098048[1];
+  double quad_625116979200[1];
+  double quad_566313590784[1];
+  double quad_114579968000[1];
   int converged;
 } Workspace;
 typedef struct Settings_t {

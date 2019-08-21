@@ -28,16 +28,22 @@ KF_observer_first_order:
   drag_coefficients: [0.010000, 0.010000, 0.000000]
 
   # Time constants for PID P gain of 600
-  roll_time_constant: 0.105595
-  roll_gain: 1.145387
-  pitch_time_constant: 0.105172
-  pitch_gain: 1.114824
+  # roll_time_constant: 0.105595
+  # roll_gain: 1.145387
+  # pitch_time_constant: 0.105172
+  # pitch_gain: 1.114824
 
   # Time constants for PID P gain of 200
   # roll_tau: 0.318522
   # roll_gain: 1.214172
   # pitch_tau: 0.312873
   # pitch_gain: 1.127141
+
+  # Constants for PID gains of 800 pq 90 (~90% fit)
+  roll_time_constant: 0.123610
+  roll_gain: 1.089656
+  pitch_time_constant: 0.121262
+  pitch_gain: 1.076642
 
   #############
   # Unbalanced Load

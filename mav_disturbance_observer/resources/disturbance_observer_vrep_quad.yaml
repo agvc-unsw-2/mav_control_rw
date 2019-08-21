@@ -60,12 +60,20 @@ KF_observer_second_order:
   #####################
   # Time constants for PID gains of 200
   #mass: 1.850000
-  roll_gain: 1.005393
-  roll_damping: 0.745251
-  roll_omega: 6.211433
-  pitch_gain: 0.996316
-  pitch_damping: 0.777345
-  pitch_omega: 6.000949
+  # roll_gain: 1.005393
+  # roll_damping: 0.745251
+  # roll_omega: 6.211433
+  # pitch_gain: 0.996316
+  # pitch_damping: 0.777345
+  # pitch_omega: 6.000949
+
+  # 4kg load for PID gains of 800 pq 90
+  roll_gain: 1.006496
+  roll_damping: 0.843728
+  roll_omega: 15.191048
+  pitch_gain: 1.008675
+  pitch_damping: 0.863757
+  pitch_omega: 15.632022
 
 #########################
   yaw_gain: 1.000000

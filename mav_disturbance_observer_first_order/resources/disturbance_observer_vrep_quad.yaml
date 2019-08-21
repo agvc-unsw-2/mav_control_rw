@@ -22,7 +22,7 @@ KF_observer_first_order:
   r_attitude: 0.01
   
   #limits
-  external_forces_limit:  [ 5.000000, 5.000000, 3.0000000 ]      #m/s^2
+  external_forces_limit:  [ 500.000000, 500.000000, 500.0000000 ]      #m/s^2
 
   yaw_gain: 1.000000
   drag_coefficients: [0.010000, 0.010000, 0.000000]

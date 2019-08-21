@@ -42,7 +42,6 @@ yaw_gain: 1.000000
 # Unbalanced Load
 #############
 # Constants for PID gains of 800 pq 90 (~90% fit)
-# mass: 1.850000
 roll_time_constant: 0.123610
 roll_gain: 1.089656
 pitch_time_constant: 0.121262

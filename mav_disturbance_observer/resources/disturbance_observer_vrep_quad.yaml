@@ -25,8 +25,8 @@ KF_observer_second_order:
   
   #limits
   omega_limit :  [ 3.000000 ,3.000000 ,2.000000]
-  external_forces_limit :  [ 5.000000 ,5.000000 ,3.0000000]      #m/s^2
-  external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
+  external_forces_limit :  [ 500.000000 ,500.000000 ,500.0000000]      #m/s^2
+  external_moments_limit :  [ 500.000000 ,500.000000 ,500.000000]  #rad/s^2
 
   drag_coefficients: [0.00000, 0.00000, 0.000000]
   

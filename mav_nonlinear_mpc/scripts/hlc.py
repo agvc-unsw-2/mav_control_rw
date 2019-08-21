@@ -94,8 +94,14 @@ class High_Level_Controller():
             time.sleep(0.1)
         print("Checking for final position")
         # Check at final point
+
+        now_secs = rospy.get_time()
+        end_time = now_secs + self.goToWaypointTimeout
         while(not at_waypoint(final_point, self.odom_subber.msg)):
             time.sleep(0.1)
+            if (rospy.get_time() > end_time):
+                print("Checking for final position waypoint timed out")
+                break
         # Sleep
         time.sleep(self.wait_time) # Wait
  

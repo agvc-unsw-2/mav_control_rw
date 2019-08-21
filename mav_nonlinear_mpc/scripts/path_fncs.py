@@ -67,7 +67,7 @@ def move_in_square(hlc):
     hlc.goToPosition(position)
     hlc.land()
 
-def generate_circle_path(r, vel_mag, altitude):
+def generate_circle_path(r, vel_mag, altitude, cycles):
     ref_time_step = 0.01
     mu = vel_mag/r # t scale factor to scale velocity
     zero_vec = Vector3(0.0, 0.0, 0.0) # For angular velocity and acceleration
@@ -77,6 +77,7 @@ def generate_circle_path(r, vel_mag, altitude):
     # speed = dist/time -> t = dist / speed
     traj_time = (2.0 * math.pi * r) / vel_mag
     num_points = int((float(traj_time) / float(ref_time_step))) + 1 # + 1 just in case
+    num_points = num_points * cycles # Repeat for some number of cycles
     traj_msg = MultiDOFJointTrajectory()
     traj_msg.points = [None]*num_points
     for i in range(num_points):
@@ -112,6 +113,7 @@ def generate_lemniscate_traj(max_dist_from_origin, vel_max, altitude, longways_d
     # Therefore it would take (a * sqrt_2) times longer than 2 * pi for a speed of 1
     traj_time = (2.0 * math.pi) * (a * sqrt_2) / vel_max # t = dist / speed
     num_points = int((float(traj_time) / float(ref_time_step))) + 1 # + 1 just in case
+    num_points = num_points * cycles # Repeat for some number of cycles
     traj_msg = MultiDOFJointTrajectory()
     traj_msg.points = [None]*num_points
     for i in range(num_points):
@@ -155,10 +157,10 @@ def generate_lemniscate_traj(max_dist_from_origin, vel_max, altitude, longways_d
         traj_msg.header.stamp = now_obj
     return traj_msg
 
-def circle_path(hlc, r, vel_mag, altitude):
+def circle_path(hlc, r, vel_mag, altitude, cycles):
     print("Generating circle path")
     now_secs = rospy.get_time()
-    traj_msg = generate_circle_path(r, vel_mag, altitude)
+    traj_msg = generate_circle_path(r, vel_mag, altitude, cycles)
     if(traj_msg.header.stamp <= rospy.Time(0.0)):
         hlc.takeoff()
         return
@@ -169,9 +171,9 @@ def circle_path(hlc, r, vel_mag, altitude):
     #print(traj_msg)
     hlc.followTraj(traj_msg, traj_time)
 
-def lemniscate_path(hlc, max_dist_from_origin, vel_max, altitude, longways_direction):
+def lemniscate_path(hlc, max_dist_from_origin, vel_max, altitude, cycles, longways_direction):
     now_secs = rospy.get_time()
-    traj_msg = generate_lemniscate_traj(max_dist_from_origin, vel_max, altitude, longways_direction)
+    traj_msg = generate_lemniscate_traj(max_dist_from_origin, vel_max, altitude, cycles, longways_direction)
     if(traj_msg.header.stamp <= rospy.Time(0.0)):
         hlc.takeoff()
         return
@@ -195,13 +197,23 @@ def main(mav_name, uav_num):
         time.sleep(0.1)
     print(rospy.get_time())
     hlc.takeoff()
-    step_response(hlc, start, end, period, cycles, "x")
+    #step_response(hlc, start, end, period, cycles, "x")
     #step_response(hlc, start, end, period, cycles, "y")
-    #circle_path(hlc, 1, 1, 1)
+
+    #####################
+    # Circle path
+    #####################
+    r = 1
+    vel_mag = 1
+    altitude = 1
+    circle_path(hlc, r, vel_mag, altitude, cycles)
+    #####################
+    # Lemniscate path
+    #####################
     x_max = 1.5
     vel_max = 1
     altitude = 1
-    #lemniscate_path(hlc, x_max, vel_max, altitude, "x")
+    #lemniscate_path(hlc, x_max, vel_max, altitude, cycles, "x")
     hlc.land()
 
 if __name__ == "__main__":

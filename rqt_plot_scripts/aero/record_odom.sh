@@ -1,0 +1,1 @@
+rosbag record /mavros/local_position/odom /vrep_hex1/command/current_reference /mavros/local_position/odom /vrep_hex1/command/current_reference

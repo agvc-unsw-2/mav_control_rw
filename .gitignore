@@ -37,3 +37,6 @@
 
 # ACADO solver generated files
 #*/solver/acado*
+
+# bag files
+*.bag

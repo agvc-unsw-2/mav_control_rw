@@ -197,7 +197,7 @@ def main(mav_name, uav_num):
         time.sleep(0.1)
     print(rospy.get_time())
     hlc.takeoff()
-    #step_response(hlc, start, end, period, cycles, "x")
+    step_response(hlc, start, end, period, cycles, "x")
     #step_response(hlc, start, end, period, cycles, "y")
 
     #####################
@@ -206,7 +206,7 @@ def main(mav_name, uav_num):
     r = 1
     vel_mag = 1
     altitude = 1
-    circle_path(hlc, r, vel_mag, altitude, cycles)
+    #circle_path(hlc, r, vel_mag, altitude, cycles)
     #####################
     # Lemniscate path
     #####################

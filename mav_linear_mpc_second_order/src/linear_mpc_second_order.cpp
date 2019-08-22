@@ -427,6 +427,7 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
     if(enable_moment_disturbances_ == true) {
       estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
     } else {
+      estimated_disturbances.setZero();
       estimated_disturbances.segment(0, 3) = KF_estimated_state.segment(12, 3);
     }
   } else {

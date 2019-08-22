@@ -35,11 +35,11 @@
 typedef struct Params_t {
   double x_0[8];
   double x_ss_0[8];
-  double Q_x[64];
+  double Q[64];
   double u_ss_0[3];
-  double R_u[9];
+  double R[9];
   double u_prev[3];
-  double R_delta[9];
+  double R_omega[9];
   double x_ss_1[8];
   double u_ss_1[3];
   double x_ss_2[8];
@@ -71,7 +71,7 @@ typedef struct Params_t {
   double x_ss_15[8];
   double u_ss_15[3];
   double x_ss_16[8];
-  double P[64];
+  double Q_final[64];
   double A[64];
   double B[24];
   double Bd[24];

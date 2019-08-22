@@ -217,12 +217,12 @@ void LinearModelPredictiveController::applyParameters()
   Eigen::Matrix<double, kStateSize, kStateSize> Q;
   Eigen::Matrix<double, kStateSize, kStateSize> Q_final;
   Eigen::Matrix<double, kInputSize, kInputSize> R;
-  Eigen::Matrix<double, kInputSize, kInputSize> R_delta;
+  Eigen::Matrix<double, kInputSize, kInputSize> R_omega;
 
   Q.setZero();
   Q_final.setZero();
   R.setZero();
-  R_delta.setZero();
+  R_omega.setZero();
 
   Q.block(0, 0, 3, 3) = q_position_.asDiagonal();
   Q.block(3, 3, 3, 3) = q_velocity_.asDiagonal();
@@ -230,7 +230,7 @@ void LinearModelPredictiveController::applyParameters()
 
   R = r_command_.asDiagonal();
 
-  R_delta = r_delta_command_.asDiagonal();
+  R_omega = r_delta_command_.asDiagonal();
 
   //Compute terminal cost
   //Q_final(k+1) = A'*Q_final(k)*A - (A'*Q_final(k)*B)*inv(B'*Q_final(k)*B+R)*(B'*Q_final(k)*A)+ Q;
@@ -249,7 +249,7 @@ void LinearModelPredictiveController::applyParameters()
   Eigen::Map<Eigen::MatrixXd>(const_cast<double*>(params.Q_final), kStateSize, kStateSize) =
       Q_final;
   Eigen::Map<Eigen::MatrixXd>(const_cast<double*>(params.R), kInputSize, kInputSize) = R;
-  Eigen::Map<Eigen::MatrixXd>(const_cast<double*>(params.R_omega), kInputSize, kInputSize) = R_delta
+  Eigen::Map<Eigen::MatrixXd>(const_cast<double*>(params.R_omega), kInputSize, kInputSize) = R_omega
       * (1.0 / sampling_time_ * sampling_time_);
 
   params.u_max[0] = roll_limit_;
@@ -264,7 +264,7 @@ void LinearModelPredictiveController::applyParameters()
   if (verbose_) {
     ROS_INFO_STREAM("diag(Q) = \n" << Q.diagonal().transpose());
     ROS_INFO_STREAM("diag(R) = \n" << R.diagonal().transpose());
-    ROS_INFO_STREAM("diag(R_delta) = \n " << R_delta.diagonal().transpose());
+    ROS_INFO_STREAM("diag(R_omega) = \n " << R_omega.diagonal().transpose());
     ROS_INFO_STREAM("Q_final = \n" << Q_final);
   }
 }

@@ -9,10 +9,10 @@ parameters
   A (nx, nx)            #dynamics matrix
   B (nx, m)             # transfer matrix
   Bd (nx, nd)           # disturbance transfer matrix
-  Q_x (nx, nx) psd      # state cost, positive semidifined
-  P (nx, nx) psd        # final state penalty, positive semidefined
-  R_u (m, m) psd        # input penalty, positive semidefined
-  R_delta (m, m) psd    # delta input penalty, positive semidefined
+  Q (nx, nx) psd      # state cost, positive semidifined
+  Q_final (nx, nx) psd        # final state penalty, positive semidefined
+  R (m, m) psd        # input penalty, positive semidefined
+  R_omega (m, m) psd    # delta input penalty, positive semidefined
   x[0] (nx)             # initial state
   d (nd)                # disturbacnes
   u_prev (m)            # previous input applied to the system
@@ -30,7 +30,7 @@ end
 
 minimize
     # define OCP problem
-    quad(x[0]-x_ss[0], Q_x) + quad(u[0]-u_ss[0], R_u) + quad(u[0]-u_prev, R_delta) + sum[t=1..T](quad(x[t]-x_ss[t], Q_x) + quad(u[t]-u_ss[t], R_u) + quad(u[t]-u[t-1], R_delta)) + quad(x[T+1]-x_ss[T+1], P)
+    quad(x[0]-x_ss[0], Q) + quad(u[0]-u_ss[0], R) + quad(u[0]-u_prev, R_omega) + sum[t=1..T](quad(x[t]-x_ss[t], Q) + quad(u[t]-u_ss[t], R) + quad(u[t]-u[t-1], R_omega)) + quad(x[T+1]-x_ss[T+1], Q_final)
   
 subject to
   x[t+1] == A*x[t] + B*u[t] + Bd*d, t=0..T #dynamics

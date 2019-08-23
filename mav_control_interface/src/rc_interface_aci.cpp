@@ -37,7 +37,8 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
     last_data_.right_up_down = msg->axes[0];
     last_data_.right_side = -msg->axes[1];
     last_data_.left_up_down = msg->axes[2];
-    last_data_.left_side = -msg->axes[3];
+    //last_data_.left_side = -msg->axes[3];
+    last_data_.left_side = msg->axes[3]; // reverse yaw
 
     if (msg->axes[5] > 0.0)
     {
@@ -110,7 +111,7 @@ bool RcInterfaceAci::isActive() const
   else if (
     std::abs(last_data_.right_up_down) > STICK_DEADZONE
     || std::abs(last_data_.right_side) > STICK_DEADZONE
-    //|| std::abs(last_data_.left_up_down) > STICK_DEADZONE
+    //|| std::abs(last_data_.left_up_down) > STICK_DEADZONE // ignore thrust
     || std::abs(last_data_.left_side) > STICK_DEADZONE
   ) return true;
   // else
@@ -130,7 +131,7 @@ float RcInterfaceAci::getStickDeadzone() const
 bool RcInterfaceAci::isRcOn(const sensor_msgs::JoyConstPtr& msg) const
 {
   // return (msg->buttons[0] == 1);
-  return (1 == 1);
+  return (1 == 1); // leave RC permanently on
 }
 
 }  // end namespace mav_control_interface

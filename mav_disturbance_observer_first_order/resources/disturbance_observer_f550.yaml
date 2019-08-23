@@ -1,0 +1,35 @@
+## Kalman Filter Parameters:
+KF_observer_first_order:
+  calibration_duration: 5 #sec
+  
+  #covariance of initial state
+  P0_position: 0.1
+  P0_velocity: 0.1
+  P0_attitude: 0.1
+  P0_force: 0.1
+  P0_torque: 0.1
+  
+  #process noise
+  q_position: 0.01
+  q_velocity: 0.025
+  q_attitude: 0.015
+  q_force: 0.1
+  q_torque: 0.1
+  
+  #measurement noise
+  r_position: 0.001
+  r_velocity: 0.0012
+  r_attitude: 0.01
+  
+  #limits
+  external_forces_limit:  [ 5.000000, 5.000000, 3.0000000 ]      #m/s^2
+
+  # WARNING: PARAMETERS COPIED FROM VREP_HEX. NEEDS TO BE CALIBRATED
+  roll_tau: 0.105720
+  roll_gain: 1.090762
+  pitch_tau: 0.104006
+  pitch_gain: 1.050036
+  yaw_gain: 1.000000
+  
+  drag_coefficients: [0.010000, 0.010000, 0.000000]
+  #drag_coefficients: [0.00000, 0.00000, 0.000000]

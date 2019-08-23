@@ -25,8 +25,8 @@ real_t rk_dim9_swap;
 /** Column vector of size: 9 */
 real_t rk_dim9_bPerm[ 9 ];
 
-/** Column vector of size: 62 */
-real_t auxVar[ 62 ];
+/** Column vector of size: 75 */
+real_t auxVar[ 75 ];
 
 real_t rk_ttt;
 
@@ -55,55 +55,60 @@ real_t rk_diffsTemp2[ 108 ];
 real_t rk_diffK[ 9 ];
 
 /** Matrix of size: 9 x 12 (row major format) */
+real_t rk_diffsPrev2[ 108 ];
+
+/** Matrix of size: 9 x 12 (row major format) */
 real_t rk_diffsNew2[ 108 ];
 
-#pragma omp threadprivate( auxVar, rk_ttt, rk_xxx, rk_kkk, rk_diffK, rk_rhsTemp, rk_dim9_perm, rk_A, rk_b, rk_diffsNew2, rk_diffsTemp2, rk_dim9_swap, rk_dim9_bPerm )
+#pragma omp threadprivate( auxVar, rk_ttt, rk_xxx, rk_kkk, rk_diffK, rk_rhsTemp, rk_dim9_perm, rk_A, rk_b, rk_diffsPrev2, rk_diffsNew2, rk_diffsTemp2, rk_dim9_swap, rk_dim9_bPerm )
 
 void acado_rhs(const real_t* in, real_t* out)
 {
 const real_t* xd = in;
 const real_t* u = in + 9;
 const real_t* od = in + 12;
-/* Vector of auxiliary variables; number of elements: 29. */
+/* Vector of auxiliary variables; number of elements: 31. */
 real_t* a = auxVar;
 
 /* Compute intermediate quantities: */
-a[0] = (sin(xd[4]));
-a[1] = (cos(xd[3]));
-a[2] = (cos(xd[5]));
-a[3] = (sin(xd[4]));
-a[4] = (sin(xd[3]));
-a[5] = (sin(xd[5]));
+a[0] = (cos(xd[3]));
+a[1] = (cos(xd[5]));
+a[2] = (sin(xd[4]));
+a[3] = (sin(xd[3]));
+a[4] = (sin(xd[5]));
+a[5] = (sin(xd[4]));
 a[6] = (cos(xd[4]));
 a[7] = (cos(xd[5]));
 a[8] = (cos(xd[4]));
 a[9] = (sin(xd[5]));
-a[10] = (cos(xd[3]));
-a[11] = (sin(xd[5]));
-a[12] = (cos(xd[5]));
-a[13] = (sin(xd[4]));
-a[14] = (sin(xd[3]));
-a[15] = (cos(xd[3]));
-a[16] = (cos(xd[5]));
-a[17] = (sin(xd[4]));
-a[18] = (sin(xd[3]));
-a[19] = (sin(xd[5]));
-a[20] = (cos(xd[3]));
-a[21] = (sin(xd[4]));
-a[22] = (sin(xd[5]));
-a[23] = (cos(xd[5]));
+a[10] = (((((a[5]*od[4])*u[2])*xd[2])+((((a[6]*a[7])*od[4])*u[2])*xd[0]))-((((a[8]*od[4])*a[9])*u[2])*xd[1]));
+a[11] = (cos(xd[3]));
+a[12] = (sin(xd[4]));
+a[13] = (sin(xd[5]));
+a[14] = (cos(xd[5]));
+a[15] = (sin(xd[3]));
+a[16] = (cos(xd[3]));
+a[17] = (sin(xd[5]));
+a[18] = (cos(xd[5]));
+a[19] = (sin(xd[4]));
+a[20] = (sin(xd[3]));
+a[21] = (cos(xd[3]));
+a[22] = (cos(xd[5]));
+a[23] = (sin(xd[4]));
 a[24] = (sin(xd[3]));
-a[25] = (cos(xd[4]));
-a[26] = (sin(xd[3]));
-a[27] = (cos(xd[4]));
-a[28] = (cos(xd[3]));
+a[25] = (sin(xd[5]));
+a[26] = (cos(xd[4]));
+a[27] = (sin(xd[3]));
+a[28] = (((((((a[16]*a[17])-((a[18]*a[19])*a[20]))*od[5])*u[2])*xd[0])-(((((a[21]*a[22])+((a[23]*a[24])*a[25]))*od[5])*u[2])*xd[1]))-((((a[26]*od[5])*a[27])*u[2])*xd[2]));
+a[29] = (cos(xd[4]));
+a[30] = (cos(xd[3]));
 
 /* Compute outputs: */
-out[0] = (((((((((real_t)(0.0000000000000000e+00)-((real_t)(0.0000000000000000e+00)-a[0]))*od[4])*u[2])*xd[2])+((((a[1]*a[2])*a[3])+(a[4]*a[5]))*u[2]))-((((a[6]*a[7])*od[4])*u[2])*xd[0]))-((((a[8]*od[4])*a[9])*u[2])*xd[1]))+od[6]);
-out[1] = (((((((((real_t)(0.0000000000000000e+00)-((((real_t)(0.0000000000000000e+00)-a[10])*a[11])+((a[12]*a[13])*a[14])))*od[5])*u[2])*xd[0])-(((((a[15]*a[16])+((a[17]*a[18])*a[19]))*od[5])*u[2])*xd[1]))+((((a[20]*a[21])*a[22])-(a[23]*a[24]))*u[2]))-((((a[25]*od[5])*a[26])*u[2])*xd[2]))+od[7]);
-out[2] = (((real_t)(-9.8065999999999995e+00)+((a[27]*a[28])*u[2]))+od[8]);
-out[3] = ((((real_t)(0.0000000000000000e+00)-xd[3])+(od[1]*u[0]))/od[0]);
-out[4] = ((((real_t)(0.0000000000000000e+00)-xd[4])+(od[3]*u[1]))/od[2]);
+out[0] = ((((((a[0]*a[1])*a[2])+(a[3]*a[4]))*u[2])-a[10])+od[6]);
+out[1] = ((((((a[11]*a[12])*a[13])-(a[14]*a[15]))*u[2])-a[28])+od[7]);
+out[2] = (((real_t)(-9.8065999999999995e+00)+((a[29]*a[30])*u[2]))+od[8]);
+out[3] = (((od[1]*u[0])-xd[3])/od[0]);
+out[4] = (((od[3]*u[1])-xd[4])/od[2]);
 out[5] = (real_t)(0.0000000000000000e+00);
 out[6] = xd[0];
 out[7] = xd[1];
@@ -117,133 +122,146 @@ void acado_diffs(const real_t* in, real_t* out)
 const real_t* xd = in;
 const real_t* u = in + 9;
 const real_t* od = in + 12;
-/* Vector of auxiliary variables; number of elements: 62. */
+/* Vector of auxiliary variables; number of elements: 75. */
 real_t* a = auxVar;
 
 /* Compute intermediate quantities: */
 a[0] = (cos(xd[4]));
 a[1] = (cos(xd[5]));
-a[2] = (cos(xd[4]));
-a[3] = (sin(xd[5]));
-a[4] = (sin(xd[4]));
-a[5] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
-a[6] = (cos(xd[5]));
-a[7] = (sin(xd[4]));
-a[8] = (cos(xd[3]));
-a[9] = (sin(xd[5]));
-a[10] = (cos(xd[4]));
+a[2] = (((a[0]*a[1])*od[4])*u[2]);
+a[3] = (cos(xd[4]));
+a[4] = (sin(xd[5]));
+a[5] = ((real_t)(0.0000000000000000e+00)-(((a[3]*od[4])*a[4])*u[2]));
+a[6] = (sin(xd[4]));
+a[7] = ((a[6]*od[4])*u[2]);
+a[8] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
+a[9] = (cos(xd[5]));
+a[10] = (sin(xd[4]));
 a[11] = (cos(xd[3]));
-a[12] = (cos(xd[4]));
-a[13] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[4])));
-a[14] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[4])));
-a[15] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
-a[16] = (sin(xd[3]));
-a[17] = (cos(xd[5]));
-a[18] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
-a[19] = (cos(xd[5]));
-a[20] = (cos(xd[3]));
-a[21] = (sin(xd[5]));
-a[22] = (cos(xd[5]));
-a[23] = (sin(xd[4]));
-a[24] = (sin(xd[3]));
-a[25] = (cos(xd[3]));
-a[26] = (cos(xd[5]));
-a[27] = (sin(xd[4]));
-a[28] = (sin(xd[3]));
-a[29] = (sin(xd[5]));
-a[30] = (cos(xd[4]));
-a[31] = (sin(xd[3]));
-a[32] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
-a[33] = (cos(xd[3]));
-a[34] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
-a[35] = (cos(xd[3]));
-a[36] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
-a[37] = (sin(xd[4]));
-a[38] = (sin(xd[5]));
-a[39] = (cos(xd[5]));
-a[40] = (cos(xd[3]));
-a[41] = (cos(xd[3]));
-a[42] = (cos(xd[4]));
-a[43] = (cos(xd[4]));
-a[44] = (cos(xd[3]));
-a[45] = (cos(xd[4]));
-a[46] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[4])));
-a[47] = (cos(xd[5]));
-a[48] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
-a[49] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
-a[50] = (cos(xd[5]));
-a[51] = (cos(xd[5]));
-a[52] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
-a[53] = (sin(xd[3]));
+a[12] = (sin(xd[5]));
+a[13] = (cos(xd[3]));
+a[14] = (cos(xd[4]));
+a[15] = (cos(xd[4]));
+a[16] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[4])));
+a[17] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[4])));
+a[18] = (((((a[15]*od[4])*u[2])*xd[2])+((((a[16]*a[1])*od[4])*u[2])*xd[0]))-((((a[17]*od[4])*a[4])*u[2])*xd[1]));
+a[19] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
+a[20] = (sin(xd[3]));
+a[21] = (cos(xd[5]));
+a[22] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
+a[23] = (cos(xd[5]));
+a[24] = (((((a[0]*a[22])*od[4])*u[2])*xd[0])-((((a[3]*od[4])*a[23])*u[2])*xd[1]));
+a[25] = ((((a[6]*od[4])*xd[2])+(((a[0]*a[1])*od[4])*xd[0]))-(((a[3]*od[4])*a[4])*xd[1]));
+a[26] = (cos(xd[3]));
+a[27] = (sin(xd[5]));
+a[28] = (cos(xd[5]));
+a[29] = (sin(xd[4]));
+a[30] = (sin(xd[3]));
+a[31] = ((((a[26]*a[27])-((a[28]*a[29])*a[30]))*od[5])*u[2]);
+a[32] = (cos(xd[3]));
+a[33] = (cos(xd[5]));
+a[34] = (sin(xd[4]));
+a[35] = (sin(xd[3]));
+a[36] = (sin(xd[5]));
+a[37] = ((real_t)(0.0000000000000000e+00)-((((a[32]*a[33])+((a[34]*a[35])*a[36]))*od[5])*u[2]));
+a[38] = (cos(xd[4]));
+a[39] = (sin(xd[3]));
+a[40] = ((real_t)(0.0000000000000000e+00)-(((a[38]*od[5])*a[39])*u[2]));
+a[41] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
+a[42] = (sin(xd[4]));
+a[43] = (sin(xd[5]));
+a[44] = (cos(xd[5]));
+a[45] = (cos(xd[3]));
+a[46] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
+a[47] = (cos(xd[3]));
+a[48] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
+a[49] = (cos(xd[3]));
+a[50] = (cos(xd[3]));
+a[51] = (((((((a[46]*a[27])-((a[28]*a[29])*a[47]))*od[5])*u[2])*xd[0])-(((((a[48]*a[33])+((a[34]*a[49])*a[36]))*od[5])*u[2])*xd[1]))-((((a[38]*od[5])*a[50])*u[2])*xd[2]));
+a[52] = (cos(xd[3]));
+a[53] = (cos(xd[4]));
 a[54] = (cos(xd[4]));
-a[55] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
+a[55] = (cos(xd[4]));
 a[56] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[4])));
-a[57] = (cos(xd[3]));
-a[58] = ((real_t)(1.0000000000000000e+00)/od[0]);
-a[59] = ((real_t)(1.0000000000000000e+00)/od[0]);
-a[60] = ((real_t)(1.0000000000000000e+00)/od[2]);
-a[61] = ((real_t)(1.0000000000000000e+00)/od[2]);
+a[57] = (((((((real_t)(0.0000000000000000e+00)-((a[28]*a[54])*a[30]))*od[5])*u[2])*xd[0])-(((((a[55]*a[35])*a[36])*od[5])*u[2])*xd[1]))-((((a[56]*od[5])*a[39])*u[2])*xd[2]));
+a[58] = (cos(xd[5]));
+a[59] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
+a[60] = (sin(xd[3]));
+a[61] = (cos(xd[5]));
+a[62] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
+a[63] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[5])));
+a[64] = (cos(xd[5]));
+a[65] = ((((((a[26]*a[61])-((a[62]*a[29])*a[30]))*od[5])*u[2])*xd[0])-(((((a[32]*a[63])+((a[34]*a[35])*a[64]))*od[5])*u[2])*xd[1]));
+a[66] = ((((((a[26]*a[27])-((a[28]*a[29])*a[30]))*od[5])*xd[0])-((((a[32]*a[33])+((a[34]*a[35])*a[36]))*od[5])*xd[1]))-(((a[38]*od[5])*a[39])*xd[2]));
+a[67] = (cos(xd[4]));
+a[68] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[3])));
+a[69] = ((real_t)(-1.0000000000000000e+00)*(sin(xd[4])));
+a[70] = (cos(xd[3]));
+a[71] = ((real_t)(1.0000000000000000e+00)/od[0]);
+a[72] = ((real_t)(1.0000000000000000e+00)/od[0]);
+a[73] = ((real_t)(1.0000000000000000e+00)/od[2]);
+a[74] = ((real_t)(1.0000000000000000e+00)/od[2]);
 
 /* Compute outputs: */
-out[0] = ((real_t)(0.0000000000000000e+00)-(((a[0]*a[1])*od[4])*u[2]));
-out[1] = ((real_t)(0.0000000000000000e+00)-(((a[2]*od[4])*a[3])*u[2]));
-out[2] = ((((real_t)(0.0000000000000000e+00)-((real_t)(0.0000000000000000e+00)-a[4]))*od[4])*u[2]);
-out[3] = ((((a[5]*a[6])*a[7])+(a[8]*a[9]))*u[2]);
-out[4] = ((((((((real_t)(0.0000000000000000e+00)-((real_t)(0.0000000000000000e+00)-a[10]))*od[4])*u[2])*xd[2])+(((a[11]*a[6])*a[12])*u[2]))-((((a[13]*a[1])*od[4])*u[2])*xd[0]))-((((a[14]*od[4])*a[3])*u[2])*xd[1]));
-out[5] = ((((((a[11]*a[15])*a[7])+(a[16]*a[17]))*u[2])-((((a[0]*a[18])*od[4])*u[2])*xd[0]))-((((a[2]*od[4])*a[19])*u[2])*xd[1]));
+out[0] = ((real_t)(0.0000000000000000e+00)-a[2]);
+out[1] = ((real_t)(0.0000000000000000e+00)-a[5]);
+out[2] = ((real_t)(0.0000000000000000e+00)-a[7]);
+out[3] = ((((a[8]*a[9])*a[10])+(a[11]*a[12]))*u[2]);
+out[4] = ((((a[13]*a[9])*a[14])*u[2])-a[18]);
+out[5] = (((((a[13]*a[19])*a[10])+(a[20]*a[21]))*u[2])-a[24]);
 out[6] = (real_t)(0.0000000000000000e+00);
 out[7] = (real_t)(0.0000000000000000e+00);
 out[8] = (real_t)(0.0000000000000000e+00);
 out[9] = (real_t)(0.0000000000000000e+00);
 out[10] = (real_t)(0.0000000000000000e+00);
-out[11] = (((((((real_t)(0.0000000000000000e+00)-((real_t)(0.0000000000000000e+00)-a[4]))*od[4])*xd[2])+(((a[11]*a[6])*a[7])+(a[16]*a[9])))-(((a[0]*a[1])*od[4])*xd[0]))-(((a[2]*od[4])*a[3])*xd[1]));
-out[12] = ((((real_t)(0.0000000000000000e+00)-((((real_t)(0.0000000000000000e+00)-a[20])*a[21])+((a[22]*a[23])*a[24])))*od[5])*u[2]);
-out[13] = ((real_t)(0.0000000000000000e+00)-((((a[25]*a[26])+((a[27]*a[28])*a[29]))*od[5])*u[2]));
-out[14] = ((real_t)(0.0000000000000000e+00)-(((a[30]*od[5])*a[31])*u[2]));
-out[15] = ((((((((real_t)(0.0000000000000000e+00)-((((real_t)(0.0000000000000000e+00)-a[32])*a[21])+((a[22]*a[23])*a[33])))*od[5])*u[2])*xd[0])-(((((a[34]*a[26])+((a[27]*a[35])*a[29]))*od[5])*u[2])*xd[1]))+((((a[36]*a[37])*a[38])-(a[39]*a[40]))*u[2]))-((((a[30]*od[5])*a[41])*u[2])*xd[2]));
-out[16] = ((((((((real_t)(0.0000000000000000e+00)-((a[22]*a[42])*a[24]))*od[5])*u[2])*xd[0])-(((((a[43]*a[28])*a[29])*od[5])*u[2])*xd[1]))+(((a[44]*a[45])*a[38])*u[2]))-((((a[46]*od[5])*a[31])*u[2])*xd[2]));
-out[17] = (((((((real_t)(0.0000000000000000e+00)-((((real_t)(0.0000000000000000e+00)-a[20])*a[47])+((a[48]*a[23])*a[24])))*od[5])*u[2])*xd[0])-(((((a[25]*a[49])+((a[27]*a[28])*a[50]))*od[5])*u[2])*xd[1]))+((((a[44]*a[37])*a[51])-(a[52]*a[53]))*u[2]));
+out[11] = ((((a[13]*a[9])*a[10])+(a[20]*a[12]))-a[25]);
+out[12] = ((real_t)(0.0000000000000000e+00)-a[31]);
+out[13] = ((real_t)(0.0000000000000000e+00)-a[37]);
+out[14] = ((real_t)(0.0000000000000000e+00)-a[40]);
+out[15] = (((((a[41]*a[42])*a[43])-(a[44]*a[45]))*u[2])-a[51]);
+out[16] = ((((a[52]*a[53])*a[43])*u[2])-a[57]);
+out[17] = (((((a[52]*a[42])*a[58])-(a[59]*a[60]))*u[2])-a[65]);
 out[18] = (real_t)(0.0000000000000000e+00);
 out[19] = (real_t)(0.0000000000000000e+00);
 out[20] = (real_t)(0.0000000000000000e+00);
 out[21] = (real_t)(0.0000000000000000e+00);
 out[22] = (real_t)(0.0000000000000000e+00);
-out[23] = (((((((real_t)(0.0000000000000000e+00)-((((real_t)(0.0000000000000000e+00)-a[20])*a[21])+((a[22]*a[23])*a[24])))*od[5])*xd[0])-((((a[25]*a[26])+((a[27]*a[28])*a[29]))*od[5])*xd[1]))+(((a[44]*a[37])*a[38])-(a[39]*a[53])))-(((a[30]*od[5])*a[31])*xd[2]));
+out[23] = ((((a[52]*a[42])*a[43])-(a[44]*a[60]))-a[66]);
 out[24] = (real_t)(0.0000000000000000e+00);
 out[25] = (real_t)(0.0000000000000000e+00);
 out[26] = (real_t)(0.0000000000000000e+00);
-out[27] = ((a[54]*a[55])*u[2]);
-out[28] = ((a[56]*a[57])*u[2]);
+out[27] = ((a[67]*a[68])*u[2]);
+out[28] = ((a[69]*a[70])*u[2]);
 out[29] = (real_t)(0.0000000000000000e+00);
 out[30] = (real_t)(0.0000000000000000e+00);
 out[31] = (real_t)(0.0000000000000000e+00);
 out[32] = (real_t)(0.0000000000000000e+00);
 out[33] = (real_t)(0.0000000000000000e+00);
 out[34] = (real_t)(0.0000000000000000e+00);
-out[35] = (a[54]*a[57]);
+out[35] = (a[67]*a[70]);
 out[36] = (real_t)(0.0000000000000000e+00);
 out[37] = (real_t)(0.0000000000000000e+00);
 out[38] = (real_t)(0.0000000000000000e+00);
-out[39] = (((real_t)(0.0000000000000000e+00)-(real_t)(1.0000000000000000e+00))*a[58]);
+out[39] = (((real_t)(0.0000000000000000e+00)-(real_t)(1.0000000000000000e+00))*a[71]);
 out[40] = (real_t)(0.0000000000000000e+00);
 out[41] = (real_t)(0.0000000000000000e+00);
 out[42] = (real_t)(0.0000000000000000e+00);
 out[43] = (real_t)(0.0000000000000000e+00);
 out[44] = (real_t)(0.0000000000000000e+00);
-out[45] = (od[1]*a[59]);
+out[45] = (od[1]*a[72]);
 out[46] = (real_t)(0.0000000000000000e+00);
 out[47] = (real_t)(0.0000000000000000e+00);
 out[48] = (real_t)(0.0000000000000000e+00);
 out[49] = (real_t)(0.0000000000000000e+00);
 out[50] = (real_t)(0.0000000000000000e+00);
 out[51] = (real_t)(0.0000000000000000e+00);
-out[52] = (((real_t)(0.0000000000000000e+00)-(real_t)(1.0000000000000000e+00))*a[60]);
+out[52] = (((real_t)(0.0000000000000000e+00)-(real_t)(1.0000000000000000e+00))*a[73]);
 out[53] = (real_t)(0.0000000000000000e+00);
 out[54] = (real_t)(0.0000000000000000e+00);
 out[55] = (real_t)(0.0000000000000000e+00);
 out[56] = (real_t)(0.0000000000000000e+00);
 out[57] = (real_t)(0.0000000000000000e+00);
-out[58] = (od[3]*a[61]);
+out[58] = (od[3]*a[74]);
 out[59] = (real_t)(0.0000000000000000e+00);
 out[60] = (real_t)(0.0000000000000000e+00);
 out[61] = (real_t)(0.0000000000000000e+00);
@@ -480,10 +498,10 @@ b[8] = rk_dim9_bPerm[8];
 
 /** Column vector of size: 1 */
 static const real_t acado_Ah_mat[ 1 ] = 
-{ 5.0000000000000003e-02 };
+{ 2.5000000000000001e-02 };
 
 
-/* Fixed step size:0.1 */
+/* Fixed step size:0.05 */
 int acado_integrate( real_t* const rk_eta, int resetIntegrator )
 {
 int error;
@@ -512,8 +530,25 @@ rk_xxx[18] = rk_eta[126];
 rk_xxx[19] = rk_eta[127];
 rk_xxx[20] = rk_eta[128];
 
-for (run = 0; run < 1; ++run)
+for (run = 0; run < 2; ++run)
 {
+if( run > 0 ) {
+for (i = 0; i < 9; ++i)
+{
+rk_diffsPrev2[i * 12] = rk_eta[i * 9 + 9];
+rk_diffsPrev2[i * 12 + 1] = rk_eta[i * 9 + 10];
+rk_diffsPrev2[i * 12 + 2] = rk_eta[i * 9 + 11];
+rk_diffsPrev2[i * 12 + 3] = rk_eta[i * 9 + 12];
+rk_diffsPrev2[i * 12 + 4] = rk_eta[i * 9 + 13];
+rk_diffsPrev2[i * 12 + 5] = rk_eta[i * 9 + 14];
+rk_diffsPrev2[i * 12 + 6] = rk_eta[i * 9 + 15];
+rk_diffsPrev2[i * 12 + 7] = rk_eta[i * 9 + 16];
+rk_diffsPrev2[i * 12 + 8] = rk_eta[i * 9 + 17];
+rk_diffsPrev2[i * 12 + 9] = rk_eta[i * 3 + 90];
+rk_diffsPrev2[i * 12 + 10] = rk_eta[i * 3 + 91];
+rk_diffsPrev2[i * 12 + 11] = rk_eta[i * 3 + 92];
+}
+}
 if( resetIntegrator ) {
 for (i = 0; i < 1; ++i)
 {
@@ -660,7 +695,7 @@ rk_diffK[i + 8] = rk_b[i * 9 + 8];
 for (i = 0; i < 9; ++i)
 {
 rk_diffsNew2[(i * 12) + (run1)] = (i == run1-0);
-rk_diffsNew2[(i * 12) + (run1)] += + rk_diffK[i]*(real_t)1.0000000000000001e-01;
+rk_diffsNew2[(i * 12) + (run1)] += + rk_diffK[i]*(real_t)5.0000000000000003e-02;
 }
 }
 for (run1 = 0; run1 < 3; ++run1)
@@ -689,18 +724,19 @@ rk_diffK[i + 8] = rk_b[i * 9 + 8];
 }
 for (i = 0; i < 9; ++i)
 {
-rk_diffsNew2[(i * 12) + (run1 + 9)] = + rk_diffK[i]*(real_t)1.0000000000000001e-01;
+rk_diffsNew2[(i * 12) + (run1 + 9)] = + rk_diffK[i]*(real_t)5.0000000000000003e-02;
 }
 }
-rk_eta[0] += + rk_kkk[0]*(real_t)1.0000000000000001e-01;
-rk_eta[1] += + rk_kkk[1]*(real_t)1.0000000000000001e-01;
-rk_eta[2] += + rk_kkk[2]*(real_t)1.0000000000000001e-01;
-rk_eta[3] += + rk_kkk[3]*(real_t)1.0000000000000001e-01;
-rk_eta[4] += + rk_kkk[4]*(real_t)1.0000000000000001e-01;
-rk_eta[5] += + rk_kkk[5]*(real_t)1.0000000000000001e-01;
-rk_eta[6] += + rk_kkk[6]*(real_t)1.0000000000000001e-01;
-rk_eta[7] += + rk_kkk[7]*(real_t)1.0000000000000001e-01;
-rk_eta[8] += + rk_kkk[8]*(real_t)1.0000000000000001e-01;
+rk_eta[0] += + rk_kkk[0]*(real_t)5.0000000000000003e-02;
+rk_eta[1] += + rk_kkk[1]*(real_t)5.0000000000000003e-02;
+rk_eta[2] += + rk_kkk[2]*(real_t)5.0000000000000003e-02;
+rk_eta[3] += + rk_kkk[3]*(real_t)5.0000000000000003e-02;
+rk_eta[4] += + rk_kkk[4]*(real_t)5.0000000000000003e-02;
+rk_eta[5] += + rk_kkk[5]*(real_t)5.0000000000000003e-02;
+rk_eta[6] += + rk_kkk[6]*(real_t)5.0000000000000003e-02;
+rk_eta[7] += + rk_kkk[7]*(real_t)5.0000000000000003e-02;
+rk_eta[8] += + rk_kkk[8]*(real_t)5.0000000000000003e-02;
+if( run == 0 ) {
 for (i = 0; i < 9; ++i)
 {
 for (j = 0; j < 9; ++j)
@@ -714,8 +750,41 @@ tmp_index2 = (j) + (i * 3);
 rk_eta[tmp_index2 + 90] = rk_diffsNew2[(i * 12) + (j + 9)];
 }
 }
+}
+else {
+for (i = 0; i < 9; ++i)
+{
+for (j = 0; j < 9; ++j)
+{
+tmp_index2 = (j) + (i * 9);
+rk_eta[tmp_index2 + 9] = + rk_diffsNew2[i * 12]*rk_diffsPrev2[j];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 1]*rk_diffsPrev2[j + 12];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 2]*rk_diffsPrev2[j + 24];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 3]*rk_diffsPrev2[j + 36];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 4]*rk_diffsPrev2[j + 48];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 5]*rk_diffsPrev2[j + 60];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 6]*rk_diffsPrev2[j + 72];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 7]*rk_diffsPrev2[j + 84];
+rk_eta[tmp_index2 + 9] += + rk_diffsNew2[i * 12 + 8]*rk_diffsPrev2[j + 96];
+}
+for (j = 0; j < 3; ++j)
+{
+tmp_index2 = (j) + (i * 3);
+rk_eta[tmp_index2 + 90] = rk_diffsNew2[(i * 12) + (j + 9)];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12]*rk_diffsPrev2[j + 9];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 1]*rk_diffsPrev2[j + 21];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 2]*rk_diffsPrev2[j + 33];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 3]*rk_diffsPrev2[j + 45];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 4]*rk_diffsPrev2[j + 57];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 5]*rk_diffsPrev2[j + 69];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 6]*rk_diffsPrev2[j + 81];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 7]*rk_diffsPrev2[j + 93];
+rk_eta[tmp_index2 + 90] += + rk_diffsNew2[i * 12 + 8]*rk_diffsPrev2[j + 105];
+}
+}
+}
 resetIntegrator = 0;
-rk_ttt += 1.0000000000000000e+00;
+rk_ttt += 5.0000000000000000e-01;
 }
 for (i = 0; i < 9; ++i)
 {

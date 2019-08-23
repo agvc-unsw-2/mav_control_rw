@@ -1,0 +1,109 @@
+#==================================================================================================================
+#
+# Project:	Nonlinear MPC for Hexacopter trajectory tracking.
+#
+# function:	NMPC Position controller parameters.
+#
+# Author:	Mina Kamel	mina.kamel@ethz.ch
+#
+# Generated:	20-Dec-2015 02:37:59
+#
+#==================================================================================================================
+
+#1st order dynamics
+#pitch fit percentage: 79.204230%
+#roll fit percentage: 78.777678%
+
+## Controller Parameters:
+yaw_gain: 1.000000
+yaw_damping: 0.950000
+yaw_omega: 5.000000
+
+mass: 1.00000000
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+
+# Time constants for PID gains of 600
+# roll_gain: 1.000298
+# roll_damping: 0.463114
+# roll_omega: 11.336867
+# pitch_gain: 1.008354
+# pitch_damping: 0.476652
+# pitch_omega: 11.264051
+# yaw_gain: 1.000000
+# yaw_damping: 0.950000
+# yaw_omega: 5.000000
+
+# Time constants for PID gains of 200
+# roll_gain: 1.007134
+# roll_damping: 0.839112
+# roll_omega: 6.639183
+# pitch_gain: 0.999276
+# pitch_damping: 0.847333
+# pitch_omega: 6.560188
+
+##################
+# Unbalanced Loads
+##################
+# 400g extra loads (100g forwards, backwards, left and right)
+
+# Time constants for PID gains of 200
+# roll_gain: 1.005393
+# roll_damping: 0.745251
+# roll_omega: 6.211433
+# pitch_gain: 0.996316
+# pitch_damping: 0.777345
+# pitch_omega: 6.000949
+
+# 4kg load for PID gains of 800 pq 90
+roll_gain: 1.006496
+roll_damping: 0.843728
+roll_omega: 15.191048
+pitch_gain: 1.008675
+pitch_damping: 0.863757
+pitch_omega: 15.632022
+
+# dynamic config default values:
+q_x : 80
+q_y : 80
+q_z : 120
+
+q_vx : 80
+q_vy : 80
+q_vz : 100
+
+q_roll : 10
+q_pitch: 10
+
+q_roll_dot : 0
+q_pitch_dot: 0
+
+r_roll  : 50
+r_pitch : 50
+r_thrust : 1
+
+roll_max: deg(45.0)
+pitch_max: deg(45.0)
+thrust_min: 0.1
+thrust_max: 50
+
+K_yaw: 1.8
+
+Ki_xy: 0.2
+#Ki_z: 0.3
+Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
+position_error_integration_limit: 2
+antiwindup_ball: 0.4
+
+enable_disturbance_observer : false
+enable_integrator : false
+
+sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
+prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s prediction time
+
+#enum Disturbance_Observer_Types {
+#  KF_DO_first_order__, // 0
+#  KF_DO_second_order__, //1
+#  integral_DO_first_order__, //2
+#  integral_DO_second_order__ //3
+#};
+disturbance_observer_type: 1

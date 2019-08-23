@@ -52,7 +52,7 @@ void SteadyStateCalculation::initialize(const Eigen::MatrixXd& A, const Eigen::M
   left_hand_side.resize(kStateSize + kMeasurementSize, kStateSize + kInputSize);
 
   Bd_ = Bd;
-  Eigen::MatrixXd C(6, 8); // Define 6x8 dynamic-size matrix
+  Eigen::MatrixXd C(kMeasurementSize, kStateSize); // Define 6x8 dynamic-size matrix
   C.setIdentity();
 
   left_hand_side << A - Eigen::MatrixXd::Identity(kStateSize, kStateSize), B, C, Eigen::MatrixXd::Zero(
@@ -62,7 +62,8 @@ void SteadyStateCalculation::initialize(const Eigen::MatrixXd& A, const Eigen::M
       * left_hand_side.transpose();
 
   initialized_params_ = true;
-  ROS_INFO("Linear MPC: Steady State calculation is initialized correctly");
+  ROS_INFO("Linear MPC: Steady State calculation initialized");
+  ROS_INFO_STREAM("pseudo_inverse_left_hand_side_:\n" << pseudo_inverse_left_hand_side_);
 }
 
 void SteadyStateCalculation::computeSteadyState(

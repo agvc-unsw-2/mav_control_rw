@@ -1,0 +1,38 @@
+dimensions
+  m = 3         # dimension of input
+  nd = 3        # dimension of disturbances
+  nx = 8        # dimension of state vector
+  T = 18        # (horizon - 1), indexed from 0
+end
+
+parameters
+  A (nx, nx)            #dynamics matrix
+  B (nx, m)             # transfer matrix
+  Bd (nx, nd)           # disturbance transfer matrix
+  Q (nx, nx) psd      # state cost, positive semidifined
+  Q_final (nx, nx) psd        # final state penalty, positive semidefined
+  R (m, m) psd        # input penalty, positive semidefined
+  x[0] (nx)             # initial state
+  d (nd)                # disturbacnes
+  u_prev (m)            # previous input applied to the system
+  u_max (m)             # input amplitude limit
+  u_min (m)             # input amplitude limit
+  x_ss[t] (nx), t=0..T+1  # reference state
+  u_ss[t] (m), t=0..T   # reference input   
+end
+
+variables
+  x[t] (nx), t=1..T+1   # state
+  u[t] (m), t=0..T      # input
+
+end
+
+minimize
+    # define OCP problem
+    quad(x[0]-x_ss[0], Q) + quad(u[0]-u_ss[0], R) + sum[t=1..T](quad(x[t]-x_ss[t], Q) + quad(u[t]-u_ss[t], R)) + quad(x[T+1]-x_ss[T+1], Q_final)
+  
+subject to
+  x[t+1] == A*x[t] + B*u[t] + Bd*d, t=0..T #dynamics
+  u_min <= u[t] <= u_max, t=0..T #input constraints
+end
+​

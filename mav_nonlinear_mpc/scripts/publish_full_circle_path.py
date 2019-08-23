@@ -74,6 +74,9 @@ class Path_Publisher(object):
                     p_ref = Vector3(d*cos(mu*t), d*sin(mu*t), self.altitude)
                     v_ref = Vector3(-mu*d*sin(mu*t), mu*d*cos(mu*t), 0.0)
                     a_ref = Vector3(-mu**2*d*cos(mu*t), -mu**2*d*sin(mu*t), 0.0)
+                    #p_ref = Vector3(traj.get_position(t).x, y, z)
+                    #v_ref = Vector3(-mu*d*sin(mu*t), mu*d*cos(mu*t), 0.0)
+                    #a_ref = Vector3(-mu**2*d*cos(mu*t), -mu**2*d*sin(mu*t), 0.0)
                     #roll = 0
                     #pitch = 0
                     #yaw = math.atan2(v_ref[1],v_ref[0])
@@ -100,9 +103,9 @@ uav_num = str(myargs[2])
 if __name__ == '__main__':
     print('-----------------------')
     print("Launching " + myargs[0] + '...')
-    circle_r = 0.7
+    circle_r = 2.0
     altitude = 1.0
-    vel_mag = 0.5
+    vel_mag = 1.0
     publish_interval = 2.0 #s
     ref_time_step = 0.01 #s
     publisher_obj = Path_Publisher(
@@ -118,4 +121,5 @@ if __name__ == '__main__':
         publisher_obj.publish_path()
     except rospy.ROSInterruptException:
         # Read current reference and publish it as new position reference to stop the drone quickly
+        # TODO
         print("Error or ending publisher")

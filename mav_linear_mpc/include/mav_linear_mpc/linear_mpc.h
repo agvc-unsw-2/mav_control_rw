@@ -181,7 +181,7 @@ class LinearModelPredictiveController
   static constexpr int kInputSize = 3;
   static constexpr int kMeasurementSize = 6;
   static constexpr int kDisturbanceSize = 3;
-  static constexpr int kPredictionHorizonSteps = 20;
+  static constexpr int kPredictionHorizonSteps = 17;
   static constexpr double kGravity = 9.8066;
 
   // ros node handles
@@ -224,7 +224,7 @@ class LinearModelPredictiveController
   Eigen::Vector3d r_command_;
   Eigen::Vector3d r_delta_command_;
 
-  // yaw P gain
+  // yaw Q_final gain
   double K_yaw_;
 
   // backup LQR

@@ -135,6 +135,18 @@ void LinearModelPredictiveController::initializeParameters()
     ROS_ERROR("prediction_sampling_time in MPC is not loaded from ros parameter server");
     abort();
   }
+  
+  // TODO: Wasn't here by default. Remove if necessary
+  if (!private_nh_.getParam("enable_disturbance_observer", enable_disturbance_observer_)) {
+    ROS_ERROR("enable_disturbance_observer in MPC is not loaded from ros parameter server");
+    abort();
+  }
+
+  // TODO: Wasn't here by default. Remove if necessary
+  if (!private_nh_.getParam("enable_integrator", enable_integrator_)) {
+    ROS_ERROR("enable_integrator in MPC is not loaded from ros parameter server");
+    abort();
+  }
   ROS_INFO("Linear MPC: Parameters initialized correctly");
 
   constructModelMatrices();

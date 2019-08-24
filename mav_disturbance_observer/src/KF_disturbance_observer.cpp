@@ -234,6 +234,15 @@ void KFDisturbanceObserver::loadROSParams()
     ROS_ERROR("sampling_time in KF is not loaded from ros parameter server");
     abort();
   }
+  if (!observer_nh_.getParam("enable_KRLS_EKF", enable_KRLS_EKF_)) {
+    ROS_ERROR("enable_KRLS_EKF in KF_first_order are not loaded from ros parameter server");
+    abort();
+  }
+
+  if (!observer_nh_.getParam("verbose", verbose_)) {
+    ROS_ERROR("verbose in KF_first_order are not loaded from ros parameter server");
+    abort();
+  }
   ROS_INFO("Read KF parameters successfully");
 
   construct_KF_matrices(
@@ -388,7 +397,7 @@ void KFDisturbanceObserver::DynConfigCallback(
     measurement_covariance_(i + 3) = config.r_velocity;
     measurement_covariance_(i + 6) = config.r_attitude;
   }
-
+  enable_KRLS_EKF_ = config.enable_KRLS_EKF;
   construct_KF_matrices(
     temporary_drag, 
     temporary_external_forces_limit,
@@ -485,16 +494,30 @@ bool KFDisturbanceObserver::updateEstimator()
   state_covariance_ = F_ * state_covariance_ * F_.transpose();
   state_covariance_.diagonal() += process_noise_covariance_;
 
-  //predict state
+  // systemDynamics calculates predicted state
+  // predicted state = x_est[k+1]
+  // equivalent to x_est[k+1] = A*x_est[k] + B*u[k] + Bd*d_est[k]
   systemDynamics(dt);
 
   Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp = H_ * state_covariance_
       * H_.transpose() + measurement_covariance_.asDiagonal().toDenseMatrix();
 
   K_ = state_covariance_ * H_.transpose() * tmp.inverse();
-
+  if (verbose_) {
+    ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
+  }
   //Update with measurements
-  state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
+  // predicted_state = A*x_est[k] + B*u[k] + Bd*d_est[k]
+
+  // Equivalent to x_est[k+1] = predicted_state +  L_x * (y[k] - C*x_est[k])
+  // For KRLS EKF, K_ is dynamic.
+  // For integral disturbance observer, K_ is static
+  if (enable_KRLS_EKF_) {
+    state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
+  } else {
+    // TODO: Implement this
+    state_ = predicted_state_ + K_static_ * (measurements_ - H_ * state_);
+  }
 
   //Update covariance
   state_covariance_ = (Eigen::Matrix<double, kStateSize, kStateSize>::Identity() - K_ * H_)

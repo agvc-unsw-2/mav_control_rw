@@ -29,6 +29,8 @@ KF_observer_second_order:
   external_moments_limit :  [ 500.000000 ,500.000000 ,500.000000]  #rad/s^2
 
   drag_coefficients: [0.00000, 0.00000, 0.000000]
+  enable_KRLS_EKF: true
+  verbose: true
   
   #model from system identification (2nd order attitude model)
 

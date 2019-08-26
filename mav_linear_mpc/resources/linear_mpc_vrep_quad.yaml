@@ -55,27 +55,22 @@ q_vx : 80
 q_vy : 80
 q_vz : 100
 
-q_roll: 10
-q_pitch: 10
+q_roll : 10
+q_pitch : 10
 
-r_roll: 50
-r_pitch: 50
-r_thrust: 1
-
-r_droll: 0.3
-r_dpitch: 0.3
-r_dthrust: 0.0025
+r_roll : 50
+r_pitch : 50
+r_thrust : 1
 
 roll_max: deg(45.0)
 pitch_max: deg(45.0)
-yaw_rate_max: deg(90)
 thrust_min: 0.1
 thrust_max: 50
 
 K_yaw: 1.8
 
-Ki_xy: 0.2
-Ki_z: 0.3
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
@@ -84,3 +79,9 @@ enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1
+
+r_droll: 0.0 # default 0.3
+r_dpitch: 0.0 # default 0.3
+r_dthrust: 0.00 # default 0.0025
+
+yaw_rate_max: deg(90)

@@ -66,9 +66,9 @@ q_vy : 80
 q_vz : 100
 
 q_roll : 10
-q_pitch: 10
+q_pitch : 10
 
-r_roll  : 50
+r_roll : 50
 r_pitch : 50
 r_thrust : 1
 
@@ -79,13 +79,12 @@ thrust_max: 50
 
 K_yaw: 1.8
 
-Ki_xy: 0.2
-#Ki_z: 0.3
-Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : false
+enable_disturbance_observer : true
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

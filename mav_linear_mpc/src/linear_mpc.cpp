@@ -147,6 +147,17 @@ void LinearModelPredictiveController::initializeParameters()
     ROS_ERROR("enable_integrator in MPC is not loaded from ros parameter server");
     abort();
   }
+
+  // TODO: Wasn't here by default. Remove if necessary
+  if (!private_nh_.getParam("Ki_altitude", Ki_altitude_)) {
+    ROS_ERROR("Ki_altitude in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  // TODO: Wasn't here by default. Remove if necessary
+  if (!private_nh_.getParam("Ki_xy", Ki_xy_)) {
+    ROS_ERROR("Ki_xy in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
   ROS_INFO("Linear MPC: Parameters initialized correctly");
 
   constructModelMatrices();

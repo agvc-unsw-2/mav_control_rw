@@ -51,7 +51,7 @@ LMPC_Second_Order_Controller::LMPC_Second_Order_Controller(const ros::NodeHandle
       linearized_command_roll_pitch_thrust_(0, 0, 0),
       mpc_queue_(nh, private_nh, kPredictionHorizonSteps),
       disturbance_observer_(nh, private_nh),
-      verbose_(true),
+      verbose_(false),
       solve_time_average_(0),
       steady_state_calculation_second_order_(nh, private_nh),
       received_first_odometry_(false)
@@ -631,21 +631,19 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
 
   double diff_time = (ros::WallTime::now() - starting_time).toSec();
 
-  if (verbose_) {
-    if (counter > 100) {
-      ROS_INFO_STREAM("average solve time: " << 1000.0 * solve_time_average_ / counter << " ms");
-      solve_time_average_ = 0.0;
+  if (counter > 100) {
+    ROS_INFO_STREAM("LMPC 2nd Order Avg solve time: " << 1000.0 * solve_time_average_ / counter << " ms");
+    solve_time_average_ = 0.0;
 
-      ROS_INFO_STREAM("Controller loop time : " << diff_time * 1000.0 << " ms");
+    ROS_INFO_STREAM("Controller loop time : " << diff_time * 1000.0 << " ms");
 
-      ROS_INFO_STREAM( 
-          "roll ref: " << command_roll_pitch_yaw_thrust_(0)
-          << "\t" << "pitch ref : \t" << command_roll_pitch_yaw_thrust_(1)
-          << "\t" << "yaw ref : \t" << command_roll_pitch_yaw_thrust_(2)
-          << "\t" << "thrust ref : \t" << command_roll_pitch_yaw_thrust_(3)
-          << "\t" << "yawrate ref : \t" << yaw_rate_cmd);
-      counter = 0;
-    }
+    ROS_INFO_STREAM( 
+        "roll ref: " << command_roll_pitch_yaw_thrust_(0)
+        << "\t" << "pitch ref : \t" << command_roll_pitch_yaw_thrust_(1)
+        << "\t" << "yaw ref : \t" << command_roll_pitch_yaw_thrust_(2)
+        << "\t" << "thrust ref : \t" << command_roll_pitch_yaw_thrust_(3)
+        << "\t" << "yawrate ref : \t" << yaw_rate_cmd);
+    counter = 0;
   }
   counter++;
 }

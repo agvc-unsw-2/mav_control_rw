@@ -397,10 +397,11 @@ void KF_DO_first_order::reset(const Eigen::Vector3d& initial_position,
 
 bool KF_DO_first_order::updateEstimator()
 {
-  static int counter = 0;
-  ros::WallTime time_before_updating = ros::WallTime::now();
   if (initialized_ == false)
     return false;
+    
+  static int counter = 0;
+  ros::WallTime time_before_updating = ros::WallTime::now();
 
   ROS_INFO_ONCE("KF is updated for first time.");
   static ros::Time t_previous = ros::Time::now();
@@ -527,14 +528,12 @@ bool KF_DO_first_order::updateEstimator()
   }
 
   solve_time_average_ += (ros::WallTime::now() - time_before_updating).toSec() * 1000.0;
-  if (verbose_) {
-    if (counter > 100) {
-      ROS_INFO_STREAM("KF first order average solve time: " << solve_time_average_ / counter << " ms");
-      solve_time_average_ = 0.0;
-      counter = 0;
-    }
-    counter++;
+  if (counter > 100) {
+    ROS_INFO_STREAM("KF first order average solve time: " << solve_time_average_ / counter << " ms");
+    solve_time_average_ = 0.0;
+    counter = 0;
   }
+  counter++;
 
   return true;
 }

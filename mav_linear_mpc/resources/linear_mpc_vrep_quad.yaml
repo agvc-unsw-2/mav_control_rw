@@ -85,3 +85,4 @@ r_dpitch: 0.0 # default 0.3
 r_dthrust: 0.00 # default 0.0025
 
 yaw_rate_max: deg(90)
+verbose: false

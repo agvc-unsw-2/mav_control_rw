@@ -468,6 +468,9 @@ bool KFDisturbanceObserver::updateEstimator()
   if (initialized_ == false)
     return false;
 
+  static int counter = 0;
+  ros::WallTime time_before_updating = ros::WallTime::now();
+
   ROS_INFO_ONCE("KF is updated for first time.");
   static ros::Time t_previous = ros::Time::now();
   static bool do_once = true;
@@ -491,38 +494,41 @@ bool KFDisturbanceObserver::updateEstimator()
     dt = sampling_time_ * 0.5;
   }
 
-  state_covariance_ = F_ * state_covariance_ * F_.transpose();
-  state_covariance_.diagonal() += process_noise_covariance_;
 
   // systemDynamics calculates predicted state
   // predicted state = x_est[k+1]
   // equivalent to x_est[k+1] = A*x_est[k] + B*u[k] + Bd*d_est[k]
   systemDynamics(dt);
 
-  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp = H_ * state_covariance_
-      * H_.transpose() + measurement_covariance_.asDiagonal().toDenseMatrix();
-
-  K_ = state_covariance_ * H_.transpose() * tmp.inverse();
-  if (verbose_) {
-    ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
-  }
   //Update with measurements
   // predicted_state = A*x_est[k] + B*u[k] + Bd*d_est[k]
 
   // Equivalent to x_est[k+1] = predicted_state +  L_x * (y[k] - C*x_est[k])
   // For KRLS EKF, K_ is dynamic.
   // For integral disturbance observer, K_ is static
+
+  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp;
   if (enable_KRLS_EKF_) {
+    state_covariance_ = F_ * state_covariance_ * F_.transpose();
+    state_covariance_.diagonal() += process_noise_covariance_;
+    tmp = H_ * state_covariance_ * H_.transpose()
+      + measurement_covariance_.asDiagonal().toDenseMatrix();
+    K_ = state_covariance_ * H_.transpose() * tmp.inverse();
     state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
+
+    if (verbose_) {
+      ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
+    }
   } else {
     // TODO: Implement this
     state_ = predicted_state_ + K_static_ * (measurements_ - H_ * state_);
   }
 
   //Update covariance
+  if (enable_KRLS_EKF_) {
   state_covariance_ = (Eigen::Matrix<double, kStateSize, kStateSize>::Identity() - K_ * H_)
       * state_covariance_;
-
+  }
   //Limits on estimated_disturbances
   if (state_.allFinite() == false) {
     ROS_ERROR("The estimated state in KF Disturbance Observer has a non-finite element");
@@ -577,6 +583,15 @@ bool KFDisturbanceObserver::updateEstimator()
 
     observer_state_pub_.publish(msg);
   }
+
+  solve_time_average_ += (ros::WallTime::now() - time_before_updating).toSec() * 1000.0;
+  if (counter > 100) {
+    ROS_INFO_STREAM("KF first order average solve time: " << solve_time_average_ / counter << " ms");
+    solve_time_average_ = 0.0;
+    counter = 0;
+  }
+  counter++;
+
   return true;
 }
 

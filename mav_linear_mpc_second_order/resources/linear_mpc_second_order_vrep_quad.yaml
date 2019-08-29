@@ -82,7 +82,9 @@ antiwindup_ball: 1.0
 
 enable_disturbance_observer : true
 enable_integrator : false
-enable_moment_disturbances : false
+enable_moment_disturbances : true
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1
+
+verbose: false

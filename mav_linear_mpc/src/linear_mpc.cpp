@@ -51,7 +51,7 @@ LinearModelPredictiveController::LinearModelPredictiveController(const ros::Node
       linearized_command_roll_pitch_thrust_(0, 0, 0),
       mpc_queue_(nh, private_nh, kPredictionHorizonSteps),
       disturbance_observer_(nh, private_nh),
-      verbose_(true),
+      verbose_(false),
       solve_time_average_(0),
       steady_state_calculation_(nh, private_nh),
       received_first_odometry_(false)
@@ -444,9 +444,11 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
       Eigen::Map<Eigen::Matrix<double, kInputSize, 1>>(const_cast<double*>(params.u_ss_0)) =
           target_input;
     }
-    if (counter % 100 == 0) {
-      ROS_INFO_STREAM("target_state[" << i << "]: \n" << target_state);
-      ROS_INFO_STREAM("target_input, i = " << i << ": \n" << target_input);
+    if(verbose_) {
+      if (counter % 100 == 0) {
+        ROS_INFO_STREAM("target_state[" << i << "]: \n" << target_state);
+        ROS_INFO_STREAM("target_input, i = " << i << ": \n" << target_input);
+      }
     }
   }
   // calculate target state and target input for last step in prediction horizon
@@ -456,13 +458,17 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
 
   steady_state_calculation_.computeSteadyState(estimated_disturbances, ref, &target_state,
                                                &target_input);
-  if (counter % 100 == 0) {
-    ROS_INFO_STREAM("target_state[" << (kPredictionHorizonSteps - 1) << "]: \n" << target_state);
-    ROS_INFO_STREAM("target_input, i = " << (kPredictionHorizonSteps - 1) << ": \n" << target_input);
+  if(verbose_) {
+    if (counter % 100 == 0) {
+      ROS_INFO_STREAM("target_state[" << (kPredictionHorizonSteps - 1) << "]: \n" << target_state);
+      ROS_INFO_STREAM("target_input, i = " << (kPredictionHorizonSteps - 1) << ": \n" << target_input);
+    }
   }
   CVXGEN_queue_.push_back(target_state);
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Pushing target states to queue\n");
+  if(verbose_) {
+    ROS_INFO_STREAM_THROTTLE(1.0, "Pushing target states to queue\n");
+  }
   // push 'steady state' target states for every step in prediction horizon to queue
   for (int i = 0; i < kPredictionHorizonSteps; i++) {
     Eigen::Map<Eigen::VectorXd>(const_cast<double*>(params.x_ss[i]), kStateSize, 1) =
@@ -506,8 +512,9 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
         Eigen::Vector3d(roll_limit_, pitch_limit_, thrust_max_));
   }
 
-  ROS_INFO_STREAM_THROTTLE(1.0, "Linearized rpt command: \n" << linearized_command_roll_pitch_thrust_);
-
+  if(verbose_) {
+    ROS_INFO_STREAM_THROTTLE(1.0, "Linearized rpt command: \n" << linearized_command_roll_pitch_thrust_);
+  }
   command_roll_pitch_yaw_thrust_(3) = (linearized_command_roll_pitch_thrust_(2) + kGravity)
       / (cos(roll) * cos(pitch));
   double ux = linearized_command_roll_pitch_thrust_(1)
@@ -519,8 +526,9 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
   command_roll_pitch_yaw_thrust_(1) = ux * cos(yaw) - uy * sin(yaw);
   command_roll_pitch_yaw_thrust_(2) = yaw_ref_.front();
   
-  ROS_INFO_STREAM_THROTTLE(1.0, "Body frame rpt command: \n" << command_roll_pitch_yaw_thrust_);
-
+  if(verbose_) {
+    ROS_INFO_STREAM_THROTTLE(1.0, "Body frame rpt command: \n" << command_roll_pitch_yaw_thrust_);
+  }
   // yaw controller
   double yaw_error = command_roll_pitch_yaw_thrust_(2) - yaw;
 
@@ -548,23 +556,21 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
 
   double diff_time = (ros::WallTime::now() - starting_time).toSec();
 
-  if (verbose_) {
-    if (counter > 100) {
-      ROS_INFO_STREAM("average solve time: " << 1000.0 * solve_time_average_ / counter << " ms");
-      solve_time_average_ = 0.0;
+  if (counter > 100) {
+    ROS_INFO_STREAM("average solve time: " << 1000.0 * solve_time_average_ / counter << " ms");
+    solve_time_average_ = 0.0;
 
-      ROS_INFO_STREAM("Controller loop time : " << diff_time * 1000.0 << " ms");
+    ROS_INFO_STREAM("Controller loop time : " << diff_time * 1000.0 << " ms");
 
-      ROS_INFO_STREAM(
-          "roll ref: " << command_roll_pitch_yaw_thrust_(0)
-          << "\t" << "pitch ref : \t" << command_roll_pitch_yaw_thrust_(1)
-          << "\t" << "yaw ref : \t" << command_roll_pitch_yaw_thrust_(2)
-          << "\t" << "thrust ref : \t" << command_roll_pitch_yaw_thrust_(3)
-          << "\t" << "yawrate ref : \t" << yaw_rate_cmd);
-      counter = 0;
-    }
-    counter++;
+    ROS_INFO_STREAM(
+        "roll ref: " << command_roll_pitch_yaw_thrust_(0)
+        << "\t" << "pitch ref : \t" << command_roll_pitch_yaw_thrust_(1)
+        << "\t" << "yaw ref : \t" << command_roll_pitch_yaw_thrust_(2)
+        << "\t" << "thrust ref : \t" << command_roll_pitch_yaw_thrust_(3)
+        << "\t" << "yawrate ref : \t" << yaw_rate_cmd);
+    counter = 0;
   }
+  counter++;
 }
 
 bool LinearModelPredictiveController::getCurrentReference(

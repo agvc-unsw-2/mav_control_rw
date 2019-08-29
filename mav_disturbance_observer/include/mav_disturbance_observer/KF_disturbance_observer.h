@@ -167,6 +167,7 @@ class KFDisturbanceObserver
   double sampling_time_;
   bool enable_KRLS_EKF_;
   bool verbose_;
+  double solve_time_average_;
 
   ros::ServiceServer service_;
   ros::Publisher observer_state_pub_;

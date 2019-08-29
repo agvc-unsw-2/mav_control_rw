@@ -33,8 +33,6 @@ from sensor_msgs.msg import Imu
 def step_response(hlc, start, end, period, cycles, longways_direction):
     print("X step response")
     hlc.takeoff()
-    position = Point(0, 0, hlc.hover_height)
-    hlc.publishPositionForTime(position, period)
     for i in range(cycles):
         if (longways_direction == "x"):
             position = Point(start, 0, hlc.hover_height)
@@ -66,6 +64,38 @@ def move_in_square(hlc):
     position = Point(-1, -1, hlc.hover_height)
     hlc.goToPosition(position)
     hlc.land()
+
+def generate_straight_line_path(start, end, speed, period, cycles, longways_direction):
+    ref_time_step = 0.01
+    mu = vel_mag/r # t scale factor to scale velocity
+    zero_vec = Vector3(0.0, 0.0, 0.0) # For angular velocity and acceleration
+    rotation = Quaternion(0.0, 0.0, 0.0, 1.0) # For rotation
+    now_secs = rospy.get_time()
+    now_obj = rospy.get_rostime()
+    # speed = dist/time -> t = dist / speed
+    traj_time = (2.0 * math.pi * r) / vel_mag
+    num_points = int((float(traj_time) / float(ref_time_step))) + 1 # + 1 just in case
+    num_points = num_points * cycles # Repeat for some number of cycles
+    traj_msg = MultiDOFJointTrajectory()
+    traj_msg.points = [None]*num_points
+    for i in range(num_points):
+        traj_msg.points[i] = MultiDOFJointTrajectoryPoint()
+    #traj_msg.points = 
+    if now_secs <= 0: # simulation hasn't started
+        # Hover in space
+        traj_msg.header.stamp = rospy.Time.from_sec(0.0)
+    else:
+        for i in range(num_points):
+            t = now_secs + (i * ref_time_step)
+            p_ref = Vector3(r*cos(mu*t), r*sin(mu*t), altitude)
+            v_ref = Vector3(-mu*r*sin(mu*t), mu*r*cos(mu*t), 0.0)
+            a_ref = Vector3(-(mu*mu)*r*cos(mu*t), -(mu*mu)*r*sin(mu*t), 0.0)
+            traj_msg.points[i].transforms = [Transform(p_ref, rotation)]
+            traj_msg.points[i].velocities = [Twist(v_ref, zero_vec)]
+            traj_msg.points[i].accelerations = [Twist(a_ref, zero_vec)]
+            traj_msg.points[i].time_from_start = rospy.Time.from_sec(t)
+        traj_msg.header.stamp = now_obj
+    return traj_msg
 
 def generate_circle_path(r, vel_mag, altitude, cycles):
     ref_time_step = 0.01

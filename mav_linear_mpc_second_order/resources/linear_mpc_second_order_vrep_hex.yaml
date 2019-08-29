@@ -68,3 +68,5 @@ enable_moment_disturbances : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1
+
+verbose: false

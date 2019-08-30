@@ -27,7 +27,7 @@ KF_observer_first_order:
   yaw_gain: 1.000000
   drag_coefficients: [0.010000, 0.010000, 0.000000]
   enable_KRLS_EKF: true
-  verbose: true
+  verbose: false
 
   # Time constants for PID P gain of 600
   # roll_time_constant: 0.105595

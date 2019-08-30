@@ -116,9 +116,18 @@ void KFDisturbanceObserver::initialize()
   forces_offset_.setZero();
   moments_offset_.setZero();
 
+  // TODO: Replace K_static_ initialization
+  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp;
+  state_covariance_ *= 1e6;
+  state_covariance_ = F_ * state_covariance_ * F_.transpose();
+  state_covariance_.diagonal() += process_noise_covariance_;
+  tmp = H_ * state_covariance_ * H_.transpose()
+    + measurement_covariance_.asDiagonal().toDenseMatrix();
+  K_static_ = state_covariance_ * H_.transpose() * tmp.inverse();
+
   initialized_ = true;
 
-  ROS_INFO("Kalman Filter Initialized!");
+  ROS_INFO("2nd Order RPY Disturbanbce Observer Initialized!");
 
 }
 
@@ -516,9 +525,9 @@ bool KFDisturbanceObserver::updateEstimator()
     K_ = state_covariance_ * H_.transpose() * tmp.inverse();
     state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
 
-    if (verbose_) {
-      ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
-    }
+    // if (verbose_) {
+    //   ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
+    // }
   } else {
     // TODO: Implement this
     state_ = predicted_state_ + K_static_ * (measurements_ - H_ * state_);
@@ -586,7 +595,7 @@ bool KFDisturbanceObserver::updateEstimator()
 
   solve_time_average_ += (ros::WallTime::now() - time_before_updating).toSec() * 1000.0;
   if (counter > 100) {
-    ROS_INFO_STREAM("KF first order average solve time: " << solve_time_average_ / counter << " ms");
+    ROS_INFO_STREAM("2nd Order RPY DO average solve time: " << solve_time_average_ / counter << " ms");
     solve_time_average_ = 0.0;
     counter = 0;
   }

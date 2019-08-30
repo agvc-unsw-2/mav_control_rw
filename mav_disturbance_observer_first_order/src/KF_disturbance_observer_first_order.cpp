@@ -463,9 +463,9 @@ bool KF_DO_first_order::updateEstimator()
     K_ = state_covariance_ * H_.transpose() * tmp.inverse();
     state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
 
-    if (verbose_) {
-      ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
-    }
+    // if (verbose_) {
+    //   ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
+    // }
   } else {
     // TODO: Implement this
     state_ = predicted_state_ + K_static_ * (measurements_ - H_ * state_);

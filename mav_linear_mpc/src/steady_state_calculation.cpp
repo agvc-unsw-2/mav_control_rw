@@ -53,6 +53,7 @@ void SteadyStateCalculation::initialize(const Eigen::MatrixXd& A, const Eigen::M
 
   Bd_ = Bd;
   Eigen::MatrixXd C(kMeasurementSize, kStateSize); // Define 6x8 dynamic-size matrix
+  // TODO: No feedback on euler angles! Fix this?
   C.setIdentity();
 
   left_hand_side << A - Eigen::MatrixXd::Identity(kStateSize, kStateSize), B, C, Eigen::MatrixXd::Zero(

@@ -35,6 +35,7 @@
 
 #include <memory>
 #include <mav_disturbance_observer/KF_disturbance_observer.h>
+#include <mav_disturbance_observer_first_order/KF_disturbance_observer_first_order.h>
 #include <mav_linear_mpc/steady_state_calculation.h>
 #include <mav_msgs/conversions.h>
 #include <mav_msgs/eigen_mav_msgs.h>
@@ -253,9 +254,19 @@ class LinearModelPredictiveController
   std::deque<Eigen::Matrix<double, kStateSize, 1>> CVXGEN_queue_;
 
   // disturbance observer
-  bool enable_disturbance_observer_;
-  KFDisturbanceObserver disturbance_observer_;
 
+  void update_KF_DO_first_order_measurements();
+  void update_KF_DO_second_order_measurements();
+
+  enum Disturbance_Observer_Types {
+    KF_DO_first_order__,
+    KF_DO_second_order__,
+  };
+  Disturbance_Observer_Types disturbance_observer_type_;
+  bool enable_disturbance_observer_;
+  KFDisturbanceObserver KF_DO_second_order_;
+  KF_DO_first_order KF_DO_first_order_; // KF disturbance observer with first order model
+  
   // commands
   Eigen::Vector4d command_roll_pitch_yaw_thrust_;  //actual roll, pitch, yaw, thrust command
   Eigen::Vector3d linearized_command_roll_pitch_thrust_;

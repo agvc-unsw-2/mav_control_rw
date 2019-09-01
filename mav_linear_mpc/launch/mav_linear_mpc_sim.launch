@@ -6,6 +6,7 @@
       <remap from="odometry" to="ground_truth/odometry" />
       <rosparam file="$(find mav_linear_mpc)/resources/linear_mpc_$(arg mav_name).yaml" />
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+      <rosparam file="$(find mav_disturbance_observer_first_order)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <param name="verbose" value="true" />
       <param name="use_rc_teleop" value="false" />
       <param name="reference_frame" value="world" />

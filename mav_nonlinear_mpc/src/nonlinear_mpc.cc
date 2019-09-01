@@ -47,8 +47,6 @@ NonlinearModelPredictiveControl::NonlinearModelPredictiveControl(const ros::Node
       command_roll_pitch_yaw_thrust_(0, 0, 0, 0),
       KF_DO_first_order_(nh, private_nh),
       KF_DO_second_order_(nh, private_nh),
-      Integral_DO_first_order_(nh, private_nh),
-      integral_DO_first_order_(nh, private_nh),
       verbose_(true),
       solve_time_average_(0),
       received_first_odometry_(false)
@@ -249,10 +247,6 @@ void NonlinearModelPredictiveControl::setOdometry(const mav_msgs::EigenOdometry&
         odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
         Eigen::Vector3d::Zero()
       );
-    } else if (disturbance_observer_type_ == Integral_DO_first_order__) {
-      Integral_DO_first_order_.reset(
-        odometry.position_W, odometry.getVelocityWorld(), euler_angles, Eigen::Vector3d::Zero()
-      );
     } else {
       ROS_ERROR("Invalid disturbance observer type in use");
       abort();
@@ -335,20 +329,6 @@ void NonlinearModelPredictiveControl::update_KF_DO_second_order_measurements() {
   KF_DO_second_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 }
 
-void NonlinearModelPredictiveControl::update_Integral_DO_first_order_measurements() {
-  Integral_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
-  Integral_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
-  Integral_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
-  Integral_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
-}
-
-void NonlinearModelPredictiveControl::update_integral_DO_first_order_measurements() {
-  integral_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
-  integral_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
-  integral_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
-  integral_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
-}
-
 void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     Eigen::Vector4d* ref_attitude_thrust)
 {
@@ -357,7 +337,6 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   ros::WallTime starting_time = ros::WallTime::now();
 
   Eigen::VectorXd KF_estimated_state;
-  Eigen::VectorXd Integral_DO_estimated_disturbance;
   Eigen::Vector3d estimated_disturbances;
   Eigen::Matrix<double, ACADO_NX, 1> x_0;
 
@@ -390,16 +369,6 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
       );
     }
     KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
-  } else if (disturbance_observer_type_ == Integral_DO_first_order__) {
-    NonlinearModelPredictiveControl::update_Integral_DO_first_order_measurements();
-    observer_update_successful = Integral_DO_first_order_.updateEstimator();
-    if (!observer_update_successful) {
-      ROS_WARN_THROTTLE(1, "Integral_DO_first_order_ failed to update estimator. Resetting");
-      Integral_DO_first_order_.reset(
-        odometry_.position_W, odometry_.getVelocityWorld(), current_rpy, Eigen::Vector3d::Zero()
-      );
-    }
-    Integral_DO_first_order_.getEstimatedDisturbance(&Integral_DO_estimated_disturbance);
   } else {
     ROS_ERROR("Invalid disturbance observer type in use");
     abort();
@@ -412,8 +381,6 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
       estimated_disturbances = KF_estimated_state.segment(9, kDisturbanceSize);
     } else if (disturbance_observer_type_ == KF_DO_second_order__) {
       estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
-    } else if (disturbance_observer_type_ == Integral_DO_first_order__) {
-      estimated_disturbances = Integral_DO_estimated_disturbance.segment(0, kDisturbanceSize);
     } else {
       ROS_ERROR("Invalid disturbance observer type in use");
       abort();
@@ -456,6 +423,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
         -(acceleration_ref_B(1) - estimated_disturbances_B(1)) / kGravity),
         ((acceleration_ref_B(0) - estimated_disturbances_B(0)) / kGravity)
       );
+    // Reference block is <states, input>
     reference_.block(i, 0, 1, ACADO_NY) << 
       position_ref_[i].transpose(), 
       velocity_ref_[i].transpose(), 

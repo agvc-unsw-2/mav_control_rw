@@ -50,7 +50,8 @@ LinearModelPredictiveController::LinearModelPredictiveController(const ros::Node
       command_roll_pitch_yaw_thrust_(0, 0, 0, 0),
       linearized_command_roll_pitch_thrust_(0, 0, 0),
       mpc_queue_(nh, private_nh, kPredictionHorizonSteps),
-      disturbance_observer_(nh, private_nh),
+      KF_DO_first_order_(nh, private_nh),
+      KF_DO_second_order_(nh, private_nh),
       verbose_(false),
       solve_time_average_(0),
       steady_state_calculation_(nh, private_nh),
@@ -135,7 +136,15 @@ void LinearModelPredictiveController::initializeParameters()
     ROS_ERROR("prediction_sampling_time in MPC is not loaded from ros parameter server");
     abort();
   }
-  
+
+  int disturbance_observer_type_temp;
+
+  if (!private_nh_.getParam("disturbance_observer_type", disturbance_observer_type_temp)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  disturbance_observer_type_ = static_cast<LinearModelPredictiveController::Disturbance_Observer_Types>(disturbance_observer_type_temp);
+
   // TODO: Wasn't here by default. Remove if necessary
   if (!private_nh_.getParam("enable_disturbance_observer", enable_disturbance_observer_)) {
     ROS_ERROR("enable_disturbance_observer in MPC is not loaded from ros parameter server");
@@ -302,10 +311,20 @@ void LinearModelPredictiveController::setOdometry(const mav_msgs::EigenOdometry&
 
     Eigen::VectorXd x0;
 
-    disturbance_observer_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
-                                odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
-                                Eigen::Vector3d::Zero());
-
+    if (disturbance_observer_type_ == KF_DO_first_order__) {
+      KF_DO_first_order_.reset(
+        odometry.position_W, odometry.getVelocityWorld(), euler_angles, Eigen::Vector3d::Zero()
+      );
+    } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+      KF_DO_second_order_.reset(
+        odometry.position_W, odometry.getVelocityWorld(), euler_angles,
+        odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
+        Eigen::Vector3d::Zero()
+      );
+    } else {
+      ROS_ERROR("Invalid disturbance observer type in use");
+      abort();
+    }
     received_first_odometry_ = true;
   }
 
@@ -354,6 +373,21 @@ void LinearModelPredictiveController::setCommandTrajectory(
   mpc_queue_.insertReferenceTrajectory(command_trajectory_array);
 }
 
+
+void LinearModelPredictiveController::update_KF_DO_first_order_measurements() {
+  KF_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  KF_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
+  KF_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  KF_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+}
+
+void LinearModelPredictiveController::update_KF_DO_second_order_measurements() {
+  KF_DO_second_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  KF_DO_second_order_.feedPositionMeasurement(odometry_.position_W);
+  KF_DO_second_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  KF_DO_second_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+}
+
 void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
     Eigen::Vector4d *ref_attitude_thrust)
 {
@@ -381,26 +415,56 @@ void LinearModelPredictiveController::calculateRollPitchYawrateThrustCommand(
   mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
 
   // update the disturbance observer
-  disturbance_observer_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
-  disturbance_observer_.feedPositionMeasurement(odometry_.position_W);
-  disturbance_observer_.feedVelocityMeasurement(odometry_.getVelocityWorld());
-  disturbance_observer_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 
-  bool observer_update_successful = disturbance_observer_.updateEstimator();
+  bool observer_update_successful = false;
+
+  if (disturbance_observer_type_ == KF_DO_first_order__) {
+    LinearModelPredictiveController::update_KF_DO_first_order_measurements();
+    observer_update_successful = KF_DO_first_order_.updateEstimator();
+    if (!observer_update_successful) {
+      ROS_WARN_THROTTLE(1, "KF_DO_first_order_ failed to update estimator. Resetting");
+      KF_DO_first_order_.reset(
+        odometry_.position_W, odometry_.getVelocityWorld(), current_rpy, Eigen::Vector3d::Zero()
+      );
+    }
+    KF_DO_first_order_.getEstimatedState(&KF_estimated_state);
+  } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+    LinearModelPredictiveController::update_KF_DO_second_order_measurements();
+    observer_update_successful = KF_DO_second_order_.updateEstimator();
+    if (!observer_update_successful) {
+      ROS_WARN_THROTTLE(1, "KF_DO_second_order_ failed to update estimator. Resetting");
+      KF_DO_second_order_.reset(
+        odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
+        Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero()
+      );
+    }
+    KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
+  } else {
+    ROS_ERROR("Invalid disturbance observer type in use");
+    abort();
+  }
+
 
   if (!observer_update_successful) {
     // reset the disturbance observer
-    disturbance_observer_.reset(odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
+    KF_DO_second_order_.reset(odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
                                 Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(),
                                 Eigen::Vector3d::Zero());
   }
 
-  disturbance_observer_.getEstimatedState(&KF_estimated_state);
+  KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
 
   if (enable_disturbance_observer_ == true) {
-    estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+    if (disturbance_observer_type_ == KF_DO_first_order__) {
+      estimated_disturbances = KF_estimated_state.segment(9, kDisturbanceSize);
+    } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+      estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+    } else {
+      ROS_ERROR("Invalid disturbance observer type in use");
+      abort();
+    }
   } else {
-    estimated_disturbances.setZero();
+    estimated_disturbances.setZero(kDisturbanceSize);
   }
 
   if (enable_integrator_) {

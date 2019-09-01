@@ -154,8 +154,8 @@ class NonlinearModelPredictiveControl
   void setThrustLimits(double thrust_scaling_factor)
   {
     thrust_scaling_factor_ = thrust_scaling_factor;
-    thrust_min_ = thrust_scaling_factor / thrust_min_normalized_;
-    thrust_max_ = thrust_scaling_factor / thrust_max_normalized_;
+    thrust_min_ = thrust_min_normalized_ / thrust_scaling_factor;
+    thrust_max_ = thrust_max_normalized_ / thrust_scaling_factor;
   }
 
   void setRollPitchYawrateLimits(const Eigen::Vector3d& roll_pitch_yawrate_limits)

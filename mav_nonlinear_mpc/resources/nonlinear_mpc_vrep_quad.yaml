@@ -77,7 +77,7 @@ pitch_max: deg(25.0)
 yaw_rate_max: deg(90.0)
 thrust_scaling_factor: 1.0
 thrust_min_normalized: 0.5 # Normalised
-thrust_max_normalized: 50.0 # Normalised
+thrust_max_normalized: 30.0 # Normalised
 
 K_yaw: 1.8
 

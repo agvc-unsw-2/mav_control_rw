@@ -1,8 +1,0 @@
-<launch>
-  <arg name="mav_name" default="vrep_hex"/>
-
-  <group ns="$(arg mav_name)">
-    <node name="joy_node" pkg="joy" type="joy_node" /> 
-    <!--node name="rotors_joy_interface" pkg="rotors_joy_interface" type="rotors_joy_interface" /-->
-  </group>
-</launch>

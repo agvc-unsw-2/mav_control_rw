@@ -151,6 +151,21 @@ class NonlinearModelPredictiveControl
     thrust_max_ = control_limits(4);
   }
 
+  void setThrustLimits(double thrust_scaling_factor)
+  {
+    thrust_scaling_factor_ = thrust_scaling_factor;
+    thrust_min_ = thrust_scaling_factor / thrust_min_normalized_;
+    thrust_max_ = thrust_scaling_factor / thrust_max_normalized_;
+  }
+
+  void setRollPitchYawrateLimits(const Eigen::Vector3d& roll_pitch_yawrate_limits)
+  {
+    //roll_max, pitch_max, yaw_rate_max, thrust_min and thrust_max
+    roll_limit_ = roll_pitch_yawrate_limits(0);
+    pitch_limit_ = roll_pitch_yawrate_limits(1);
+    yaw_rate_limit_ = roll_pitch_yawrate_limits(2);
+  }
+
   void setDragCoefficients(const Eigen::Vector3d& drag_coefficients)
   {
     drag_coefficients_ = drag_coefficients;
@@ -232,6 +247,9 @@ class NonlinearModelPredictiveControl
   double roll_limit_;
   double pitch_limit_;
   double yaw_rate_limit_;
+  double thrust_scaling_factor_;
+  double thrust_min_normalized_;
+  double thrust_max_normalized_;
   double thrust_min_;
   double thrust_max_;
 

@@ -70,25 +70,27 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
     mav_nonlinear_mpc::NonLinearMPCConfig &config, uint32_t level)
 {
   ROS_INFO(
-    "Received reconfigure request"
+    "Nonlinear MPC Received controller reconfigure request"
   );
   Eigen::Vector3d q_position;
   Eigen::Vector3d q_velocity;
   Eigen::Vector2d q_attitude;
 
   Eigen::Vector3d r_command;
-  Eigen::VectorXd control_limits(5);
+  Eigen::VectorXd roll_pitch_yawrate_limits(3);
   Eigen::Vector3d drag_coefficients;
+  double thrust_scaling_factor;
 
   q_position << config.q_x, config.q_y, config.q_z;
   q_velocity << config.q_vx, config.q_vy, config.q_vz;
   q_attitude << config.q_roll, config.q_pitch;
 
   r_command << config.r_roll, config.r_pitch, config.r_thrust;
-
-  control_limits << config.roll_max, config.pitch_max, config.yaw_rate_max, config.thrust_min, config
-      .thrust_max;
   
+  roll_pitch_yawrate_limits << config.roll_max, config.pitch_max, config.yaw_rate_max;
+
+  thrust_scaling_factor = config.thrust_scaling_factor;
+
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_x;
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_y;
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_z;
@@ -110,7 +112,8 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   nonlinear_mpc_.setAttitudePenality(q_attitude);
   nonlinear_mpc_.setCommandPenality(r_command);
   nonlinear_mpc_.setYawGain(config.K_yaw);
-  nonlinear_mpc_.setControlLimits(control_limits);
+  nonlinear_mpc_.setRollPitchYawrateLimits(roll_pitch_yawrate_limits);
+  nonlinear_mpc_.setThrustLimits(thrust_scaling_factor);
 
   nonlinear_mpc_.setAltitudeIntratorGain(config.Ki_altitude);
   nonlinear_mpc_.setXYIntratorGain(config.Ki_xy);

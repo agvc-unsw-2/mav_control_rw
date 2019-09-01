@@ -155,9 +155,36 @@ void NonlinearModelPredictiveControl::initializeParameters()
     ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
     abort();
   }
-
   disturbance_observer_type_ = static_cast<NonlinearModelPredictiveControl::Disturbance_Observer_Types>(disturbance_observer_type_temp);
 
+  // TODO: Debug conflicts between ros parameter server and dynamic reconfigure
+  if (!private_nh_.getParam("roll_max", roll_limit_)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  if (!private_nh_.getParam("pitch_max", pitch_limit_)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  if (!private_nh_.getParam("yaw_rate_max", yaw_rate_limit_)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  if (!private_nh_.getParam("thrust_min_normalized", thrust_min_normalized_)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  if (!private_nh_.getParam("thrust_max_normalized", thrust_max_normalized_)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  if (!private_nh_.getParam("thrust_scaling_factor", thrust_scaling_factor_)) {
+    ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+
+  // Some of these may be redundant because they are somehow called by the dynamic reconfigure server
+  //applyParameters();
   constructModelMatrices();
   initialized_parameters_ = true;
 

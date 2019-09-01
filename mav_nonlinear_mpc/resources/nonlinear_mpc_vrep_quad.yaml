@@ -74,8 +74,10 @@ r_thrust : 1
 
 roll_max: deg(25.0)
 pitch_max: deg(25.0)
-thrust_min: 0.1
-thrust_max: 50
+yaw_rate_max: deg(90.0)
+thrust_scaling_factor: 1.0
+thrust_min_normalized: 0.5 # Normalised
+thrust_max_normalized: 50.0 # Normalised
 
 K_yaw: 1.8
 

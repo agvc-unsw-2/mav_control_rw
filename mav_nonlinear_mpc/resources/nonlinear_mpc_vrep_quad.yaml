@@ -24,31 +24,37 @@
 # yaw_gain: 1.000000
 
 # Controller Parameters:
-mass: 1.450000
-
-# Time constants for PID gains of 600
-roll_time_constant: 0.105595
-roll_gain: 1.145387
-pitch_time_constant: 0.105172
-pitch_gain: 1.114824
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
+mass: 1.0000
+
+# Time constants for PID gains of 600
+# mass: 1.450000
+# roll_time_constant: 0.105595
+# roll_gain: 1.145387
+# pitch_time_constant: 0.105172
+# pitch_gain: 1.114824
 
 # Time constants for PID gains of 200
 # roll_time_constant: 0.318522
 # roll_gain: 1.214172
 # pitch_time_constant: 0.312873
 # pitch_gain: 1.127141
-# linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
-# yaw_gain: 1.000000
 
-# Time constants for PDI gains of 60
+# Time constants for PID gains of 60
 #roll_time_constant: 0.635581
 #roll_gain: 1.275039
 #pitch_time_constant: 0.630045
 #pitch_gain: 1.241289
-#linear_drag_coefficients: [0.000000, 0.000000, 0.000000]
-#yaw_gain: 1.000000
+
+#############
+# Unbalanced Load
+#############
+# Constants for PID gains of 800 pq 90 (~90% fit)
+roll_time_constant: 0.123610
+roll_gain: 1.089656
+pitch_time_constant: 0.121262
+pitch_gain: 1.076642
 
 # dynamic config default values:
 q_x : 80
@@ -60,22 +66,21 @@ q_vy : 80
 q_vz : 100
 
 q_roll : 10
-q_pitch: 10
+q_pitch : 10
 
-r_roll  : 50
+r_roll : 50
 r_pitch : 50
 r_thrust : 1
 
-roll_max: deg(45.0)
-pitch_max: deg(45.0)
+roll_max: deg(25.0)
+pitch_max: deg(25.0)
 thrust_min: 0.1
 thrust_max: 50
 
 K_yaw: 1.8
 
-Ki_xy: 0.2
-#Ki_z: 0.3
-Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
@@ -88,7 +93,5 @@ prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s
 #enum Disturbance_Observer_Types {
 #  KF_DO_first_order__, // 0
 #  KF_DO_second_order__, //1
-#  integral_DO_first_order__, //2
-#  integral_DO_second_order__ //3
 #};
 disturbance_observer_type: 1

@@ -55,9 +55,8 @@ thrust_max: 50
 
 K_yaw: 1.8
 
-Ki_xy: 0.2
-#Ki_z: 0.3
-Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
@@ -70,8 +69,6 @@ prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s
 #enum Disturbance_Observer_Types {
 #  KF_DO_first_order__, // 0
 #  KF_DO_second_order__, //1
-#  integral_DO_first_order__, //2
-#  integral_DO_second_order__ //3
 #};
 
 disturbance_observer_type: 1

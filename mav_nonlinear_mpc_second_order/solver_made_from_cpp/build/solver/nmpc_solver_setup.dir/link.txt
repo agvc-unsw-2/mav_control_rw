@@ -1,1 +1,0 @@
-/usr/bin/c++   -std=c++11 -g   CMakeFiles/../solver/nmpc_solver_setup.dir/nmpc_solver_setup.cpp.o  -o ../../solver/nmpc_solver_setup -rdynamic /home/mbzirc/ACADO/ACADOtoolkit/build/lib/libacado_toolkit_s.so -Wl,-rpath,/home/mbzirc/ACADO/ACADOtoolkit/build/lib 

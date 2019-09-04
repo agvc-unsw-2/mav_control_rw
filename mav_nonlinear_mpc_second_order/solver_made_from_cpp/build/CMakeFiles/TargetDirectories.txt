@@ -1,3 +1,0 @@
-/home/mbzirc/catkin_ws_mav_control_rw/src/mav_control_rw/mav_nonlinear_mpc_second_order/solver_made_from_cpp/build/CMakeFiles/edit_cache.dir
-/home/mbzirc/catkin_ws_mav_control_rw/src/mav_control_rw/mav_nonlinear_mpc_second_order/solver_made_from_cpp/build/CMakeFiles/../solver/nmpc_solver_setup.dir
-/home/mbzirc/catkin_ws_mav_control_rw/src/mav_control_rw/mav_nonlinear_mpc_second_order/solver_made_from_cpp/build/CMakeFiles/rebuild_cache.dir

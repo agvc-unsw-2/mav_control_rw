@@ -1,8 +1,0 @@
-<launch>
-  <arg name="mav_name" default="vrep_hex" />
-  <arg name="namespace" default="$(arg mav_name)"/>
-  <arg name="uav_num" default="1"/>
-  <node pkg="mav_linear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/>
-<!--   
-  </node> -->
-</launch>

@@ -28,39 +28,14 @@ KF_observer_second_order:
   external_forces_limit :  [ 5.000000 ,5.000000 ,3.0000000]      #m/s^2
   external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
 
-  #model from system identification (2nd order attitude model)
- 
-  drag_coefficients: [0.010000, 0.010000, 0.000000]
-  #old 
-  #roll_gain: 0.784733
-  #roll_damping: 0.718606
-  #roll_omega: 13.409113
-  #pitch_gain: 0.690345
-  #pitch_damping: 0.540064
-  #pitch_omega: 11.191757
-  #yaw_gain: 1.000000
-  #yaw_damping: 0.950000
-  #yaw_omega: 5.000000
-
-  #roll_gain: 0.731289
-  #roll_damping: 0.593308
-  #roll_omega: 11.732979
-  #pitch_gain: 0.536179
-  #pitch_damping: 0.417839
-  #pitch_omega: 10.549021
-  #yaw_gain: 1.000000
-  #yaw_damping: 0.950000
-  #yaw_omega: 5.000000#
-
 # Fixed MATLAB Script
   drag_coefficients: [0.010000, 0.010000, 0.000000]
-  roll_gain: 0.939553
+  roll_gain: 0.971658
   roll_damping: 1.000000
-  roll_omega: 14.957131
-  pitch_gain: 0.974889
+  roll_omega: 16.126117
+  pitch_gain: 0.991565
   pitch_damping: 1.000000
-  pitch_omega: 13.400655
+  pitch_omega: 15.060208
   yaw_gain: 1.000000
   yaw_damping: 0.950000
   yaw_omega: 5.000000
-

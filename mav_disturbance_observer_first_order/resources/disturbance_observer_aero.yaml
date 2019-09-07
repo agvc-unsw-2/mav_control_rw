@@ -28,32 +28,12 @@ KF_observer_first_order:
   external_forces_limit :  [ 5.000000 ,5.000000 ,3.0000000]      #m/s^2
   external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
 
-  roll_tau: 0.126858
-  roll_gain: 0.904591
-  pitch_tau: 0.119135
-  pitch_gain: 0.804236
+  roll_tau: 0.075201
+  roll_gain: 0.961149
+  pitch_tau: 0.075037
+  pitch_gain: 0.975368
+
   yaw_tau: 5.00
   yaw_gain: 1.000000
 
-  #model from system identification (2nd order attitude model)
-  #drag_coefficients : [ 0.010000 , 0.010000 , 0]
-  #roll_omega : 7.07
-  #roll_damping : 0.72
-  #roll_gain : 0.8
-  #pitch_omega : 7.07
-  #pitch_damping : 0.76
-  #pitch_gain : 0.84
-  #yaw_omega : 5.000000
-  #yaw_damping : 0.950000
-  #yaw_gain : 1.000000
-
   drag_coefficients: [0.010000, 0.010000, 0.000000]
-  # roll_gain: 0.784733
-  # roll_damping: 0.718606
-  # roll_omega: 13.409113
-  # pitch_gain: 0.690345
-  # pitch_damping: 0.540064
-  # pitch_omega: 11.191757
-  # yaw_gain: 1.000000
-  # yaw_damping: 0.950000
-  # yaw_omega: 5.000000

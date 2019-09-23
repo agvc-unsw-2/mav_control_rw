@@ -61,9 +61,10 @@ if __name__ == '__main__':
     )
 
     invert_arr = []
-    for i, arg in enumerate(myargs):
-        if i >= 3:
-            invert_arr.append(int(arg))
+    #for i, arg in enumerate(myargs):
+    #    if i >= 3:
+    #        invert_arr.append(int(arg))
+    invert_arr = [0, 3]
     echo_node = JoyEcho(
         mav_name, 
         uav_num, 

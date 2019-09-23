@@ -54,12 +54,14 @@ KF_observer_second_order:
 
 # Fixed MATLAB Script
   drag_coefficients: [0.010000, 0.010000, 0.000000]
-  roll_gain: 0.939553
+  # Tarot parameters
+  roll_gain: 0.946041
   roll_damping: 1.000000
-  roll_omega: 14.957131
-  pitch_gain: 0.974889
+  roll_omega: 23.372142
+  pitch_gain: 0.945460
   pitch_damping: 1.000000
-  pitch_omega: 13.400655
+  pitch_omega: 25.359643
+
   yaw_gain: 1.000000
   yaw_damping: 0.950000
   yaw_omega: 5.000000

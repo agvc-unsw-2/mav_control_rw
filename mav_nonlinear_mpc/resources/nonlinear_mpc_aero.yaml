@@ -46,10 +46,12 @@ mass: 1.000000
 
 # Fixed MATLAB Script
 
-roll_time_constant: 0.075201
-roll_gain: 0.961149
-pitch_time_constant: 0.075037
-pitch_gain: 0.975368
+# Tarot parameters
+roll_time_constant: 0.043466
+roll_gain: 0.946935
+pitch_time_constant: 0.040790
+pitch_gain: 0.947119
+
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
 

@@ -39,17 +39,18 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
     last_data_.left_up_down = msg->axes[2];
     //last_data_.left_side = -msg->axes[3];
     last_data_.left_side = msg->axes[3]; // reverse yaw
-    
-    if (msg->axes[5] > 0.0)
-    {
-      last_data_.control_interface = RcData::ControlInterface::OFF;
-      last_data_.control_mode = RcData::ControlMode::MANUAL;
+    bool enable_manual_mode = false;
+    if (enable_manual_mode) {
+      if (msg->axes[5] > 0.0)
+      {
+        last_data_.control_interface = RcData::ControlInterface::OFF;
+        last_data_.control_mode = RcData::ControlMode::MANUAL;
 
-      ROS_WARN_STREAM_THROTTLE(5.0, "MANUAL OFFBOARD MODE");
+        ROS_WARN_STREAM_THROTTLE(5.0, "MANUAL OFFBOARD MODE");
+      }
     }
     else
     {
-      
       last_data_.control_interface = RcData::ControlInterface::ON;
       last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
 

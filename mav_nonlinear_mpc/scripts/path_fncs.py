@@ -218,25 +218,25 @@ def main(mav_name, uav_num):
     rospy.init_node('python_hlc', anonymous=False)
     hlc = hlc_lib.High_Level_Controller(mav_name, uav_num)
     start = 0.0
-    end = 10.0
-    period = 10.0
-    cycles = 4
+    end = 3.0
+    period = 5.0
+    cycles = 6
     while(rospy.get_time() < 1.0):
         time.sleep(0.1)
     while(rospy.get_time() < 1.0):
         time.sleep(0.1)
     print(rospy.get_time())
     hlc.takeoff()
-    step_response(hlc, start, end, period, cycles, "x")
+    #step_response(hlc, start, end, period, cycles, "x")
     #step_response(hlc, start, end, period, cycles, "y")
 
     #####################
     # Circle path
     #####################
     r = 1
-    vel_mag = 1
+    vel_mag = 1.5
     altitude = 1
-    #circle_path(hlc, r, vel_mag, altitude, cycles)
+    circle_path(hlc, r, vel_mag, altitude, cycles)
     #####################
     # Lemniscate path
     #####################

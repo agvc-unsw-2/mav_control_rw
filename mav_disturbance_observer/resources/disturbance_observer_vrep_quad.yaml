@@ -77,6 +77,14 @@ KF_observer_second_order:
   pitch_damping: 0.863757
   pitch_omega: 15.632022
 
+  # PID gains 800 pq 40
+  # roll_gain: 0.996776
+  # roll_damping: 0.342339
+  # roll_omega: 14.598897
+  # pitch_gain: 1.001319
+  # pitch_damping: 0.370841
+  # pitch_omega: 14.633268
+
 #########################
   yaw_gain: 1.000000
   yaw_damping: 0.950000

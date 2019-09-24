@@ -30,7 +30,7 @@ yaw_gain: 1.000000
 # linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 # yaw_gain: 1.000000
 
-# Time constants for PDI gains of 60
+# Time constants for PID gains of 60
 #roll_time_constant: 0.635581
 #roll_gain: 1.275039
 #pitch_time_constant: 0.630045
@@ -46,6 +46,12 @@ roll_time_constant: 0.123610
 roll_gain: 1.089656
 pitch_time_constant: 0.121262
 pitch_gain: 1.076642
+
+# Constants for PID gains of 800 pq 40 (~75% fit)
+# roll_time_constant: 0.066959
+# roll_gain: 1.092674
+# pitch_time_constant: 0.071899
+# pitch_gain: 1.103494
 
 q_x : 80
 q_y : 80
@@ -74,7 +80,7 @@ Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : true
+enable_disturbance_observer : false
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

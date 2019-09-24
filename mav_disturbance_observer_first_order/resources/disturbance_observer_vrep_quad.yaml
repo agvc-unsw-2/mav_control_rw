@@ -41,18 +41,25 @@ KF_observer_first_order:
   # pitch_tau: 0.312873
   # pitch_gain: 1.127141
 
+  #############
+  # Unbalanced Load
+  #############
+  # Constants for PID gains of 200 (~80% fit)
+  #roll_time_constant: 0.301281
+  #roll_gain: 1.169458
+  #pitch_time_constant: 0.326310
+  #pitch_gain: 1.170929
+
   # Constants for PID gains of 800 pq 90 (~90% fit)
   roll_time_constant: 0.123610
   roll_gain: 1.089656
   pitch_time_constant: 0.121262
   pitch_gain: 1.076642
 
-  #############
-  # Unbalanced Load
-  #############
-  # Constants for PID gains of 200 (~80% fit)
-  roll_time_constant: 0.301281
-  roll_gain: 1.169458
-  pitch_time_constant: 0.326310
-  pitch_gain: 1.170929
+  # Constants for PID gains of 800 pq 40 (~75% fit)
+  # roll_time_constant: 0.066959
+  # roll_gain: 1.092674
+  # pitch_time_constant: 0.071899
+  # pitch_gain: 1.103494
+
 

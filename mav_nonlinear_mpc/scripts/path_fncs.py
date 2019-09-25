@@ -234,7 +234,7 @@ def main(mav_name, uav_num):
     # Circle path
     #####################
     r = 1
-    vel_mag = 1.5
+    vel_mag = 1.0
     altitude = 1
     circle_path(hlc, r, vel_mag, altitude, cycles)
     #####################

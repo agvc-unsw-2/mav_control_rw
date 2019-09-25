@@ -80,7 +80,7 @@ Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.4
 
-enable_disturbance_observer : false
+enable_disturbance_observer : true
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg

@@ -93,6 +93,8 @@ enable_disturbance_observer : true
 enable_integrator : false
 enable_moment_disturbances : true
 
+disturbance_observer_type : 1
+
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1
 

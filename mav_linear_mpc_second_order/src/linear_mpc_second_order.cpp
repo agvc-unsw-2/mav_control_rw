@@ -50,7 +50,8 @@ LMPC_Second_Order_Controller::LMPC_Second_Order_Controller(const ros::NodeHandle
       command_roll_pitch_yaw_thrust_(0, 0, 0, 0),
       linearized_command_roll_pitch_thrust_(0, 0, 0),
       mpc_queue_(nh, private_nh, kPredictionHorizonSteps),
-      disturbance_observer_(nh, private_nh),
+      KF_DO_first_order_(nh, private_nh),
+      KF_DO_second_order_(nh, private_nh),
       verbose_(false),
       solve_time_average_(0),
       steady_state_calculation_second_order_(nh, private_nh),
@@ -166,6 +167,16 @@ void LMPC_Second_Order_Controller::initializeParameters()
     abort();
   }
   
+  int disturbance_observer_type_temp;
+
+  if (!private_nh_.getParam("disturbance_observer_type", disturbance_observer_type_temp)) {
+    //ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
+    //abort();
+    disturbance_observer_type_temp = 1;
+  }
+
+  disturbance_observer_type_ = static_cast<LMPC_Second_Order_Controller::Disturbance_Observer_Types>(disturbance_observer_type_temp);
+
   ROS_INFO("Linear MPC: Parameters initialized correctly");
 
   constructModelMatrices();
@@ -322,12 +333,20 @@ void LMPC_Second_Order_Controller::setOdometry(const mav_msgs::EigenOdometry& od
     Eigen::Vector3d euler_angles;
     odometry.getEulerAngles(&euler_angles);
 
-    Eigen::VectorXd x0;
-
-    disturbance_observer_.reset(odometry.position_W, odometry.getVelocityWorld(), euler_angles,
-                                odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
-                                Eigen::Vector3d::Zero());
-
+    if (disturbance_observer_type_ == KF_DO_first_order__) {
+      KF_DO_first_order_.reset(
+        odometry.position_W, odometry.getVelocityWorld(), euler_angles, Eigen::Vector3d::Zero()
+      );
+    } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+      KF_DO_second_order_.reset(
+        odometry.position_W, odometry.getVelocityWorld(), euler_angles,
+        odometry.angular_velocity_B, Eigen::Vector3d::Zero(),
+        Eigen::Vector3d::Zero()
+      );
+    } else {
+      ROS_ERROR("Invalid disturbance observer type in use");
+      abort();
+    }
     received_first_odometry_ = true;
   }
 
@@ -357,6 +376,20 @@ void LMPC_Second_Order_Controller::setOdometry(const mav_msgs::EigenOdometry& od
 
   odometry_.orientation_W_B = odometry.orientation_W_B;
   previous_odometry.orientation_W_B = odometry.orientation_W_B;
+}
+
+void LMPC_Second_Order_Controller::update_KF_DO_first_order_measurements() {
+  KF_DO_first_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  KF_DO_first_order_.feedPositionMeasurement(odometry_.position_W);
+  KF_DO_first_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  KF_DO_first_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
+}
+
+void LMPC_Second_Order_Controller::update_KF_DO_second_order_measurements() {
+  KF_DO_second_order_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
+  KF_DO_second_order_.feedPositionMeasurement(odometry_.position_W);
+  KF_DO_second_order_.feedVelocityMeasurement(odometry_.getVelocityWorld());
+  KF_DO_second_order_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
 }
 
 void LMPC_Second_Order_Controller::setCommandTrajectoryPoint(
@@ -411,39 +444,49 @@ void LMPC_Second_Order_Controller::calculateRollPitchYawrateThrustCommand(
   // Copy out the whole queues
   mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
 
-  Eigen::Vector4d zero4d;
-  zero4d.setZero();
-  // update the disturbance observer
-  //disturbance_observer_.feedAttitudeCommand(zero4d);
-  disturbance_observer_.feedAttitudeCommand(command_roll_pitch_yaw_thrust_);
-  disturbance_observer_.feedPositionMeasurement(odometry_.position_W);
-  disturbance_observer_.feedVelocityMeasurement(odometry_.getVelocityWorld());
-  disturbance_observer_.feedRotationMatrix(odometry_.orientation_W_B.toRotationMatrix());
-  //TODO add feed angular velocity to 2nd order disturbance observer using getAngularVelocity()
-  // create angular velocity function using odometry_.angular_velocity_b
-  //disturbance_observer_.feedAngularVelocity(odometry_.angular_velocity_B);
+  bool observer_update_successful = false;
 
-  bool observer_update_successful = disturbance_observer_.updateEstimator();
-
-  if (!observer_update_successful) {
-    // reset the disturbance observer
-    disturbance_observer_.reset(odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
-                                Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(),
-                                Eigen::Vector3d::Zero());
+  if (disturbance_observer_type_ == KF_DO_first_order__) {
+    LMPC_Second_Order_Controller::update_KF_DO_first_order_measurements();
+    observer_update_successful = KF_DO_first_order_.updateEstimator();
+    if (!observer_update_successful) {
+      ROS_WARN_THROTTLE(1, "KF_DO_first_order_ failed to update estimator. Resetting");
+      KF_DO_first_order_.reset(
+        odometry_.position_W, odometry_.getVelocityWorld(), current_rpy, Eigen::Vector3d::Zero()
+      );
+    }
+    KF_DO_first_order_.getEstimatedState(&KF_estimated_state);
+  } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+    LMPC_Second_Order_Controller::update_KF_DO_second_order_measurements();
+    observer_update_successful = KF_DO_second_order_.updateEstimator();
+    if (!observer_update_successful) {
+      ROS_WARN_THROTTLE(1, "KF_DO_second_order_ failed to update estimator. Resetting");
+      KF_DO_second_order_.reset(
+        odometry_.position_W, odometry_.getVelocityWorld(), current_rpy,
+        Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero(), Eigen::Vector3d::Zero()
+      );
+    }
+    KF_DO_second_order_.getEstimatedState(&KF_estimated_state);
+  } else {
+    ROS_ERROR("Invalid disturbance observer type in use");
+    abort();
   }
-
-  disturbance_observer_.getEstimatedState(&KF_estimated_state);
-
+  
   // TODO: Change this disturbance observer appropriately
+  estimated_disturbances.setZero();
   if (enable_disturbance_observer_ == true) {
-    if(enable_moment_disturbances_ == true) {
-      estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
-    } else {
-      estimated_disturbances.setZero();
-      estimated_disturbances.segment(0, 3) = KF_estimated_state.segment(12, 3);
+    if (disturbance_observer_type_ == KF_DO_first_order__) {
+      estimated_disturbances = KF_estimated_state.segment(9, 3);
+    } else if (disturbance_observer_type_ == KF_DO_second_order__) {
+      if(enable_moment_disturbances_ == true) {
+        estimated_disturbances = KF_estimated_state.segment(12, kDisturbanceSize);
+      } else { // force disturbance only
+        estimated_disturbances.setZero();
+        estimated_disturbances.segment(0, 3) = KF_estimated_state.segment(12, 3);
+      }
     }
   } else {
-    estimated_disturbances.setZero();
+    estimated_disturbances.setZero(); // redundant because done at start
   }
 
   if (enable_integrator_) {

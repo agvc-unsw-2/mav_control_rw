@@ -6,17 +6,17 @@ KF_observer_second_order:
   P0_position: 0.001
   P0_velocity: 0.001
   P0_attitude: 0.001
-  P0_angular_velocity: 0.001
-  P0_force: 0.001
-  P0_torque: 0.001
+  P0_angular_velocity: 0.1
+  P0_force: 0.4
+  P0_torque: 0.4
   
   #process noise
-  q_position: 0.0001
-  q_velocity: 0.00025
-  q_attitude: 0.00015
-  q_angular_velocity: 0.0002
-  q_force: 0.001
-  q_torque: 0.001
+  q_position: 0.01
+  q_velocity: 0.025
+  q_attitude: 0.015
+  q_angular_velocity: 0.02
+  q_force: 0.1
+  q_torque: 0.1
   
   #measurement noise
   r_position: 0.001

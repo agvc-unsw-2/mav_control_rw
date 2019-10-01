@@ -118,13 +118,33 @@ void KFDisturbanceObserver::initialize()
 
   // TODO: Replace K_static_ initialization
   Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp;
-  state_covariance_ *= 1e6;
-  state_covariance_ = F_ * state_covariance_ * F_.transpose();
-  state_covariance_.diagonal() += process_noise_covariance_;
-  tmp = H_ * state_covariance_ * H_.transpose()
-    + measurement_covariance_.asDiagonal().toDenseMatrix();
-  K_static_ = state_covariance_ * H_.transpose() * tmp.inverse();
+  //state_covariance_ *= 1e6;
+  // METHOD 1
+  int method = 2;
+  if (method == 1) {
+    state_covariance_ = F_ * initial_state_covariance_.asDiagonal() * F_.transpose();
+    state_covariance_.diagonal() += process_noise_covariance_;
+    tmp = H_ * state_covariance_ * H_.transpose()
+      + measurement_covariance_.asDiagonal().toDenseMatrix();
+    K_static_ = state_covariance_ * H_.transpose() * tmp.inverse();
 
+  // METHOD 2
+  } else if (method == 2) {
+    state_covariance_ = F_ * initial_state_covariance_.asDiagonal() * F_.transpose();
+    tmp = H_ * initial_state_covariance_.asDiagonal() * H_.transpose();
+    tmp += measurement_covariance_.asDiagonal().toDenseMatrix();
+    state_covariance_ -= 
+      (F_ * initial_state_covariance_.asDiagonal() * H_.transpose()) * 
+      tmp.inverse() * 
+      (H_ * initial_state_covariance_.asDiagonal() * F_.transpose());
+    state_covariance_.diagonal() += process_noise_covariance_;
+    K_static_ = state_covariance_ * H_.transpose() * tmp.inverse();
+    // txtbook uses F_ * K_static_ instead of just K_static. For code simplicity modify here
+    K_static_ = F_ * K_static_;
+  } else {
+    ROS_ERROR("Invalid static KF gain calculation method");
+    abort();
+  }
   initialized_ = true;
 
   ROS_INFO("2nd Order RPY Disturbanbce Observer Initialized!");

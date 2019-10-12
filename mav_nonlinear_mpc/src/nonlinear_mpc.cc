@@ -374,8 +374,6 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     abort();
   }
 
-// TODO: Add disturbance_observer_type as a dynamic reconfigure, and appropriate reset the disturbance observers on change.
-
   if (enable_disturbance_observer_ == true) {
     if (disturbance_observer_type_ == KF_DO_first_order__) {
       estimated_disturbances = KF_estimated_state.segment(9, kDisturbanceSize);

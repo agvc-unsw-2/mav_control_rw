@@ -466,8 +466,10 @@ bool KF_DO_first_order::updateEstimator()
     // if (verbose_) {
     //   ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
     // }
+    ROS_INFO_THROTTLE(1.0, "Using KRLS_EKF");
   } else {
     // TODO: Implement this
+    ROS_INFO_THROTTLE(1.0, "Using Static KF Gains");
     state_ = predicted_state_ + K_static_ * (measurements_ - H_ * state_);
   }
 

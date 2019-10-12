@@ -35,6 +35,7 @@
 
 #include <memory>
 #include <mav_disturbance_observer/KF_disturbance_observer.h>
+#include <mav_disturbance_observer_first_order/KF_disturbance_observer_first_order.h>
 #include <mav_linear_mpc_second_order/steady_state_calculation_second_order.h>
 #include <mav_msgs/conversions.h>
 #include <mav_msgs/eigen_mav_msgs.h>
@@ -152,6 +153,11 @@ class LMPC_Second_Order_Controller
   void setEnableMomentDisturbances(bool enable_moment_disturbances)
   {
     enable_moment_disturbances_ = enable_moment_disturbances;
+  }
+
+  void setDisturbanceObserverType(int disturbance_observer_type)
+  {
+    disturbance_observer_type_ = static_cast<LMPC_Second_Order_Controller::Disturbance_Observer_Types>(disturbance_observer_type);
   }
 
   void setControlLimits(const Eigen::VectorXd& control_limits)
@@ -279,8 +285,20 @@ class LMPC_Second_Order_Controller
   std::deque<Eigen::Matrix<double, kStateSize, 1>> CVXGEN_queue_;
 
   // disturbance observer
+
+  void update_KF_DO_first_order_measurements();
+  void update_KF_DO_second_order_measurements();
+
+  enum Disturbance_Observer_Types {
+    KF_DO_first_order__,
+    KF_DO_second_order__,
+  };
+
+  Disturbance_Observer_Types disturbance_observer_type_;
+
   bool enable_disturbance_observer_;
-  KFDisturbanceObserver disturbance_observer_;
+  KF_DO_first_order KF_DO_first_order_; // KF disturbance observer with first order model
+  KFDisturbanceObserver KF_DO_second_order_; // KF disturbance observer with second order model
 
   // commands
   Eigen::Vector4d command_roll_pitch_yaw_thrust_;  //actual roll, pitch, yaw, thrust command

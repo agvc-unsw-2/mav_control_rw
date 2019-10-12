@@ -20,5 +20,6 @@
   <depend>tf</depend>
   <depend>mav_control_interface</depend>
   <depend>mav_disturbance_observer</depend>
+  <depend>mav_disturbance_observer_first_order</depend>
   <depend>message_runtime</depend>
 </package>

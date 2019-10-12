@@ -120,6 +120,7 @@ void LMPC_Second_Order_Node::DynConfigCallback(mav_linear_mpc_second_order::Line
 
   linear_mpc_second_order_.setDragCoefficients(drag_coefficients);
 
+  linear_mpc_second_order_.setDisturbanceObserverType(config.disturbance_observer_type);
   linear_mpc_second_order_.applyParameters();
   linear_mpc_second_order_.constructModelMatrices();
 }

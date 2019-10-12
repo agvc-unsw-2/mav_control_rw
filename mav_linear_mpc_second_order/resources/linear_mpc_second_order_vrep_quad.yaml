@@ -45,6 +45,15 @@ pitch_gain: 1.008675
 pitch_damping: 0.863757
 pitch_omega: 15.632022
 
+# PID gains 800 pq 40
+# roll_gain: 0.996776
+# roll_damping: 0.342339
+# roll_omega: 14.598897
+# pitch_gain: 1.001319
+# pitch_damping: 0.370841
+# pitch_omega: 14.633268
+
+
 q_x : 80
 q_y : 80
 q_z : 120
@@ -82,7 +91,9 @@ antiwindup_ball: 1.0
 
 enable_disturbance_observer : true
 enable_integrator : false
-enable_moment_disturbances : true
+enable_moment_disturbances : false
+
+disturbance_observer_type : 1
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
 prediction_sampling_time: 0.1

@@ -31,6 +31,13 @@
 #include <mav_linear_mpc_second_order/steady_state_calculation_second_order.h>
 
 namespace mav_control {
+
+constexpr int SteadyStateCalculationSecondOrder::kStateSize;
+constexpr int SteadyStateCalculationSecondOrder::kInputSize;
+constexpr int SteadyStateCalculationSecondOrder::kMeasurementSize;
+constexpr int SteadyStateCalculationSecondOrder::kDisturbanceSize;
+constexpr int SteadyStateCalculationSecondOrder::kOutputSize;
+
 SteadyStateCalculationSecondOrder::SteadyStateCalculationSecondOrder(const ros::NodeHandle& nh,
                                                const ros::NodeHandle& private_nh)
     : nh_(nh),

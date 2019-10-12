@@ -31,6 +31,12 @@
 #include <mav_linear_mpc/steady_state_calculation.h>
 
 namespace mav_control {
+
+constexpr int SteadyStateCalculation::kStateSize;
+constexpr int SteadyStateCalculation::kInputSize;
+constexpr int SteadyStateCalculation::kMeasurementSize;
+constexpr int SteadyStateCalculation::kDisturbanceSize;
+
 SteadyStateCalculation::SteadyStateCalculation(const ros::NodeHandle& nh,
                                                const ros::NodeHandle& private_nh)
     : nh_(nh),

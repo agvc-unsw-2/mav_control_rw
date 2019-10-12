@@ -3,12 +3,12 @@ KF_observer_second_order:
   calibration_duration: 5 #sec
   
   #covariance of initial state
-  P0_position: 0.001
-  P0_velocity: 0.001
-  P0_attitude: 0.001
+  P0_position: 0.01
+  P0_velocity: 0.1
+  P0_attitude: 0.01
   P0_angular_velocity: 0.1
-  P0_force: 0.4
-  P0_torque: 0.4
+  P0_force: 100.0
+  P0_torque: 100.0
   
   #process noise
   q_position: 0.01
@@ -17,6 +17,13 @@ KF_observer_second_order:
   q_angular_velocity: 0.02
   q_force: 0.1
   q_torque: 0.1
+
+  # q_position: 0.00
+  # q_velocity: 0.00
+  # q_attitude: 0.00
+  # q_angular_velocity: 0.00
+  # q_force: 0.0
+  # q_torque: 0.0
   
   #measurement noise
   r_position: 0.001
@@ -29,7 +36,7 @@ KF_observer_second_order:
   external_moments_limit :  [ 500.000000 ,500.000000 ,500.000000]  #rad/s^2
 
   drag_coefficients: [0.00000, 0.00000, 0.000000]
-  enable_KRLS_EKF: false
+  enable_KRLS_EKF: true
   verbose: false
   
   #model from system identification (2nd order attitude model)

@@ -130,17 +130,17 @@ void KFDisturbanceObserver::initialize()
 
   // METHOD 2
   } else if (method == 2) {
-    state_covariance_ = F_ * initial_state_covariance_.asDiagonal() * F_.transpose();
-    tmp = H_ * initial_state_covariance_.asDiagonal() * H_.transpose();
-    tmp += measurement_covariance_.asDiagonal().toDenseMatrix();
+    state_covariance_ = F_ * initial_state_covariance_.asDiagonal() * F_.transpose(); // same
+    state_covariance_.diagonal() += process_noise_covariance_; // same
+    tmp = H_ * state_covariance_ * H_.transpose(); //same
+    tmp += measurement_covariance_.asDiagonal().toDenseMatrix(); // same
     state_covariance_ -= 
-      (F_ * initial_state_covariance_.asDiagonal() * H_.transpose()) * 
-      tmp.inverse() * 
-      (H_ * initial_state_covariance_.asDiagonal() * F_.transpose());
-    state_covariance_.diagonal() += process_noise_covariance_;
-    K_static_ = state_covariance_ * H_.transpose() * tmp.inverse();
+     (F_ * initial_state_covariance_.asDiagonal() * H_.transpose()) * 
+     tmp.inverse() * 
+     (H_ * initial_state_covariance_.asDiagonal() * F_.transpose()); // different
+    K_static_ = state_covariance_ * H_.transpose() * tmp.inverse(); // same
     // txtbook uses F_ * K_static_ instead of just K_static. For code simplicity modify here
-    K_static_ = F_ * K_static_;
+    K_static_ = F_ * K_static_; // different
   } else {
     ROS_ERROR("Invalid static KF gain calculation method");
     abort();

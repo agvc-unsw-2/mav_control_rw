@@ -91,7 +91,7 @@ antiwindup_ball: 1.0
 
 enable_disturbance_observer : true
 enable_integrator : false
-enable_moment_disturbances : true
+enable_moment_disturbances : false
 
 disturbance_observer_type : 1
 

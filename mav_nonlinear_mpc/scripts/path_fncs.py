@@ -220,7 +220,7 @@ def main(mav_name, uav_num):
     start = 0.0
     end = 3.0
     period = 5.0
-    cycles = 8
+    cycles = 6
     while(rospy.get_time() < 1.0):
         time.sleep(0.1)
     while(rospy.get_time() < 1.0):

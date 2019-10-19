@@ -37,6 +37,7 @@
     <!-- <node pkg="mav_nonlinear_mpc" name="odom_delay" args="$(arg mav_name) $(arg uav_num)" output="screen" type="odom_delay.py"/> -->
 
     <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_sim.py"/>
+    <node pkg="mav_nonlinear_mpc" name="vrep_publish_cam_info" args="$(arg mav_name) $(arg uav_num)" output="screen" type="vrep_publish_cam_info.py"/>
     <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/> -->
     <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_real" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_real.py"/> -->
     </group>

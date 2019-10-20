@@ -16,6 +16,8 @@ $ ./pull_required_repos.sh
 
 $ ./install_deps.sh
 
+- FOR SIMULATION: Follow the instructions in the following file: ~/catkin_ws/src/mbzirc2019/simulation/installing_vrep_readme.md
+
 - Go to the following directory using the below command
 
 $ cd ~/catkin_ws/src/mav_control_rw

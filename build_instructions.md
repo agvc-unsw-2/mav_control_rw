@@ -26,6 +26,9 @@ $ git checkout feature/simulation
 
 BEFORE BUILDING:
 
-- Delete the kalibr repo, or replace kalibr/catkin_simple with catkin/catkin_simple by deleting kalibr/catkin_simple and cloning catkin/catkin_simple into kalibr/
+- Delete the kalibr repo, or replace kalibr/catkin_simple with catkin/catkin_simple by deleting kalibr/catkin_simple and running the following command(s)
 
+$ catkin clean kalibr
+
+$ catkin clean catkin_simple
 

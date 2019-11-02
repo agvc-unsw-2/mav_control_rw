@@ -220,7 +220,7 @@ def main(mav_name, uav_num):
     start = 0.0
     end = 3.0
     period = 5.0
-    cycles = 6
+    cycles = 1
     while(rospy.get_time() < 1.0):
         time.sleep(0.1)
     while(rospy.get_time() < 1.0):
@@ -244,7 +244,7 @@ def main(mav_name, uav_num):
     vel_max = 1
     altitude = 1
     #lemniscate_path(hlc, x_max, vel_max, altitude, cycles, "x")
-    hlc.land()
+    #hlc.land()
 
 if __name__ == "__main__":
     myargs = rospy.myargv(argv=sys.argv)

@@ -27,6 +27,7 @@
 #include <mutex>
 #include <memory>
 #include <visualization_msgs/Marker.h>
+#include <std_msgs/Bool.h>
 
 namespace mav_control {
 
@@ -87,6 +88,8 @@ class MPCQueue
   void popBackPoint();
   void getLastPoint(mav_msgs::EigenTrajectoryPoint* point);
   void shrinkQueueToMinimum();
+  bool allPointsSameInQueue();
+  bool arePointsSame(mav_msgs::EigenTrajectoryPoint& point1, mav_msgs::EigenTrajectoryPoint& point2);
 
   //interpolate the reference queue to the controller update rate
   void linearInterpolateTrajectory(const mav_msgs::EigenTrajectoryPointDeque& input_queue,  mav_msgs::EigenTrajectoryPointDeque& output_queue);
@@ -95,6 +98,10 @@ class MPCQueue
   void printQueue();
 
   ros::Publisher trajectory_reference_vis_publisher_;
+  ros::Publisher finished_traj_publisher_;
+  bool publish_traj_status_;
+  bool sending_traj_; // as opposed to a single point
+
   void publishQueueMarker(const ros::TimerEvent&);
   ros::Timer publish_queue_marker_timer_;
   std::string reference_frame_id_;

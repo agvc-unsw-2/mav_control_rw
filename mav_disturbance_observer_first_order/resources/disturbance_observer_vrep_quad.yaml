@@ -1,0 +1,65 @@
+## Kalman Filter Parameters:
+KF_observer_first_order:
+  calibration_duration: 5 #sec
+  
+  #covariance of initial state
+  P0_position: 0.001
+  P0_velocity: 0.001
+  P0_attitude: 0.001
+  P0_force: 0.001
+  P0_torque: 0.001
+  
+  #process noise
+  q_position: 0.0001
+  q_velocity: 0.00025
+  q_attitude: 0.00015
+  q_force: 0.001
+  q_torque: 0.001
+  
+  #measurement noise
+  r_position: 0.0001
+  r_velocity: 0.00012
+  r_attitude: 0.001
+  
+  #limits
+  external_forces_limit:  [ 500.000000, 500.000000, 500.0000000 ]      #m/s^2
+
+  yaw_gain: 1.000000
+  drag_coefficients: [0.010000, 0.010000, 0.000000]
+  enable_KRLS_EKF: true
+  verbose: false
+
+  # Time constants for PID P gain of 600
+  # roll_time_constant: 0.105595
+  # roll_gain: 1.145387
+  # pitch_time_constant: 0.105172
+  # pitch_gain: 1.114824
+
+  # Time constants for PID P gain of 200
+  # roll_tau: 0.318522
+  # roll_gain: 1.214172
+  # pitch_tau: 0.312873
+  # pitch_gain: 1.127141
+
+  #############
+  # Unbalanced Load
+  #############
+  # Constants for PID gains of 200 (~80% fit)
+  #roll_time_constant: 0.301281
+  #roll_gain: 1.169458
+  #pitch_time_constant: 0.326310
+  #pitch_gain: 1.170929
+
+  # Constants for PID gains of 800 pq 90 (~90% fit)
+  roll_time_constant: 0.123610
+  roll_gain: 1.089656
+  pitch_time_constant: 0.121262
+  pitch_gain: 1.076642
+
+  # Constants for PID gains of 800 pq 40 (~75% fit)
+  # roll_time_constant: 0.066959
+  # roll_gain: 1.092674
+  # pitch_time_constant: 0.071899
+  # pitch_gain: 1.103494
+
+

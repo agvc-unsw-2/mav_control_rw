@@ -30,6 +30,9 @@ KF_observer_first_order:
   pitch_tau: 0.104006
   pitch_gain: 1.050036
   yaw_gain: 1.000000
+  verbose: true
   
   drag_coefficients: [0.010000, 0.010000, 0.000000]
+  
+  enable_KRLS_EKF: true
   #drag_coefficients: [0.00000, 0.00000, 0.000000]

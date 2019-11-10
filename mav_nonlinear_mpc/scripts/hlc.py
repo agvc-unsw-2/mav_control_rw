@@ -35,6 +35,7 @@ class High_Level_Controller():
         self.land_height = 0.05
         self.suction_height = 0.0 #offset for suction cup
         self.wait_time = 1.0
+        self.goToWaypointTimeout = 10.0
 
         self.odom_subber = odom_subscriber(mav_name, uav_num)
         self.pose_pubber = pose_publisher(mav_name, uav_num)
@@ -43,6 +44,8 @@ class High_Level_Controller():
 
     def goToWaypoint(self, pose_cmd):
         self.pose_pubber.publish(pose_cmd)
+        now_secs = rospy.get_time()
+        end_time = now_secs + self.goToWaypointTimeout
         while(not at_waypoint(pose_cmd, self.odom_subber.msg)):
             #print("At: ")
             #print(self.odom_subber.msg)
@@ -50,6 +53,9 @@ class High_Level_Controller():
             print("At [" + str(position.x) + ", " + str(position.y) + ", " + str(position.z)) + ']'
             self.pose_pubber.publish(pose_cmd)
             time.sleep(0.5)
+            if (rospy.get_time() > end_time):
+                print("Going to waypoint timed out")
+                break
         time.sleep(self.wait_time) # Wait
     
     # Same as goToPose but position Point msg instead of Pose cmd
@@ -88,8 +94,14 @@ class High_Level_Controller():
             time.sleep(0.1)
         print("Checking for final position")
         # Check at final point
+
+        now_secs = rospy.get_time()
+        end_time = now_secs + self.goToWaypointTimeout
         while(not at_waypoint(final_point, self.odom_subber.msg)):
             time.sleep(0.1)
+            if (rospy.get_time() > end_time):
+                print("Checking for final position waypoint timed out")
+                break
         # Sleep
         time.sleep(self.wait_time) # Wait
  
@@ -104,7 +116,7 @@ class High_Level_Controller():
 
     def land(self):
         print("Landing")
-        self.hover()
+        #self.hover()
         position = Point(0, 0, self.hover_height)
         self.goToPosition(position)
         position = Point(0, 0, self.land_height)
@@ -112,8 +124,9 @@ class High_Level_Controller():
 
     def takeoff(self):
         print("Taking off")
-        position = copy.deepcopy(self.odom_subber.msg.pose.pose.position)
-        position.z = self.hover_height
+        #position = copy.deepcopy(self.odom_subber.msg.pose.pose.position)
+        #position.z = self.hover_height
+        position = Point(0, 0, self.hover_height)
         self.goToPosition(position)
 
 # Check if value in range

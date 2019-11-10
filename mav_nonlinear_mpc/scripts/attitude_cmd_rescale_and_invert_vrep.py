@@ -72,11 +72,16 @@ class RescaleAndInverter(object):
         msg.pitch = -msg.pitch
         return msg
 
+    def invert_yaw_rate(self, msg):
+        msg.yaw_rate = -msg.yaw_rate
+        return msg
+
     def read_callback(self, msg):
         #print(data.angular_velocities)
         msg = self.scale_msg(msg)
         #msg = self.invert_roll(msg)
         msg = self.invert_pitch(msg)
+        msg = self.invert_yaw_rate(msg)
         self.msg_to_publish = msg
         #print("Scaled RC message")
         self.pub.publish(self.msg_to_publish)

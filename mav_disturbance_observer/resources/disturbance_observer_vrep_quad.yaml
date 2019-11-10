@@ -3,12 +3,12 @@ KF_observer_second_order:
   calibration_duration: 5 #sec
   
   #covariance of initial state
-  P0_position: 0.1
+  P0_position: 0.01
   P0_velocity: 0.1
-  P0_attitude: 0.1
+  P0_attitude: 0.01
   P0_angular_velocity: 0.1
-  P0_force: 0.1
-  P0_torque: 0.1
+  P0_force: 100.0
+  P0_torque: 100.0
   
   #process noise
   q_position: 0.01
@@ -17,6 +17,13 @@ KF_observer_second_order:
   q_angular_velocity: 0.02
   q_force: 0.1
   q_torque: 0.1
+
+  # q_position: 0.00
+  # q_velocity: 0.00
+  # q_attitude: 0.00
+  # q_angular_velocity: 0.00
+  # q_force: 0.0
+  # q_torque: 0.0
   
   #measurement noise
   r_position: 0.001
@@ -25,34 +32,29 @@ KF_observer_second_order:
   
   #limits
   omega_limit :  [ 3.000000 ,3.000000 ,2.000000]
-  external_forces_limit :  [ 5.000000 ,5.000000 ,3.0000000]      #m/s^2
-  external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
+  external_forces_limit :  [ 500.000000 ,500.000000 ,500.0000000]      #m/s^2
+  external_moments_limit :  [ 500.000000 ,500.000000 ,500.000000]  #rad/s^2
 
   drag_coefficients: [0.00000, 0.00000, 0.000000]
+  enable_KRLS_EKF: true
+  verbose: false
   
   #model from system identification (2nd order attitude model)
 
   # Time constants for PID P gain of 600
-  roll_gain: 1.000298
-  roll_damping: 0.463114
-  roll_omega: 11.336867
-  pitch_gain: 1.008354
-  pitch_damping: 0.476652
-  pitch_omega: 11.264051
-  yaw_gain: 1.000000
-  yaw_damping: 0.950000
-  yaw_omega: 5.000000
-
+  # roll_gain: 1.000298
+  # roll_damping: 0.463114
+  # roll_omega: 11.336867
+  # pitch_gain: 1.008354
+  # pitch_damping: 0.476652
+  # pitch_omega: 11.264051
   # Time constants for PID gains of 200
-  roll_gain: 1.007134
-  roll_damping: 0.839112
-  roll_omega: 6.639183
-  pitch_gain: 0.999276
-  pitch_damping: 0.847333
-  pitch_omega: 6.560188
-  yaw_gain: 1.000000
-  yaw_damping: 0.950000
-  yaw_omega: 5.000000
+  # roll_gain: 1.007134
+  # roll_damping: 0.839112
+  # roll_omega: 6.639183
+  # pitch_gain: 0.999276
+  # pitch_damping: 0.847333
+  # pitch_omega: 6.560188
 
   # Time constants for PID gains of 60
   # roll_gain: 1.024860
@@ -61,6 +63,36 @@ KF_observer_second_order:
   # pitch_gain: 1.032659
   # pitch_damping: 1.000000
   # pitch_omega: 2.815358
-  # yaw_gain: 1.000000
-  # yaw_damping: 0.950000
-  # yaw_omega: 5.000000
+
+  #####################
+  # Unbalanced Loads
+  #####################
+  # Time constants for PID gains of 200
+  #mass: 1.850000
+  # roll_gain: 1.005393
+  # roll_damping: 0.745251
+  # roll_omega: 6.211433
+  # pitch_gain: 0.996316
+  # pitch_damping: 0.777345
+  # pitch_omega: 6.000949
+
+  # 4kg load for PID gains of 800 pq 90
+  roll_gain: 1.006496
+  roll_damping: 0.843728
+  roll_omega: 15.191048
+  pitch_gain: 1.008675
+  pitch_damping: 0.863757
+  pitch_omega: 15.632022
+
+  # PID gains 800 pq 40
+  # roll_gain: 0.996776
+  # roll_damping: 0.342339
+  # roll_omega: 14.598897
+  # pitch_gain: 1.001319
+  # pitch_damping: 0.370841
+  # pitch_omega: 14.633268
+
+#########################
+  yaw_gain: 1.000000
+  yaw_damping: 0.950000
+  yaw_omega: 5.000000

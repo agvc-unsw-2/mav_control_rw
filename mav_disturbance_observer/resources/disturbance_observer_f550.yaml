@@ -35,6 +35,8 @@ KF_observer_second_order:
   #model from system identification (2nd order attitude model)
 
   drag_coefficients: [0.00000, 0.00000, 0.000000]
+  enable_KRLS_EKF: true
+  verbose: true
 
   roll_gain: 0.971658
   roll_damping: 1.000000

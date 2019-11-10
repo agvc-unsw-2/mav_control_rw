@@ -1,22 +1,36 @@
 For mbzirc2019 unsw members:
 
-also clone this repo
-git clone https://github.com/agvc-unsw-2/mav_control_rw
-also clone mav_comm and eigen_catkin
-git clone https://github.com/ethz-asl/mav_comm.git
-git clone https://github.com/ethz-asl/eigen_catkin.git
+- Follow the necessary steps in the mbzirc2019 repo wiki
 
-Replace kalibr/catkin_simple with catkin/catkin_simple by deleting kalibr/catkin_simple and cloning catkin/catkin_simple into kalibr/
+- Go to the mbzirc2019 repo and switch to the following branch using the following instruction
 
-(git clone https://github.com/catkin/catkin_simple.git)
+$ git checkout feature/mav_control_rw_vrep_intergration_v2
 
-Also install dependencies
-sudo apt-get install liblapacke-dev
-sudo apt install libopenblas-dev
-(if you still have build problems: sudo apt install libatlas-base-dev)
+- Go to the following directory using the below command
 
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
-wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+$ cd ~/catkin_ws/src/mbzirc2019/mbz_utils
 
-sudo apt-get install ros-kinetic-desktop-full ros-kinetic-joy ros-kinetic-octomap-ros ros-kinetic-mavlink python-wstool python-catkin-tools protobuf-compiler libgoogle-glog-dev ros-kinetic-control-toolbox
+- Run the following scripts using the below commands
+
+$ ./pull_required_repos.sh
+
+$ ./install_deps.sh
+
+- FOR SIMULATION: Follow the instructions in the following file: ~/catkin_ws/src/mbzirc2019/simulation/installing_vrep_readme.md
+
+- Go to the following directory using the below command
+
+$ cd ~/catkin_ws/src/mav_control_rw
+
+- FOR SIMULATION: Switch branches in this repo to feature/simulation using the following command
+
+$ git checkout feature/simulation
+
+BEFORE BUILDING:
+
+- Delete the kalibr repo, or replace kalibr/catkin_simple with catkin/catkin_simple by deleting kalibr/catkin_simple and running the following command(s)
+
+$ catkin clean kalibr
+
+$ catkin clean catkin_simple
 

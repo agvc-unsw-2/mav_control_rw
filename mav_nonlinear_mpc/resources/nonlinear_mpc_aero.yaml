@@ -86,9 +86,8 @@ thrust_max_normalized: 1.0
 
 K_yaw: 1.8
 
-Ki_xy: 0.2
-#Ki_z: 0.3
-Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.5
 

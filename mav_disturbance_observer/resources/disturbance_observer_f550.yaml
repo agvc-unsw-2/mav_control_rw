@@ -25,8 +25,8 @@ KF_observer_second_order:
   
   #limits
   omega_limit :  [ 3.000000 ,3.000000 ,2.000000]
-  external_forces_limit :  [ 5.000000 ,5.000000 ,3.0000000]      #m/s^2
-  external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
+  external_forces_limit :  [ 10.000000 ,10.000000 , 35.0000000]      #m/s^2
+  external_moments_limit :  [ 20.000000 ,20.000000 , 20.000000]  #rad/s^2
 
 #2nd order dynamics
 #pitch fit percentage: 92.744558%

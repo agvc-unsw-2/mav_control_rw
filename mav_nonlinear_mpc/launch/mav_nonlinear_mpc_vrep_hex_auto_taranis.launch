@@ -18,6 +18,7 @@
     <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node"  respawn="true" clear_params="true" output="screen">
       <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+      <rosparam file="$(find mav_disturbance_observer_first_order)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <param name="use_rc_teleop" value="false" />
 
       <remap from="odometry" to="/$(arg namespace)$(arg uav_num)/ground_truth/mavros/local_position/odom" />

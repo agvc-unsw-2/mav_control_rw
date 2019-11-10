@@ -40,3 +40,6 @@
 
 # bag files
 *.bag
+
+# vscode files
+.vscode/*

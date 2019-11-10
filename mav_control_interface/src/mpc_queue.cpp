@@ -56,13 +56,12 @@ MPCQueue::~MPCQueue()
 void MPCQueue::clearQueue()
 {
   //ROS_WARN_THROTTLE(1.0, "Clearing MPC queue");
-  ROS_WARN("Clearing MPC queue");
+  //ROS_WARN("Clearing MPC queue");
   position_reference_.clear();
   velocity_reference_.clear();
   acceleration_reference_.clear();
   yaw_reference_.clear();
   queue_start_time_ = 0.0;
-
   current_queue_size_ = 0;
 }
 
@@ -144,6 +143,7 @@ void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeq
 {
   this->sending_traj_ = true;
   this->publish_traj_status_ = true;
+  clearQueue();
   mav_msgs::EigenTrajectoryPointDeque interpolated_queue;
   ROS_WARN("===============================");
   ROS_WARN("RECEIVED REFERENCE TRAJECTORY");

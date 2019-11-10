@@ -12,7 +12,6 @@ import std_msgs.msg
 #from pygame.locals import *
 
 from dynamic_reconfigure.server import Server
-from mav_nonlinear_mpc.cfg import ThrustRescalerConfig
 
 def display(str):
     text = font.render(str, True, (255, 255, 255), (159, 182, 205))
@@ -38,6 +37,7 @@ class RescaleAndInverter(object):
         #self.pub = rospy.Publisher('/mavros/setpoint_raw/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
         self.pub = rospy.Publisher('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust', RollPitchYawrateThrust, queue_size=1)
         #rospy.Subscriber('/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N', RollPitchYawrateThrust, self.read_callback)
+        rospy.Subscriber('/' + mav_name +  uav_num + '/' + 'thrust_scaling_factor', Float32, self.update_scaling_factor_cb)
         rospy.Subscriber('/' + mav_name +  uav_num + '/command/roll_pitch_yawrate_thrust_raw', RollPitchYawrateThrust, self.read_callback)
 
         self.scale_factors_initialized = False
@@ -81,15 +81,10 @@ class RescaleAndInverter(object):
         #print("Scaled RC message")
         self.pub.publish(self.msg_to_publish)
 
-    def dyn_config_callback(self, config, level):
-        print("Received reconfigure request")
-        print("thrust_scaling_factor:")
-        #self.thrust_scaling_factor = config.thrust_scaling_factor
-        print(self.thrust_scaling_factor)
-        return config
-
-    def update_scaling_factor(self, new_factor):
-        self.thrust_scaling_factor = new_factor
+    def update_scaling_factor_cb(self, msg):
+        print("Python rescaler updating thrust scaling factor")
+        print("Thrust scaling factor: " + str(msg.data))
+        self.thrust_scaling_factor = msg.data
 
 myargs = rospy.myargv(argv=sys.argv)
 if len(myargs) != 4:
@@ -121,7 +116,5 @@ if __name__ == '__main__':
     echo_node.initialise_scale_factors(
         input_thrust_scaling_factor
     )
-    srv = Server(ThrustRescalerConfig, echo_node.dyn_config_callback)
-    
 
     rospy.spin()

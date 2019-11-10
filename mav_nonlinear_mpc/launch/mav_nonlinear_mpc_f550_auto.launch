@@ -3,7 +3,7 @@
   <arg name="namespace" default="nuc"/>
   <arg name="uav_num" default="2"/>
   <arg name="verbose" default="true"/>
-  <arg name="thrust_scaling_factor" default="0.01"/>
+  <arg name="thrust_scaling_factor" default="0.078"/>
   <!-- <param name="use_sim_time" value="true" /> -->
 
   <!-- From sim -->
@@ -32,9 +32,10 @@
       <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer_first_order)/resources/disturbance_observer_$(arg mav_name).yaml"/>
-      <rosparam file="$(find mav_integral_disturbance_observer_first_order)/resources/disturbance_observer_$(arg mav_name).yaml"/>
-      <rosparam file="$(find integral_disturbance_observer_first_order)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+      
+      
       <param name="use_rc_teleop" value="false" />
+      <param name="thrust_scaling_factor" value="$(arg thrust_scaling_factor)"/>
 
       <remap from="odometry" to="/mavros/local_position/odom" />
       <remap from="command/roll_pitch_yawrate_thrust" to="/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N" />

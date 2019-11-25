@@ -148,6 +148,7 @@ void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeq
   ROS_WARN("===============================");
   ROS_WARN("RECEIVED REFERENCE TRAJECTORY");
   ROS_WARN("===============================");
+  clearQueue();
   linearInterpolateTrajectory(queue, interpolated_queue);
   // interpolated queue now has a point for every queue_dt (10ms default)
   {

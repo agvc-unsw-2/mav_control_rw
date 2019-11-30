@@ -373,7 +373,8 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   odometry_.getEulerAngles(&current_rpy);
 
   mpc_queue_.updateQueue();
-  mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
+  mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, 
+    yaw_ref_, yaw_rate_ref_, time_from_start_ns_ref_);
 
   bool observer_update_successful = false;
 
@@ -606,7 +607,8 @@ bool NonlinearModelPredictiveControl::getCurrentReference(
   (*reference).velocity_W = velocity_ref_.front();
   (*reference).acceleration_W = acceleration_ref_.front();
   (*reference).setFromYaw(yaw_ref_.front());
-
+  (*reference).time_from_start_ns = time_from_start_ns_ref_.front();
+  //ROS_WARN_STREAM("point_non_queue_time_from_start_ns: " << (*reference).time_from_start_ns);
   return true;
 }
 
@@ -623,7 +625,9 @@ bool NonlinearModelPredictiveControl::getCurrentReference(
     pnt.velocity_W = velocity_ref_.at(i);
     pnt.acceleration_W = acceleration_ref_.at(i);
     pnt.setFromYaw(yaw_ref_.at(i));
+    pnt.time_from_start_ns = time_from_start_ns_ref_.front();
     (*reference).push_back(pnt);
+    //ROS_WARN_STREAM("point_dequeue_time_from_start_ns: " << pnt.time_from_start_ns);
   }
   return true;
 }

@@ -258,7 +258,7 @@ class NonlinearModelPredictiveControl
   // reference queue
   MPCQueue mpc_queue_;
   Vector3dDeque position_ref_, velocity_ref_, acceleration_ref_;
-  std::deque<double> yaw_ref_, yaw_rate_ref_;
+  std::deque<double> yaw_ref_, yaw_rate_ref_, time_from_start_ns_ref_;
 
   // solver matrices
   Eigen::Matrix<double, ACADO_NY, ACADO_NY> W_;

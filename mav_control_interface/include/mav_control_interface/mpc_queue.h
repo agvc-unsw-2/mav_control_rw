@@ -52,9 +52,9 @@ class MPCQueue
 
   void insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeque& queue);
 
-  void getQueue(Vector3dDeque& position_reference_, Vector3dDeque& velocity_reference_,
-                Vector3dDeque& acceleration_reference, std::deque<double>& yaw_reference_,
-                std::deque<double>& yaw_rate_reference_);
+  void getQueue(Vector3dDeque& position_reference, Vector3dDeque& velocity_reference,
+                Vector3dDeque& acceleration_reference, std::deque<double>& yaw_reference,
+                std::deque<double>& yaw_rate_reference, std::deque<double>& time_from_start_ns);
 
   void updateQueue();
 
@@ -79,6 +79,7 @@ class MPCQueue
   Vector3dDeque acceleration_reference_;
   std::deque<double> yaw_reference_;
   std::deque<double> yaw_rate_reference_;
+  std::deque<double> time_from_start_ns_reference_;
   double queue_start_time_;
 
   void clearQueue();

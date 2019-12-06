@@ -37,12 +37,23 @@ KF_observer_second_order:
 
 # Fixed MATLAB Script
   drag_coefficients: [0.010000, 0.010000, 0.000000]
-  roll_gain: 0.967082
-  roll_damping: 0.591765
-  roll_omega: 10.686268
-  pitch_gain: 0.962103
-  pitch_damping: 0.642385
-  pitch_omega: 10.855208
+
+  # Delay compensated
+  roll_gain: 0.769668
+  roll_damping: 1.000000
+  roll_omega: 0.035531
+  pitch_gain: 0.944939
+  pitch_damping: 1.000000
+  pitch_omega: 17.587963
+
+  # Slow params
+  # roll_gain: 0.967082
+  # roll_damping: 0.591765
+  # roll_omega: 10.686268
+  # pitch_gain: 0.962103
+  # pitch_damping: 0.642385
+  # pitch_omega: 10.855208
+
   yaw_gain: 1.000000
   yaw_damping: 0.950000
   yaw_omega: 5.000000

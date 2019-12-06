@@ -36,6 +36,8 @@
 
 # New sysID
 mass: 1.000000
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+yaw_gain: 1.000000
 
 #roll_time_constant: 0.110846
 #roll_gain: 0.788517
@@ -46,20 +48,17 @@ mass: 1.000000
 
 # Fixed MATLAB Script
 
-roll_time_constant: 0.195256
-roll_gain: 1.042753
-pitch_time_constant: 0.185942
-pitch_gain: 1.066260
-linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
-yaw_gain: 1.000000
+# Delay compensated
+roll_time_constant: 0.047596
+roll_gain: 0.658635
+pitch_time_constant: 0.057590
+pitch_gain: 0.945911
 
-# With LPE
-#roll_time_constant: 0.126858
-#roll_gain: 0.904591
-#pitch_time_constant: 0.119135
-#pitch_gain: 0.804236
-#linear_drag_coefficients: [0.020000, 0.020000, 0.000000]
-#yaw_gain: 1.000000
+# Slow params
+# roll_time_constant: 0.195256
+# roll_gain: 1.042753
+# pitch_time_constant: 0.185942
+# pitch_gain: 1.066260
 
 # dynamic config default values:
 q_x : 80

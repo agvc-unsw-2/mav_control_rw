@@ -32,10 +32,17 @@ KF_observer_first_order:
   enable_KRLS_EKF: true
   verbose: true
 
-  roll_tau: 0.195256
-  roll_gain: 1.042753
-  pitch_tau: 0.185942
-  pitch_gain: 1.066260
+  # Delay compensated params
+  roll_tau: 0.047596
+  roll_gain: 0.658635
+  pitch_tau: 0.057590
+  pitch_gain: 0.945911
+  
+  # Slow params
+  # roll_tau: 0.195256
+  # roll_gain: 1.042753
+  # pitch_tau: 0.185942
+  # pitch_gain: 1.066260
   yaw_tau: 5.00
   yaw_gain: 1.000000
 

@@ -25,7 +25,8 @@ RcInterfaceAci::RcInterfaceAci(const ros::NodeHandle& nh)
       nh_(nh),
       is_on_(false)
 {
-  rc_sub_ = nh_.subscribe("rc", 1, &RcInterfaceAci::rcCallback, this);
+  rc_sub_ = nh_.subscribe("rc", 1, &RcInterfaceAci::rcCallback, this, 
+    ros::TransportHints().tcpNoDelay());
 }
 
 void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)

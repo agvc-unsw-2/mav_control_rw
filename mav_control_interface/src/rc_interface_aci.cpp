@@ -40,21 +40,21 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
     //last_data_.left_side = -msg->axes[3];
     last_data_.left_side = msg->axes[3]; // reverse yaw
 
-    //if (msg->axes[5] > 0.0)
-    //{
-    //  last_data_.control_interface = RcData::ControlInterface::OFF;
-    //  last_data_.control_mode = RcData::ControlMode::MANUAL;
+    if (msg->axes[5] > 0.0)
+    {
+      last_data_.control_interface = RcData::ControlInterface::OFF;
+      last_data_.control_mode = RcData::ControlMode::MANUAL;
 
-    //  ROS_WARN_STREAM_THROTTLE(5.0, "MANUAL OFFBOARD MODE");
-    //}
-    //else
-    //{
+      ROS_WARN_STREAM_THROTTLE(5.0, "MANUAL OFFBOARD MODE");
+    }
+    else
+    {
       last_data_.control_interface = RcData::ControlInterface::ON;
       last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
 
       //ROS_WARN_STREAM_THROTTLE(1.0, "CONTROL INTERFACE OFF");
       ROS_WARN_STREAM_THROTTLE(5.0, "POSITION OFFBOARD MODE");
-    //}
+    }
 
     /*
     if (msg->axes[4] <= -0.5)
@@ -107,7 +107,9 @@ RcData RcInterfaceAci::getRcData() const
 bool RcInterfaceAci::isActive() const
 {
   // DEBUG PURPOSES:
-  return false;
+  // return false;
+  // Leave on and determine if manual through axes[5]
+  return true;
 
   /*
   if (!is_on_)

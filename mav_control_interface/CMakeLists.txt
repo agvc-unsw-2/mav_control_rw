@@ -25,12 +25,14 @@ set(SOURCE_FILES
 cs_add_library(${PROJECT_NAME} ${SOURCE_FILES})
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DBOOST_MPL_CFG_NO_PREPROCESSED_HEADERS -DBOOST_MPL_LIMIT_VECTOR_SIZE=30 -DBOOST_MPL_LIMIT_MAP_SIZE=30 ")
 
-
 cs_add_executable(${PROJECT_NAME}_test_node src/test_node.cpp)
 target_link_libraries(${PROJECT_NAME}_test_node ${PROJECT_NAME})
 
 cs_add_executable(thrust_rescaler_node src/thrust_rescaler.cpp)
 target_link_libraries(thrust_rescaler_node ${PROJECT_NAME})
+
+cs_add_executable(delay_command_node src/delay_command.cpp)
+target_link_libraries(delay_command_node ${PROJECT_NAME})
 
 cs_install()
 cs_export()

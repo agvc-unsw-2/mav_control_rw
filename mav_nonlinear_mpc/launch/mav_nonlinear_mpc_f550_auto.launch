@@ -3,7 +3,7 @@
   <arg name="namespace" default="nuc"/>
   <arg name="uav_num" default="2"/>
   <arg name="verbose" default="true"/>
-  <arg name="thrust_scaling_factor" default="0.078"/>
+  <arg name="thrust_scaling_factor" default="0.05"/>
   <!-- <param name="use_sim_time" value="true" /> -->
 
   <!-- From sim -->
@@ -17,15 +17,14 @@
     <remap from="joy_source" to="/mavros/rc/in" />
     <remap from="joy_dest" to="/mavros/rc/in_remapped" />
     <param name="button_mapping" type="str" value="=" />
-    <param name="axis_mapping" type="str" value="1 2 0 3 4 5 6" />
+    <param name="axis_mapping" type="str" value="0 1 2 3 4 5 6" />
   </node>
 
   <node pkg="mav_nonlinear_mpc"
     name="joy_invert"
-    args="$(arg mav_name) $(arg uav_num) 0 1 2 3"
+    args="$(arg mav_name) $(arg uav_num) 1 3"
     output="screen"
     type="joy_invert.py"/>
-
 
   <group ns="$(arg namespace)$(arg uav_num)">
     <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node"  respawn="true" clear_params="true" output="screen">

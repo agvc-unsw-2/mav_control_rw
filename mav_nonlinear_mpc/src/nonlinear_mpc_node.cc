@@ -91,12 +91,13 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   q_attitude << config.q_roll, config.q_pitch;
 
   r_command << config.r_roll, config.r_pitch, config.r_thrust;
-
-  //control_limits << config.roll_max, config.pitch_max, config.yaw_rate_max, config.thrust_min, config
-  //    .thrust_max;
   roll_pitch_yawrate_limits << config.roll_max, config.pitch_max, config.yaw_rate_max;
   thrust_scaling_factor = config.thrust_scaling_factor;
   
+  roll_pitch_yawrate_limits << config.roll_max, config.pitch_max, config.yaw_rate_max;
+
+  thrust_scaling_factor = config.thrust_scaling_factor;
+
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_x;
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_y;
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_z;

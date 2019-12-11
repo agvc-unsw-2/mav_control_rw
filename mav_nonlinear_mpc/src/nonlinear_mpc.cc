@@ -166,7 +166,7 @@ void NonlinearModelPredictiveControl::initializeParameters()
     ROS_ERROR("Ki_xy in nonlinear MPC is not loaded from ros parameter server");
     abort();
   }
-
+  
   disturbance_observer_type_ = static_cast<NonlinearModelPredictiveControl::Disturbance_Observer_Types>(disturbance_observer_type_temp);
 
   // TODO: Debug conflicts between ros parameter server and dynamic reconfigure
@@ -197,7 +197,6 @@ void NonlinearModelPredictiveControl::initializeParameters()
 
   // Some of these may be redundant because they are somehow called by the dynamic reconfigure server
   //applyParameters();
-
   constructModelMatrices();
   initialized_parameters_ = true;
 

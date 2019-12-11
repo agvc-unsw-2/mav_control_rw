@@ -47,8 +47,8 @@
       args="$(arg mav_name) $(arg uav_num) $(arg thrust_scaling_factor)"
       output="screen"
       type="attitude_cmd_rescale_auto.py"/> -->
-  </group>
   <!-- cpp thrust scaler -->
     <node pkg="mav_control_interface" name="attitude_cmd_rescale_cpp" type="thrust_rescaler_node"
       args="$(arg thrust_scaling_factor)" respawn="true" clear_params="true" output="screen"/>
+  </group>
 </launch>

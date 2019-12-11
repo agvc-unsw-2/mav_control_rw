@@ -31,7 +31,8 @@ PIDAttitudeControllerNode::PIDAttitudeControllerNode(const ros::NodeHandle& nh,
 
   command_roll_pitch_yawrate_thrust_sub_ = nh_.subscribe(
       mav_msgs::default_topics::COMMAND_ROLL_PITCH_YAWRATE_THRUST, 1,
-      &PIDAttitudeControllerNode::CommandRollPitchYawRateThrustCallback, this);
+      &PIDAttitudeControllerNode::CommandRollPitchYawRateThrustCallback, this, 
+      ros::TransportHints().tcpNoDelay());
 
   odometry_sub_ = nh_.subscribe(mav_msgs::default_topics::ODOMETRY, 1,
                                 &PIDAttitudeControllerNode::OdometryCallback, this,

@@ -155,6 +155,18 @@ void NonlinearModelPredictiveControl::initializeParameters()
     ROS_ERROR("observer_type in nonlinear MPC is not loaded from ros parameter server");
     abort();
   }
+
+  // TODO: Wasn't here by default. Remove if necessary
+  if (!private_nh_.getParam("Ki_altitude", Ki_altitude_)) {
+    ROS_ERROR("Ki_altitude in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  // TODO: Wasn't here by default. Remove if necessary
+  if (!private_nh_.getParam("Ki_xy", Ki_xy_)) {
+    ROS_ERROR("Ki_xy in nonlinear MPC is not loaded from ros parameter server");
+    abort();
+  }
+  
   disturbance_observer_type_ = static_cast<NonlinearModelPredictiveControl::Disturbance_Observer_Types>(disturbance_observer_type_temp);
 
   // TODO: Debug conflicts between ros parameter server and dynamic reconfigure
@@ -360,7 +372,8 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
   odometry_.getEulerAngles(&current_rpy);
 
   mpc_queue_.updateQueue();
-  mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, yaw_ref_, yaw_rate_ref_);
+  mpc_queue_.getQueue(position_ref_, velocity_ref_, acceleration_ref_, 
+    yaw_ref_, yaw_rate_ref_, time_from_start_ns_ref_);
 
   bool observer_update_successful = false;
 
@@ -389,8 +402,6 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
     ROS_ERROR("Invalid disturbance observer type in use");
     abort();
   }
-
-// TODO: Add disturbance_observer_type as a dynamic reconfigure, and appropriate reset the disturbance observers on change.
 
   if (enable_disturbance_observer_ == true) {
     if (disturbance_observer_type_ == KF_DO_first_order__) {
@@ -439,6 +450,7 @@ void NonlinearModelPredictiveControl::calculateRollPitchYawrateThrustCommand(
         -(acceleration_ref_B(1) - estimated_disturbances_B(1)) / kGravity),
         ((acceleration_ref_B(0) - estimated_disturbances_B(0)) / kGravity)
       );
+    // Reference block is <states, input>
     reference_.block(i, 0, 1, ACADO_NY) << 
       position_ref_[i].transpose(), 
       velocity_ref_[i].transpose(), 
@@ -594,7 +606,8 @@ bool NonlinearModelPredictiveControl::getCurrentReference(
   (*reference).velocity_W = velocity_ref_.front();
   (*reference).acceleration_W = acceleration_ref_.front();
   (*reference).setFromYaw(yaw_ref_.front());
-
+  (*reference).time_from_start_ns = time_from_start_ns_ref_.front();
+  //ROS_WARN_STREAM("point_non_queue_time_from_start_ns: " << (*reference).time_from_start_ns);
   return true;
 }
 
@@ -611,7 +624,9 @@ bool NonlinearModelPredictiveControl::getCurrentReference(
     pnt.velocity_W = velocity_ref_.at(i);
     pnt.acceleration_W = acceleration_ref_.at(i);
     pnt.setFromYaw(yaw_ref_.at(i));
+    pnt.time_from_start_ns = time_from_start_ns_ref_.front();
     (*reference).push_back(pnt);
+    //ROS_WARN_STREAM("point_dequeue_time_from_start_ns: " << pnt.time_from_start_ns);
   }
   return true;
 }

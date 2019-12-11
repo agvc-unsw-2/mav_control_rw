@@ -128,6 +128,7 @@ class KF_DO_first_order
   Eigen::SparseMatrix<double> F_; // System dynamics matrix.
 //  Eigen::Matrix<double, kStateSize, kStateSize> F_; // System dynamics matrix.
   Eigen::Matrix<double, kStateSize, kMeasurementSize> K_; // Kalman gain matrix.
+  Eigen::Matrix<double, kStateSize, kMeasurementSize> K_static_; // Static Kalman gain matrix.
   Eigen::SparseMatrix<double> H_; // Measurement matrix.
 //  Eigen::Matrix<double, kMeasurementSize, kStateSize> H_; // Measurement matrix.
 
@@ -144,6 +145,9 @@ class KF_DO_first_order
   double yaw_gain_;
 
   double sampling_time_;
+  bool enable_KRLS_EKF_;
+  bool verbose_;
+  double solve_time_average_;
 
   ros::ServiceServer service_;
   ros::Publisher observer_state_pub_;

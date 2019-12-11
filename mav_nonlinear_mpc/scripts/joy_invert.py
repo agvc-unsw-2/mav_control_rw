@@ -10,7 +10,8 @@ import std_msgs.msg
 
 from copy import deepcopy
 
-from mav_nonlinear_mpc.cfg import ThrustRescalerConfig
+#from mav_nonlinear_mpc.cfg import ThrustRescalerConfig
+from mav_nonlinear_mpc.cfg import NonLinearMPCConfig
 
 class JoyEcho(object):
     def __init__(

@@ -79,14 +79,15 @@ r_thrust : 1
 
 roll_max: deg(25.0)
 pitch_max: deg(25.0)
-thrust_min: 4
-thrust_max: 18
+yaw_rate_max: deg(25.0)
+thrust_scaling_factor: 0.0582
+thrust_min_normalized: 0.05
+thrust_max_normalized: 1.0
 
 K_yaw: 1.8
 
-Ki_xy: 0.2
-#Ki_z: 0.3
-Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
 antiwindup_ball: 0.5
 
@@ -99,7 +100,5 @@ prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s
 #enum Disturbance_Observer_Types {
 #  KF_DO_first_order__, // 0
 #  KF_DO_second_order__, //1
-#  integral_DO_first_order__, //2
-#  integral_DO_second_order__ //3
 #};
 disturbance_observer_type: 1

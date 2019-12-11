@@ -27,6 +27,7 @@
 #include <mutex>
 #include <memory>
 #include <visualization_msgs/Marker.h>
+#include <std_msgs/Bool.h>
 
 namespace mav_control {
 
@@ -51,9 +52,9 @@ class MPCQueue
 
   void insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeque& queue);
 
-  void getQueue(Vector3dDeque& position_reference_, Vector3dDeque& velocity_reference_,
-                Vector3dDeque& acceleration_reference, std::deque<double>& yaw_reference_,
-                std::deque<double>& yaw_rate_reference_);
+  void getQueue(Vector3dDeque& position_reference, Vector3dDeque& velocity_reference,
+                Vector3dDeque& acceleration_reference, std::deque<double>& yaw_reference,
+                std::deque<double>& yaw_rate_reference, std::deque<double>& time_from_start_ns);
 
   void updateQueue();
 
@@ -78,6 +79,7 @@ class MPCQueue
   Vector3dDeque acceleration_reference_;
   std::deque<double> yaw_reference_;
   std::deque<double> yaw_rate_reference_;
+  std::deque<double> time_from_start_ns_reference_;
   double queue_start_time_;
 
   void clearQueue();
@@ -87,6 +89,8 @@ class MPCQueue
   void popBackPoint();
   void getLastPoint(mav_msgs::EigenTrajectoryPoint* point);
   void shrinkQueueToMinimum();
+  bool allPointsSameInQueue();
+  bool arePointsSame(mav_msgs::EigenTrajectoryPoint& point1, mav_msgs::EigenTrajectoryPoint& point2);
 
   //interpolate the reference queue to the controller update rate
   void linearInterpolateTrajectory(const mav_msgs::EigenTrajectoryPointDeque& input_queue,  mav_msgs::EigenTrajectoryPointDeque& output_queue);
@@ -95,6 +99,10 @@ class MPCQueue
   void printQueue();
 
   ros::Publisher trajectory_reference_vis_publisher_;
+  ros::Publisher finished_traj_publisher_;
+  bool publish_traj_status_;
+  bool sending_traj_; // as opposed to a single point
+
   void publishQueueMarker(const ros::TimerEvent&);
   ros::Timer publish_queue_marker_timer_;
   std::string reference_frame_id_;

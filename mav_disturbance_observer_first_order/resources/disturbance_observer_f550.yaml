@@ -37,4 +37,4 @@ KF_observer_first_order:
   #pitch_gain: 1.090816
   
   drag_coefficients: [0.010000, 0.010000, 0.000000]
-  #drag_coefficients: [0.00000, 0.00000, 0.000000]
+  enable_KRLS_EKF: true

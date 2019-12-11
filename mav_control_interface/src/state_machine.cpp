@@ -80,7 +80,7 @@ void StateMachineDefinition::PublishCurrentReference()
   ros::Time time_now = ros::Time::now();
   mav_msgs::EigenTrajectoryPoint current_reference;
   controller_->getCurrentReference(&current_reference);
-
+  
   tf::Quaternion q;
   tf::Vector3 p;
   tf::vectorEigenToTF(current_reference.position_W, p);

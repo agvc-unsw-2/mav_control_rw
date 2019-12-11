@@ -29,5 +29,8 @@ SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-DBOOST_MPL_CFG_
 cs_add_executable(${PROJECT_NAME}_test_node src/test_node.cpp)
 target_link_libraries(${PROJECT_NAME}_test_node ${PROJECT_NAME})
 
+cs_add_executable(thrust_rescaler_node src/thrust_rescaler.cpp)
+target_link_libraries(thrust_rescaler_node ${PROJECT_NAME})
+
 cs_install()
 cs_export()

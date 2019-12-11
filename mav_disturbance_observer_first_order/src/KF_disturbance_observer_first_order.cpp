@@ -195,6 +195,16 @@ void KF_DO_first_order::loadROSParams()
     abort();
   }
 
+  if (!observer_nh_.getParam("enable_KRLS_EKF", enable_KRLS_EKF_)) {
+    ROS_ERROR("enable_KRLS_EKF in KF_first_order are not loaded from ros parameter server");
+    abort();
+  }
+
+  if (!observer_nh_.getParam("verbose", verbose_)) {
+    ROS_ERROR("verbose in KF_first_order are not loaded from ros parameter server");
+    abort();
+  }
+
   ROS_INFO("Read KF_first_order parameters successfully");
 
   construct_KF_matrices(
@@ -266,6 +276,15 @@ void KF_DO_first_order::construct_KF_matrices(
   for (int i = 0; i < 3; i++) {
     drag_coefficients_matrix_(i, i) = temporary_drag.at(i);
   }
+
+  // TODO: Replace K_static_ initialization
+  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp;
+  state_covariance_ = F_ * state_covariance_ * F_.transpose();
+  state_covariance_.diagonal() += process_noise_covariance_;
+  tmp = H_ * state_covariance_ * H_.transpose()
+    + measurement_covariance_.asDiagonal().toDenseMatrix();
+  K_static_ = state_covariance_ * H_.transpose() * tmp.inverse();
+
   ROS_INFO("Updated KF_first_order Matrices successfully");
 }
 
@@ -315,6 +334,8 @@ void KF_DO_first_order::DynConfigCallback(
     measurement_covariance_(i + 3) = config.r_velocity;
     measurement_covariance_(i + 6) = config.r_attitude;
   }
+
+  enable_KRLS_EKF_ = config.enable_KRLS_EKF;
 
   construct_KF_matrices(
     temporary_drag, 
@@ -378,6 +399,9 @@ bool KF_DO_first_order::updateEstimator()
 {
   if (initialized_ == false)
     return false;
+    
+  static int counter = 0;
+  ros::WallTime time_before_updating = ros::WallTime::now();
 
   ROS_INFO_ONCE("KF is updated for first time.");
   static ros::Time t_previous = ros::Time::now();
@@ -396,29 +420,28 @@ bool KF_DO_first_order::updateEstimator()
   //check that dt is not so different from default sampling time of 0.01
   if (dt > sampling_time_ * 1.5) {
     dt = sampling_time_ * 1.5;
+    ROS_WARN_STREAM("dt greater than 1.5 * sampling_time_");
   }
 
   if (dt < sampling_time_ * 0.5) {
     dt = sampling_time_ * 0.5;
+    ROS_WARN_STREAM("dt less than 0.5 * sampling_time_");
   }
 
-  state_covariance_ = F_ * state_covariance_ * F_.transpose();
-  state_covariance_.diagonal() += process_noise_covariance_;
 
-  //predict state
+  // systemDynamics calculates predicted state
+  // predicted state = x_est[k+1]
+  // equivalent to x_est[k+1] = A*x_est[k] + B*u[k] + Bd*d_est[k]
   systemDynamics(dt);
 
-  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp = H_ * state_covariance_
-      * H_.transpose() + measurement_covariance_.asDiagonal().toDenseMatrix();
 
-  K_ = state_covariance_ * H_.transpose() * tmp.inverse();
-
-  Eigen::Matrix<double, kStateSize, 1> output_est_error;
-  Eigen::Matrix<double, kMeasurementSize, 1> meas_error;
-  Eigen::Matrix<double, kMeasurementSize, 1> est_output;
-  est_output = H_ * state_;
-  meas_error = (measurements_ - H_ * state_);
-  output_est_error = K_ * (measurements_ - H_ * state_);
+  // Debug matrices
+  // Eigen::Matrix<double, kStateSize, 1> output_est_error;
+  // Eigen::Matrix<double, kMeasurementSize, 1> meas_error;
+  // Eigen::Matrix<double, kMeasurementSize, 1> est_output;
+  // est_output = H_ * state_;
+  // meas_error = (measurements_ - H_ * state_);
+  // output_est_error = K_ * (measurements_ - H_ * state_);
 
   // ROS_INFO_STREAM_THROTTLE(1.0,
   //   "\nH_:\n" << H_ <<
@@ -427,8 +450,28 @@ bool KF_DO_first_order::updateEstimator()
   // );
 
   //Update with measurements
-  state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
+  // predicted_state = A*x_est[k] + B*u[k] + Bd*d_est[k]
+  // Equivalent to x_est[k+1] = predicted_state +  L_x * (y[k] - C*x_est[k])
+  // For KRLS EKF, K_ is dynamic.
+  // For integral disturbance observer, K_ is static
+  Eigen::Matrix<double, kMeasurementSize, kMeasurementSize> tmp;
+  if (enable_KRLS_EKF_) {
+    state_covariance_ = F_ * state_covariance_ * F_.transpose();
+    state_covariance_.diagonal() += process_noise_covariance_;
+    tmp = H_ * state_covariance_ * H_.transpose()
+      + measurement_covariance_.asDiagonal().toDenseMatrix();
+    K_ = state_covariance_ * H_.transpose() * tmp.inverse();
+    state_ = predicted_state_ + K_ * (measurements_ - H_ * state_);
 
+    // if (verbose_) {
+    //   ROS_INFO_STREAM_THROTTLE(1.0, "K_: \n" << K_);
+    // }
+    ROS_INFO_THROTTLE(1.0, "Using KRLS_EKF");
+  } else {
+    // TODO: Implement this
+    ROS_INFO_THROTTLE(1.0, "Using Static KF Gains");
+    state_ = predicted_state_ + K_static_ * (measurements_ - H_ * state_);
+  }
 
   // ROS_INFO_STREAM_THROTTLE(1.0, 
   //   "\nest_output:\n" << est_output <<
@@ -440,8 +483,11 @@ bool KF_DO_first_order::updateEstimator()
   // );
 
   //Update covariance
-  state_covariance_ = (Eigen::Matrix<double, kStateSize, kStateSize>::Identity() - K_ * H_)
-      * state_covariance_;
+
+  if (enable_KRLS_EKF_) {
+    state_covariance_ = (Eigen::Matrix<double, kStateSize, kStateSize>::Identity() - K_ * H_)
+        * state_covariance_;
+  }
 
   //Limits on estimated_disturbances
   if (state_.allFinite() == false) {
@@ -482,6 +528,15 @@ bool KF_DO_first_order::updateEstimator()
 
     observer_state_pub_.publish(msg);
   }
+
+  solve_time_average_ += (ros::WallTime::now() - time_before_updating).toSec() * 1000.0;
+  if (counter > 100) {
+    ROS_INFO_STREAM("KF first order average solve time: " << solve_time_average_ / counter << " ms");
+    solve_time_average_ = 0.0;
+    counter = 0;
+  }
+  counter++;
+
   return true;
 }
 

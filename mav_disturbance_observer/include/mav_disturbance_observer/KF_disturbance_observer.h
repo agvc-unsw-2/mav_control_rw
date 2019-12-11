@@ -143,6 +143,7 @@ class KFDisturbanceObserver
   Eigen::SparseMatrix<double> F_; // System dynamics matrix.
 //  Eigen::Matrix<double, kStateSize, kStateSize> F_; // System dynamics matrix.
   Eigen::Matrix<double, kStateSize, kMeasurementSize> K_; // Kalman gain matrix.
+  Eigen::Matrix<double, kStateSize, kMeasurementSize> K_static_;
   Eigen::SparseMatrix<double> H_; // Measurement matrix.
 //  Eigen::Matrix<double, kMeasurementSize, kStateSize> H_; // Measurement matrix.
 
@@ -164,6 +165,9 @@ class KFDisturbanceObserver
   double yaw_gain_;
 
   double sampling_time_;
+  bool enable_KRLS_EKF_;
+  bool verbose_;
+  double solve_time_average_;
 
   ros::ServiceServer service_;
   ros::Publisher observer_state_pub_;

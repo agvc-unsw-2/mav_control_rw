@@ -39,6 +39,7 @@
 #include <ros/callback_queue.h>
 
 //ros msgs
+#include <std_msgs/Float32.h>
 #include <mav_msgs/RollPitchYawrateThrust.h>
 #include <mav_msgs/eigen_mav_msgs.h>
 #include <mav_msgs/conversions.h>
@@ -49,7 +50,7 @@
 //dynamic reconfiguration
 #include <dynamic_reconfigure/server.h>
 #include <mav_nonlinear_mpc/NonLinearMPCConfig.h>
-#include <mav_nonlinear_mpc/ThrustRescalerConfig.h>
+//#include <mav_nonlinear_mpc/ThrustRescalerConfig.h>
 
 #include <mav_nonlinear_mpc/nonlinear_mpc.h>
 #include <mav_control_interface/position_controller_interface.h>
@@ -66,9 +67,13 @@ class NonLinearModelPredictiveControllerNode : public mav_control_interface::Pos
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
  private:
+  ros::NodeHandle nh_;
+  ros::NodeHandle private_nh_;
+
   NonlinearModelPredictiveControl nonlinear_mpc_;
 
   dynamic_reconfigure::Server<mav_nonlinear_mpc::NonLinearMPCConfig> controller_dyn_config_server_;
+  ros::Publisher thrust_scaling_factor_pub_;
   void ControllerDynConfigCallback(mav_nonlinear_mpc::NonLinearMPCConfig &config, uint32_t level);
 
   virtual std::string getName() const

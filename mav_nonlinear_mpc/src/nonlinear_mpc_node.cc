@@ -39,12 +39,17 @@ namespace mav_control {
 NonLinearModelPredictiveControllerNode::NonLinearModelPredictiveControllerNode(
     const ros::NodeHandle& nh, const ros::NodeHandle& private_nh)
     : nonlinear_mpc_(nh, private_nh),
-      controller_dyn_config_server_(private_nh)
+      controller_dyn_config_server_(private_nh),
+      nh_(nh),
+      private_nh_(private_nh)
 {
   dynamic_reconfigure::Server<mav_nonlinear_mpc::NonLinearMPCConfig>::CallbackType f_controller;
   f_controller = boost::bind(&NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback,
                              this, _1, _2);
   controller_dyn_config_server_.setCallback(f_controller);
+
+  // last boolean enables/disables latching
+  thrust_scaling_factor_pub_ = nh_.advertise<std_msgs::Float32>("thrust_scaling_factor", 0, true);
 }
 
 NonLinearModelPredictiveControllerNode::~NonLinearModelPredictiveControllerNode()
@@ -86,6 +91,8 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   q_attitude << config.q_roll, config.q_pitch;
 
   r_command << config.r_roll, config.r_pitch, config.r_thrust;
+  roll_pitch_yawrate_limits << config.roll_max, config.pitch_max, config.yaw_rate_max;
+  thrust_scaling_factor = config.thrust_scaling_factor;
   
   roll_pitch_yawrate_limits << config.roll_max, config.pitch_max, config.yaw_rate_max;
 
@@ -94,6 +101,11 @@ void NonLinearModelPredictiveControllerNode::ControllerDynConfigCallback(
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_x;
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_y;
   drag_coefficients << config.groups.drag_coefficients.drag_coefficients_z;
+
+  // Publish thrust scaling factor
+  std_msgs::Float32 thrust_scaling_factor_msg;
+  thrust_scaling_factor_msg.data = config.thrust_scaling_factor;
+  thrust_scaling_factor_pub_.publish(thrust_scaling_factor_msg);
 
 	  // Update model parameters
   nonlinear_mpc_.setMass(config.mass);

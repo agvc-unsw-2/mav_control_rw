@@ -156,7 +156,8 @@ class NonlinearModelPredictiveControl
     thrust_scaling_factor_ = thrust_scaling_factor;
     thrust_min_ = thrust_min_normalized_ / thrust_scaling_factor;
     thrust_max_ = thrust_max_normalized_ / thrust_scaling_factor;
-  }
+    ROS_INFO_STREAM_THROTTLE(1.0, "thrust_min_: " << thrust_min_);
+    ROS_INFO_STREAM_THROTTLE(1.0, "thrust_max_: " << thrust_max_);
 
   void setRollPitchYawrateLimits(const Eigen::Vector3d& roll_pitch_yawrate_limits)
   {
@@ -256,7 +257,7 @@ class NonlinearModelPredictiveControl
   // reference queue
   MPCQueue mpc_queue_;
   Vector3dDeque position_ref_, velocity_ref_, acceleration_ref_;
-  std::deque<double> yaw_ref_, yaw_rate_ref_;
+  std::deque<double> yaw_ref_, yaw_rate_ref_, time_from_start_ns_ref_;
 
   // solver matrices
   Eigen::Matrix<double, ACADO_NY, ACADO_NY> W_;
@@ -271,7 +272,6 @@ class NonlinearModelPredictiveControl
 
   void update_KF_DO_first_order_measurements();
   void update_KF_DO_second_order_measurements();
-
 
   enum Disturbance_Observer_Types {
     KF_DO_first_order__,

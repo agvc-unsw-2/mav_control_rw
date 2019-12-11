@@ -37,3 +37,9 @@
 
 # ACADO solver generated files
 #*/solver/acado*
+
+# bag files
+*.bag
+
+# vscode files
+.vscode/*

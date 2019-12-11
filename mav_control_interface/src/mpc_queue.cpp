@@ -29,13 +29,23 @@ MPCQueue::MPCQueue(const ros::NodeHandle& nh, const ros::NodeHandle& private_nh,
       initialized_(false),
       prediction_sampling_time_(0.01),
       queue_dt_(0.01),
-      queue_start_time_(0.0)
+      queue_start_time_(0.0),
+      publish_traj_status_(true),
+      sending_traj_(false)
 {
   trajectory_reference_vis_publisher_ = nh_.advertise<visualization_msgs::Marker>( "reference_trajectory", 0 );
+  finished_traj_publisher_ = nh_.advertise<std_msgs::Bool>( "traj_finished", 1 );
   //publish at 10 hz
   publish_queue_marker_timer_ = nh_.createTimer(ros::Duration(0.1), &MPCQueue::publishQueueMarker, this);
   private_nh_.param<std::string>("reference_frame", reference_frame_id_, "odom");
   minimum_queue_size_ = mpc_queue_size_*std::ceil(prediction_sampling_time_/queue_dt_);
+
+  // Publish initial message
+  std_msgs::Bool msg;
+  msg.data = false;
+  for(int i = 0; i < 5; i += 1) {
+    this->finished_traj_publisher_.publish(msg);
+  }
 }
 
 MPCQueue::~MPCQueue()
@@ -45,12 +55,15 @@ MPCQueue::~MPCQueue()
 
 void MPCQueue::clearQueue()
 {
+  //ROS_WARN_THROTTLE(1.0, "Clearing MPC queue");
+  //ROS_WARN("Clearing MPC queue");
   position_reference_.clear();
   velocity_reference_.clear();
   acceleration_reference_.clear();
   yaw_reference_.clear();
+  yaw_rate_reference_.clear();
+  time_from_start_ns_reference_.clear();
   queue_start_time_ = 0.0;
-
   current_queue_size_ = 0;
 }
 
@@ -121,6 +134,8 @@ void MPCQueue::fillQueueWithPoint(const mav_msgs::EigenTrajectoryPoint& point)
 
 void MPCQueue::insertReference(const mav_msgs::EigenTrajectoryPoint& point)
 {
+  this->sending_traj_ = false;
+  this->publish_traj_status_ = false;
   clearQueue();
   fillQueueWithPoint(point);
   queue_start_time_ = 0.0;
@@ -128,8 +143,14 @@ void MPCQueue::insertReference(const mav_msgs::EigenTrajectoryPoint& point)
 
 void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeque& queue)
 {
-
+  this->sending_traj_ = true;
+  this->publish_traj_status_ = true;
+  clearQueue();
   mav_msgs::EigenTrajectoryPointDeque interpolated_queue;
+  ROS_WARN("===============================");
+  ROS_WARN("RECEIVED REFERENCE TRAJECTORY");
+  ROS_WARN("===============================");
+  clearQueue();
   linearInterpolateTrajectory(queue, interpolated_queue);
   // interpolated queue now has a point for every queue_dt (10ms default)
   {
@@ -139,15 +160,17 @@ void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeq
     double commanded_time_from_start = static_cast<double>(
         interpolated_queue.begin()->time_from_start_ns) * 1e-9;
 
-    //ROS_WARN("Commanded time from start: %f, queue time: %f", commanded_time_from_start, queue_start_time_);
+    ROS_WARN("Commanded time from start: %f, queue start time: %f", commanded_time_from_start, queue_start_time_);
 
     if (commanded_time_from_start <= queue_start_time_ || commanded_time_from_start <= 1e-4) {
       clearQueue();
       queue_start_time_ = commanded_time_from_start;
     } else {
+      // TODO: Fix this code
       // Find where this insertion point belongs and clear the queue out up to that point.
       // This is so that the for loop below can write new references into the queue for the corresponding times
       double queue_end_time = queue_start_time_ + current_queue_size_ * queue_dt_;
+      ROS_WARN("queue_end_time: %f", queue_end_time);
       if (commanded_time_from_start < queue_end_time) {
         size_t start_index = std::round((commanded_time_from_start - queue_start_time_)/queue_dt_);
 
@@ -159,6 +182,7 @@ void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeq
         acceleration_reference_.erase(acceleration_reference_.begin() + start_index, acceleration_reference_.end());
         yaw_reference_.erase(yaw_reference_.begin() + start_index, yaw_reference_.end());
         yaw_rate_reference_.erase(yaw_rate_reference_.begin() + start_index, yaw_rate_reference_.end());
+        time_from_start_ns_reference_.erase(time_from_start_ns_reference_.begin() + start_index, time_from_start_ns_reference_.end());
         current_queue_size_ = start_index; // +/- 1?
 
         //ROS_INFO("Queue start time: %f, queue end time: %f, reference start time: %f, start_index: %d", queue_start_time_, queue_end_time, commanded_time_from_start, start_index);
@@ -174,14 +198,17 @@ void MPCQueue::insertReferenceTrajectory(const mav_msgs::EigenTrajectoryPointDeq
       acceleration_reference_.push_back(it->acceleration_W);
       yaw_reference_.push_back(it->getYaw());
       yaw_rate_reference_.push_back(it->getYawRate());
+      time_from_start_ns_reference_.push_back(it->time_from_start_ns);
+      //ROS_WARN_STREAM("time_from_start_ns_reference_" << it->time_from_start_ns);
       current_queue_size_++;
     }
+    ROS_WARN("After queue processing: Commanded time from start: %f, queue start time: %f", commanded_time_from_start, queue_start_time_);
   }
 
   if (current_queue_size_ < minimum_queue_size_) {
     fillQueueWithPoint(interpolated_queue.back());
   }
-
+  ROS_WARN_STREAM("publish_traj_status_: " << publish_traj_status_);
   //ROS_INFO("Current queue size: %d, current actual size: %d", current_queue_size_, position_reference_.size());
 }
 
@@ -193,6 +220,7 @@ void MPCQueue::pushBackPoint(const mav_msgs::EigenTrajectoryPoint& point)
     acceleration_reference_.push_back(point.acceleration_W);
     yaw_reference_.push_back(point.getYaw());
     yaw_rate_reference_.push_back(point.getYawRate());
+    time_from_start_ns_reference_.push_back(point.time_from_start_ns);
     current_queue_size_++;
   } else {
     ROS_WARN_STREAM_THROTTLE(1, "MPC: maximum queue size reached, discarding last reference point");
@@ -208,14 +236,21 @@ void MPCQueue::shrinkQueueToMinimum()
 
 void MPCQueue::popFrontPoint()
 {
+  std_msgs::Bool msg;
   if (current_queue_size_ > 0) {
-    position_reference_.pop_front();
-    velocity_reference_.pop_front();
-    acceleration_reference_.pop_front();
-    yaw_reference_.pop_front();
-    yaw_rate_reference_.pop_front();
-    queue_start_time_ += queue_dt_;
-    current_queue_size_--;
+    this->position_reference_.pop_front();
+    this->velocity_reference_.pop_front();
+    this->acceleration_reference_.pop_front();
+    this->yaw_reference_.pop_front();
+    this->yaw_rate_reference_.pop_front();
+    this->time_from_start_ns_reference_.pop_front();
+    this->queue_start_time_ += queue_dt_;
+    this->current_queue_size_--;
+    //this->publish_traj_status_ = true;
+    //msg.data = false;
+    //this->finished_traj_publisher_.publish(msg);
+  } else {
+    // This never gets called because updateQueue pushes back the last point until the end
   }
 }
 
@@ -227,6 +262,7 @@ void MPCQueue::popBackPoint()
     acceleration_reference_.pop_back();
     yaw_reference_.pop_back();
     yaw_rate_reference_.pop_back();
+    time_from_start_ns_reference_.pop_back();
     current_queue_size_--;
   }
 }
@@ -240,19 +276,76 @@ void MPCQueue::getLastPoint(mav_msgs::EigenTrajectoryPoint* point)
     (*point).acceleration_W = acceleration_reference_.back();
     (*point).setFromYaw(yaw_reference_.back());
     (*point).setFromYawRate(yaw_rate_reference_.back());
+    (*point).time_from_start_ns = time_from_start_ns_reference_.back();
   }
+}
+
+bool MPCQueue::arePointsSame(mav_msgs::EigenTrajectoryPoint& point1, mav_msgs::EigenTrajectoryPoint& point2) {
+  bool points_same = false;
+  if(point1.position_W.isApprox(point2.position_W))
+    if(point1.velocity_W.isApprox(point2.velocity_W))
+      if (point1.acceleration_W.isApprox(point2.acceleration_W))
+        if (point1.orientation_W_B.isApprox(point2.orientation_W_B))
+          if (point1.angular_velocity_W.isApprox(point2.angular_velocity_W))
+            points_same = true;
+    //if(point1->)
+  return points_same;
+}
+
+bool MPCQueue::allPointsSameInQueue() {
+  bool all_same = true;
+  mav_msgs::EigenTrajectoryPoint first_point;
+  mav_msgs::EigenTrajectoryPoint compare_point;
+
+  first_point.position_W = position_reference_.front();
+  first_point.velocity_W = velocity_reference_.front();
+  first_point.acceleration_W = acceleration_reference_.front();
+  first_point.setFromYaw(yaw_reference_.front());
+  first_point.setFromYawRate(yaw_rate_reference_.front());
+  first_point.time_from_start_ns = time_from_start_ns_reference_.front();
+
+  for(int i = 0; i < minimum_queue_size_; i += 1) {
+    compare_point.position_W = position_reference_.at(i);
+    compare_point.velocity_W = velocity_reference_.at(i);
+    compare_point.acceleration_W = acceleration_reference_.at(i);
+    compare_point.setFromYaw(yaw_reference_.at(i));
+    compare_point.setFromYawRate(yaw_rate_reference_.at(i));
+    //compare_point.time_from_start_ns = time_from_start_ns_reference_.at(i);
+    if(arePointsSame(first_point, compare_point) == false) {
+      all_same = false;
+      break;
+    }
+  }
+  return all_same;
 }
 
 void MPCQueue::updateQueue()
 {
+
+  ROS_WARN_STREAM_THROTTLE(1.0, "Updating queue. publish_traj_status_: " << publish_traj_status_);
   if (initialized_) {
     popFrontPoint();
 
     mav_msgs::EigenTrajectoryPoint point;
+    std_msgs::Bool msg;
+    msg.data = false;
     getLastPoint(&point);
 
-    while (current_queue_size_ < minimum_queue_size_)
+    while (current_queue_size_ < minimum_queue_size_) {
       pushBackPoint(point);
+    }
+    if (sending_traj_) {
+      if (allPointsSameInQueue()) {
+        // send msg    
+        msg.data = true;
+        if(this->publish_traj_status_ == true) {
+            this->finished_traj_publisher_.publish(msg);
+        }
+        this->publish_traj_status_ = false;
+      } else {
+        // do nithing
+      }
+    }
   }
 }
 
@@ -291,13 +384,14 @@ void MPCQueue::printQueue()
 
 void MPCQueue::getQueue(Vector3dDeque& position_reference, Vector3dDeque& velocity_reference,
                         Vector3dDeque& acceleration_reference, std::deque<double>& yaw_reference,
-                        std::deque<double>& yaw_rate_reference)
+                        std::deque<double>& yaw_rate_reference, std::deque<double>& time_from_start_ns_reference)
 {
 	position_reference.clear();
 	velocity_reference.clear();
 	acceleration_reference.clear();
 	yaw_reference.clear();
 	yaw_rate_reference.clear();
+  time_from_start_ns_reference.clear();
 
   int N = std::ceil(prediction_sampling_time_/queue_dt_);
   for(int i=0; i<N*std::floor(current_queue_size_/N); i=i+N){
@@ -306,6 +400,8 @@ void MPCQueue::getQueue(Vector3dDeque& position_reference, Vector3dDeque& veloci
 	  acceleration_reference.push_back(acceleration_reference_.at(i));
 	  yaw_reference.push_back(yaw_reference_.at(i));
 	  yaw_rate_reference.push_back(yaw_rate_reference_.at(i));
+    time_from_start_ns_reference.push_back(time_from_start_ns_reference_.at(i));
+    //ROS_WARN_STREAM("getQueue time_from_start_ns_reference: " << time_from_start_ns_reference_.at(i));
   }
 }
 

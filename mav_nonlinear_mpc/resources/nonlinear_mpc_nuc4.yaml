@@ -1,0 +1,103 @@
+#==================================================================================================================
+#
+# Project:	Nonlinear MPC for Hexacopter trajectory tracking.
+#
+# function:	NMPC Position controller parameters.
+#
+# Author:	Mina Kamel	mina.kamel@ethz.ch
+#
+# Generated:	20-Dec-2015 02:37:59
+#
+#==================================================================================================================
+
+#1st order dynamics
+#pitch fit percentage: 79.204230%
+#roll fit percentage: 78.777678%
+
+## Controller Parameters:
+# mass: 0.063705 # magic number for scaling thrust between 0 and 1.
+# RC is linear between 0 to 0.5 for negative axis of joystick
+# RC is linear between 0.5 to 1 for positive axis of joystick
+# WARNING:
+# In auto flight mode, thrust is approx mass * 9.8.
+# Therefore, if you are using mass = 0.063705, you need to make sure the drone won't fly given a thrust of
+# 0.62 ish
+
+#===========================================
+# Recommended approach:
+#===========================================
+# Determine "mass" thrust scaling factor such that idle (max thrust / 2) is hovering.
+# NOTE: Need to determine behaviour of drone at 0 thrust.
+# px4 subscribes to roll pitch yawrate thrust
+# mpc doesn't subscribe to odometry of quadcopter to prevent weird behaviour with switching to altitude hold
+# Record roll pitch yawrate thrust and actual roll pitch yawrate thrust
+
+#yaw_gain: 1.000000
+
+# New sysID
+mass: 1.000000
+linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+yaw_gain: 1.000000
+
+#roll_time_constant: 0.110846
+#roll_gain: 0.788517
+#pitch_time_constant: 0.095241
+#pitch_gain: 0.576213
+#linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+#yaw_gain: 1.000000
+
+# Fixed MATLAB Script
+
+# Delay compensated
+roll_time_constant: 0.047596
+roll_gain: 0.658635
+pitch_time_constant: 0.057590
+pitch_gain: 0.945911
+
+# Slow params
+# roll_time_constant: 0.195256
+# roll_gain: 1.042753
+# pitch_time_constant: 0.185942
+# pitch_gain: 1.066260
+
+# dynamic config default values:
+q_x : 80
+q_y : 80
+q_z : 120
+
+q_vx : 80
+q_vy : 80
+q_vz : 100
+
+q_roll : 10
+q_pitch: 10
+
+r_roll  : 50
+r_pitch : 50
+r_thrust : 1
+
+roll_max: deg(25.0)
+pitch_max: deg(25.0)
+yaw_rate_max: deg(25.0)
+thrust_scaling_factor: 0.0582
+thrust_min_normalized: 0.05
+thrust_max_normalized: 1.0
+
+K_yaw: 1.8
+
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
+position_error_integration_limit: 2
+antiwindup_ball: 0.5
+
+enable_disturbance_observer : true
+enable_integrator : false
+
+sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
+prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s prediction time
+
+#enum Disturbance_Observer_Types {
+#  KF_DO_first_order__, // 0
+#  KF_DO_second_order__, //1
+#};
+disturbance_observer_type: 1

@@ -1,19 +1,36 @@
 For mbzirc2019 unsw members:
 
-Replace kalibr/catkin_simple with catkin/catkin_simple by deleting kalibr/catkin_simple and cloning catkin/catkin_simple into kalibr/
+- Follow the necessary steps in the mbzirc2019 repo wiki
 
-(git clone https://github.com/catkin/catkin_simple.git)
+- Go to the mbzirc2019 repo and switch to the following branch using the following instruction
 
+$ git checkout feature/mav_control_rw_vrep_intergration_v2
 
-also clone mav_comm and eigen_catkin
-git clone https://github.com/ethz-asl/mav_comm.git
-git clone https://github.com/ethz-asl/eigen_catkin.git
+- Go to the following directory using the below command
 
-also clone this repo
-git clone https://github.com/agvc-unsw-2/mav_control_rw
+$ cd ~/catkin_ws/src/mbzirc2019/mbz_utils
 
-Also install dependencies
-sudo apt-get install liblapacke-dev
-sudo apt install libopenblas-dev
-(if you still have build problems: sudo apt install libatlas-base-dev)
+- Run the following scripts using the below commands
+
+$ ./pull_required_repos.sh
+
+$ ./install_deps.sh
+
+- FOR SIMULATION: Follow the instructions in the following file: ~/catkin_ws/src/mbzirc2019/simulation/installing_vrep_readme.md
+
+- Go to the following directory using the below command
+
+$ cd ~/catkin_ws/src/mav_control_rw
+
+- FOR SIMULATION: Switch branches in this repo to feature/simulation using the following command
+
+$ git checkout feature/simulation
+
+BEFORE BUILDING:
+
+- Delete the kalibr repo, or replace kalibr/catkin_simple with catkin/catkin_simple by deleting kalibr/catkin_simple and running the following command(s)
+
+$ catkin clean kalibr
+
+$ catkin clean catkin_simple
 

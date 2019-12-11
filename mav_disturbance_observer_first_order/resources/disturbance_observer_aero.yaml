@@ -27,6 +27,10 @@ KF_observer_first_order:
   omega_limit :  [ 3.000000 ,3.000000 ,2.000000]
   external_forces_limit :  [ 5.000000 ,5.000000 ,3.0000000]      #m/s^2
   external_moments_limit :  [ 20.000000 ,20.000000 ,20.000000]  #rad/s^2
+  drag_coefficients: [0.010000, 0.010000, 0.000000]
+  
+  enable_KRLS_EKF: true
+  verbose: true
 
   roll_tau: 0.126858
   roll_gain: 0.904591
@@ -47,7 +51,7 @@ KF_observer_first_order:
   #yaw_damping : 0.950000
   #yaw_gain : 1.000000
 
-  drag_coefficients: [0.010000, 0.010000, 0.000000]
+  
   # roll_gain: 0.784733
   # roll_damping: 0.718606
   # roll_omega: 13.409113

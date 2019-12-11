@@ -25,7 +25,8 @@ RcInterfaceAci::RcInterfaceAci(const ros::NodeHandle& nh)
       nh_(nh),
       is_on_(false)
 {
-  rc_sub_ = nh_.subscribe("rc", 1, &RcInterfaceAci::rcCallback, this);
+  rc_sub_ = nh_.subscribe("rc", 1, &RcInterfaceAci::rcCallback, this, 
+    ros::TransportHints().tcpNoDelay());
 }
 
 void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
@@ -39,7 +40,7 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
     last_data_.left_up_down = msg->axes[2];
     //last_data_.left_side = -msg->axes[3];
     last_data_.left_side = msg->axes[3]; // reverse yaw
-
+    /*
     if (msg->axes[5] > 0.0)
     {
       last_data_.control_interface = RcData::ControlInterface::OFF;
@@ -49,12 +50,13 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
     }
     else
     {
+      */
       last_data_.control_interface = RcData::ControlInterface::ON;
       last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
 
       //ROS_WARN_STREAM_THROTTLE(1.0, "CONTROL INTERFACE OFF");
       ROS_WARN_STREAM_THROTTLE(5.0, "POSITION OFFBOARD MODE");
-    }
+    //}
 
     /*
     if (msg->axes[4] <= -0.5)

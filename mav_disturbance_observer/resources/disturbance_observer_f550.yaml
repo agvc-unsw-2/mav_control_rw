@@ -36,12 +36,30 @@ KF_observer_second_order:
 
   drag_coefficients: [0.00000, 0.00000, 0.000000]
 
+  # September params
   roll_gain: 0.971658
   roll_damping: 1.000000
   roll_omega: 16.126117
   pitch_gain: 0.991565
   pitch_damping: 1.000000
   pitch_omega: 15.060208
+ 
+  # Dec delay compensated params 
+  roll_gain: 0.970147
+  roll_damping: 1.000000
+  roll_omega: 14.4006
+  pitch_gain: 0.982851
+  pitch_damping: 1.000000
+  pitch_omega: 14.448604
+
+  # December full manual sysid non-delay-compensated params
+  #roll_gain: 0.985043
+  #roll_damping: 0.709544
+  #roll_omega: 8.962209
+  #pitch_gain: 0.995722
+  #pitch_damping: 0.704172
+  #pitch_omega: 9.012600
+
   yaw_gain: 1.000000
   yaw_damping: 0.950000
   yaw_omega: 5.000000

@@ -35,13 +35,27 @@
 #yaw_gain: 1.000000
 
 mass: 1.000000
-
-roll_time_constant: 0.085605
-roll_gain: 0.983039
-pitch_time_constant: 0.084477
-pitch_gain: 0.999616
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
+
+# September Params
+#roll_time_constant: 0.085605
+#roll_gain: 0.983039
+#pitch_time_constant: 0.084477
+#pitch_gain: 0.999616
+
+# Dec delay-compensated params
+
+roll_time_constant: 0.084891
+roll_gain: 0.990807
+pitch_time_constant: 0.084217
+pitch_gain: 0.997689
+
+# December full manual non-delay-compensated sysid params
+#roll_time_constant: 0.221482
+#roll_gain: 1.140415
+#pitch_time_constant: 0.207139
+#pitch_gain: 1.090816
 
 # dynamic config default values:
 q_x : 80

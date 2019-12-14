@@ -25,7 +25,8 @@ RcInterfaceAci::RcInterfaceAci(const ros::NodeHandle& nh)
       nh_(nh),
       is_on_(false)
 {
-  rc_sub_ = nh_.subscribe("rc", 1, &RcInterfaceAci::rcCallback, this);
+  rc_sub_ = nh_.subscribe("rc", 1, &RcInterfaceAci::rcCallback, this, 
+    ros::TransportHints().tcpNoDelay());
 }
 
 void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
@@ -34,8 +35,8 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
   last_data_.timestamp = msg->header.stamp;
 
   if (is_on_) {
-    last_data_.right_up_down = msg->axes[0];
-    last_data_.right_side = -msg->axes[1];
+    last_data_.right_up_down = -msg->axes[0];
+    last_data_.right_side = msg->axes[1];
     last_data_.left_up_down = msg->axes[2];
     //last_data_.left_side = -msg->axes[3];
     last_data_.left_side = msg->axes[3]; // reverse yaw
@@ -109,6 +110,8 @@ bool RcInterfaceAci::isActive() const
 {
   // DEBUG PURPOSES:
   return false;
+  // Leave on and determine if manual through axes[5]
+  //return true;
 
   /*
   if (!is_on_)

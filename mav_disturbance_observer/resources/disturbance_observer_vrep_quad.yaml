@@ -92,7 +92,6 @@ KF_observer_second_order:
   # pitch_damping: 0.370841
   # pitch_omega: 14.633268
 
-#########################
   yaw_gain: 1.000000
   yaw_damping: 0.950000
   yaw_omega: 5.000000

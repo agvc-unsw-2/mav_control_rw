@@ -73,9 +73,7 @@ class NonLinearModelPredictiveControllerNode : public mav_control_interface::Pos
   NonlinearModelPredictiveControl nonlinear_mpc_;
 
   dynamic_reconfigure::Server<mav_nonlinear_mpc::NonLinearMPCConfig> controller_dyn_config_server_;
-
   ros::Publisher thrust_scaling_factor_pub_;
-
   void ControllerDynConfigCallback(mav_nonlinear_mpc::NonLinearMPCConfig &config, uint32_t level);
 
   virtual std::string getName() const

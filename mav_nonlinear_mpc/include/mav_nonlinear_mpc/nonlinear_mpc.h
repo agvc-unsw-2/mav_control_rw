@@ -159,7 +159,7 @@ class NonlinearModelPredictiveControl
     ROS_INFO_STREAM_THROTTLE(1.0, "thrust_min_: " << thrust_min_);
     ROS_INFO_STREAM_THROTTLE(1.0, "thrust_max_: " << thrust_max_);
   }
-
+  
   void setRollPitchYawrateLimits(const Eigen::Vector3d& roll_pitch_yawrate_limits)
   {
     //roll_max, pitch_max, yaw_rate_max, thrust_min and thrust_max

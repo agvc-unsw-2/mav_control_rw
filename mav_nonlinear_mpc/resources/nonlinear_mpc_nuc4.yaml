@@ -34,28 +34,31 @@
 
 #yaw_gain: 1.000000
 
+# New sysID
 mass: 1.000000
 linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
 yaw_gain: 1.000000
 
-# September Params
-#roll_time_constant: 0.085605
-#roll_gain: 0.983039
-#pitch_time_constant: 0.084477
-#pitch_gain: 0.999616
+#roll_time_constant: 0.110846
+#roll_gain: 0.788517
+#pitch_time_constant: 0.095241
+#pitch_gain: 0.576213
+#linear_drag_coefficients: [0.010000, 0.010000, 0.000000]
+#yaw_gain: 1.000000
 
-# Dec delay-compensated params
+# Fixed MATLAB Script
 
-roll_time_constant: 0.084891
-roll_gain: 0.990807
-pitch_time_constant: 0.084217
-pitch_gain: 0.997689
+# Delay compensated
+roll_time_constant: 0.047596
+roll_gain: 0.658635
+pitch_time_constant: 0.057590
+pitch_gain: 0.945911
 
-# December full manual non-delay-compensated sysid params
-#roll_time_constant: 0.221482
-#roll_gain: 1.140415
-#pitch_time_constant: 0.207139
-#pitch_gain: 1.090816
+# Slow params
+# roll_time_constant: 0.195256
+# roll_gain: 1.042753
+# pitch_time_constant: 0.185942
+# pitch_gain: 1.066260
 
 # dynamic config default values:
 q_x : 80
@@ -76,20 +79,18 @@ r_thrust : 1
 roll_max: deg(25.0)
 pitch_max: deg(25.0)
 yaw_rate_max: deg(25.0)
-
-thrust_scaling_factor: 0.05
-thrust_min_normalized: 0.05 # Normalised
-thrust_max_normalized: 1.0 # Normalised
+thrust_scaling_factor: 0.0582
+thrust_min_normalized: 0.05
+thrust_max_normalized: 1.0
 
 K_yaw: 1.8
 
-Ki_xy: 0.2
-#Ki_z: 0.3
-Ki_altitude: 0.3 #Replace Ki_z (incorrectly labelled)
+Ki_xy: 0.2 # default 0.2
+Ki_altitude: 0.3 # default 0.3
 position_error_integration_limit: 2
-antiwindup_ball: 0.4
+antiwindup_ball: 0.5
 
-enable_disturbance_observer : false
+enable_disturbance_observer : true
 enable_integrator : false
 
 sampling_time: 0.01    #IMPORTANT: set this equal to the rate of odometry msg
@@ -99,5 +100,4 @@ prediction_sampling_time: 0.1 # with kPredictionHorizonSteps = 20, this gives 2s
 #  KF_DO_first_order__, // 0
 #  KF_DO_second_order__, //1
 #};
-
 disturbance_observer_type: 1

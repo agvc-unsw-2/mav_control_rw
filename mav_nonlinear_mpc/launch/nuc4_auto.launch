@@ -1,7 +1,7 @@
 <launch>
-  <arg name="mav_name" default="aero" />
+  <arg name="mav_name" default="nuc4" />
   <arg name="namespace" default="$(arg mav_name)"/>
-  <arg name="uav_num" default="1"/>
+  <arg name="uav_num" default=""/>
   <arg name="verbose" default="true"/>
   <arg name="thrust_scaling_factor" default="0.0582"/>
   <!-- <param name="use_sim_time" value="true" /> -->
@@ -47,8 +47,8 @@
       args="$(arg mav_name) $(arg uav_num) $(arg thrust_scaling_factor)"
       output="screen"
       type="attitude_cmd_rescale_auto.py"/> -->
+  </group>
   <!-- cpp thrust scaler -->
     <node pkg="mav_control_interface" name="attitude_cmd_rescale_cpp" type="thrust_rescaler_node"
       args="$(arg thrust_scaling_factor)" respawn="true" clear_params="true" output="screen"/>
-  </group>
 </launch>

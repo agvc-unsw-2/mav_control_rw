@@ -7,8 +7,10 @@ ThrustRescaler::ThrustRescaler(const ros::NodeHandle& nh, const ros::NodeHandle&
       thrust_scaling_factor_(thrust_scaling_factor)
 {
     ROS_WARN_STREAM("ThrustRescaler initialising with thrust_scaling_factor_: " << thrust_scaling_factor);
-    chatter_sub_ = nh_.subscribe("/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N", 1, &ThrustRescaler::republishCb, this);
-    thrust_scaling_factor_sub_ = nh_.subscribe("thrust_scaling_factor", 1, &ThrustRescaler::updateScalingFactorCb, this);
+    chatter_sub_ = nh_.subscribe("/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N", 1, 
+        &ThrustRescaler::republishCb, this, ros::TransportHints().tcpNoDelay());
+    thrust_scaling_factor_sub_ = nh_.subscribe("thrust_scaling_factor", 1, 
+        &ThrustRescaler::updateScalingFactorCb, this, ros::TransportHints().tcpNoDelay());
     chatter_pub_ = nh_.advertise<mav_msgs::RollPitchYawrateThrust>("/mavros/setpoint_raw/roll_pitch_yawrate_thrust", 1);
 }
 

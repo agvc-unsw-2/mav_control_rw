@@ -24,15 +24,18 @@ KF_observer_first_order:
   #limits
   external_forces_limit:  [ 5.000000, 5.000000, 3.0000000 ]      #m/s^2
 
-  # WARNING: PARAMETERS COPIED FROM VREP_HEX. NEEDS TO BE CALIBRATED
-  roll_tau: 0.105720
-  roll_gain: 1.090762
-  pitch_tau: 0.104006
-  pitch_gain: 1.050036
-  yaw_gain: 1.000000
-  verbose: true
+  # Dec delay-compensated params
+  roll_tau: 0.084891
+  roll_gain: 0.990807
+  pitch_tau: 0.084217
+  pitch_gain: 0.997689
+
+  # December full manual sysid non-delay-compensated params
+  #roll_tau: 0.221482
+  #roll_gain: 1.140415
+  #pitch_tau: 0.207139
+  #pitch_gain: 1.090816
   
   drag_coefficients: [0.010000, 0.010000, 0.000000]
-  
   enable_KRLS_EKF: true
-  #drag_coefficients: [0.00000, 0.00000, 0.000000]
+  verbose: true

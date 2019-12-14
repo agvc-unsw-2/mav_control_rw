@@ -282,12 +282,13 @@ void MPCQueue::getLastPoint(mav_msgs::EigenTrajectoryPoint* point)
 
 bool MPCQueue::arePointsSame(mav_msgs::EigenTrajectoryPoint& point1, mav_msgs::EigenTrajectoryPoint& point2) {
   bool points_same = false;
-  if(point1.position_W.isApprox(point2.position_W))
-    if(point1.velocity_W.isApprox(point2.velocity_W))
-      if (point1.acceleration_W.isApprox(point2.acceleration_W))
-        if (point1.orientation_W_B.isApprox(point2.orientation_W_B))
-          if (point1.angular_velocity_W.isApprox(point2.angular_velocity_W))
-            points_same = true;
+  // if(point1.position_W.isApprox(point2.position_W))
+  //   if(point1.velocity_W.isApprox(point2.velocity_W))
+  //     if (point1.acceleration_W.isApprox(point2.acceleration_W))
+  //       if (point1.orientation_W_B.isApprox(point2.orientation_W_B))
+  //         if (point1.angular_velocity_W.isApprox(point2.angular_velocity_W))
+            if (point1.time_from_start_ns == point2.time_from_start_ns)
+              points_same = true;
     //if(point1->)
   return points_same;
 }
@@ -297,20 +298,20 @@ bool MPCQueue::allPointsSameInQueue() {
   mav_msgs::EigenTrajectoryPoint first_point;
   mav_msgs::EigenTrajectoryPoint compare_point;
 
-  first_point.position_W = position_reference_.front();
-  first_point.velocity_W = velocity_reference_.front();
-  first_point.acceleration_W = acceleration_reference_.front();
-  first_point.setFromYaw(yaw_reference_.front());
-  first_point.setFromYawRate(yaw_rate_reference_.front());
+  // first_point.position_W = position_reference_.front();
+  // first_point.velocity_W = velocity_reference_.front();
+  // first_point.acceleration_W = acceleration_reference_.front();
+  // first_point.setFromYaw(yaw_reference_.front());
+  // first_point.setFromYawRate(yaw_rate_reference_.front());
   first_point.time_from_start_ns = time_from_start_ns_reference_.front();
 
   for(int i = 0; i < minimum_queue_size_; i += 1) {
-    compare_point.position_W = position_reference_.at(i);
-    compare_point.velocity_W = velocity_reference_.at(i);
-    compare_point.acceleration_W = acceleration_reference_.at(i);
-    compare_point.setFromYaw(yaw_reference_.at(i));
-    compare_point.setFromYawRate(yaw_rate_reference_.at(i));
-    //compare_point.time_from_start_ns = time_from_start_ns_reference_.at(i);
+    // compare_point.position_W = position_reference_.at(i);
+    // compare_point.velocity_W = velocity_reference_.at(i);
+    // compare_point.acceleration_W = acceleration_reference_.at(i);
+    // compare_point.setFromYaw(yaw_reference_.at(i));
+    // compare_point.setFromYawRate(yaw_rate_reference_.at(i));
+    compare_point.time_from_start_ns = time_from_start_ns_reference_.at(i);
     if(arePointsSame(first_point, compare_point) == false) {
       all_same = false;
       break;

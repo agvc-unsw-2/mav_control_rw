@@ -22,8 +22,8 @@ class DelayCommand
         ros::NodeHandle nh_;
         ros::NodeHandle private_nh_;
 
-        ros::Subscriber chatter_sub_;
-        ros::Publisher chatter_pub_;
+        ros::Subscriber cmd_sub_;
+        ros::Publisher cmd_pub_;
 
         std::deque<uint> seq_ref_;
         std::deque<double> roll_ref_;

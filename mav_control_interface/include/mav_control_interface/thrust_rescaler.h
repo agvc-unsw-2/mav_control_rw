@@ -20,9 +20,9 @@ class ThrustRescaler
         ros::NodeHandle nh_;
         ros::NodeHandle private_nh_;
 
-        ros::Subscriber chatter_sub_;
+        ros::Subscriber cmd_sub_;
         ros::Subscriber thrust_scaling_factor_sub_;
-        ros::Publisher chatter_pub_;
+        ros::Publisher cmd_pub_;
         double thrust_scaling_factor_;
 };
 

@@ -37,7 +37,11 @@
     <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_sim.py"/>
     <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/> -->
     <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_real" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_real.py"/> -->
-    </group>
+  
+    <!-- PositionYawController -->
+    <node pkg="mav_control_interface" name="position_yaw_controller" type="position_yaw_controller"
+      args="$(arg position_yaw_controller_use_degrees)" respawn="true" clear_params="true" output="screen"/>
+  </group>
 </launch>
 
 

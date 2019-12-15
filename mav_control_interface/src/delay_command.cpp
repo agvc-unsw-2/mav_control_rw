@@ -12,8 +12,8 @@ DelayCommand::DelayCommand(const ros::NodeHandle& nh, const ros::NodeHandle& pri
     yaw_rate_ref_.clear();
     thrust_z_ref_.clear();
     elems_to_delay_ = elems_to_delay;
-    chatter_sub_ = nh_.subscribe("/mavros/setpoint_raw/roll_pitch_yawrate_thrust", 1, &DelayCommand::publishCb, this);
-    chatter_pub_ = nh_.advertise<mav_msgs::RollPitchYawrateThrust>("/mavros/setpoint_raw/roll_pitch_yawrate_thrust_delayed", 1);
+    cmd_sub_ = nh_.subscribe("/mavros/setpoint_raw/roll_pitch_yawrate_thrust", 1, &DelayCommand::publishCb, this);
+    cmd_pub_ = nh_.advertise<mav_msgs::RollPitchYawrateThrust>("/mavros/setpoint_raw/roll_pitch_yawrate_thrust_delayed", 1);
 }
 
 DelayCommand::~DelayCommand()
@@ -41,7 +41,7 @@ void DelayCommand::publishCb(const mav_msgs::RollPitchYawrateThrust::Ptr& msg_in
         yaw_rate_ref_.pop_front();
         thrust_z_ref_.pop_front();
         current_queue_size_--;
-        chatter_pub_.publish((*msg_in));
+        cmd_pub_.publish((*msg_in));
     }
     //ROS_INFO_STREAM("current_queue_size: " << current_queue_size_);
 }

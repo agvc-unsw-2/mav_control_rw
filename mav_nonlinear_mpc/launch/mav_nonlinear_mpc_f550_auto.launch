@@ -4,6 +4,7 @@
   <arg name="uav_num" default="2"/>
   <arg name="verbose" default="true"/>
   <arg name="thrust_scaling_factor" default="0.05"/>
+  <arg name="position_yaw_controller_use_degrees" default="true"/>
   <!-- <param name="use_sim_time" value="true" /> -->
 
   <!-- From sim -->
@@ -58,5 +59,7 @@
     <!-- cpp thrust scaler -->
     <node pkg="mav_control_interface" name="attitude_cmd_rescale_cpp" type="thrust_rescaler_node"
       args="$(arg thrust_scaling_factor)" respawn="true" clear_params="true" output="screen"/>
-  </group
+    <node pkg="mav_control_interface" name="position_yaw_controller" type="position_yaw_controller"
+      args="$(arg position_yaw_controller_use_degrees)" respawn="true" clear_params="true" output="screen"/>
+  </group>
 </launch>

@@ -3,6 +3,7 @@
   <arg name="namespace" default="$(arg mav_name)"/>
   <arg name="uav_num" default="1"/>
   <param name="use_sim_time" value="true" />
+  <arg name="position_yaw_controller_use_degrees" default="true"/>
 
   <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/$(arg namespace)$(arg uav_num)/joy_remapped" />
 
@@ -38,7 +39,11 @@
     <node pkg="mav_nonlinear_mpc" name="vrep_publish_cam_info" args="$(arg mav_name) $(arg uav_num)" output="screen" type="vrep_publish_cam_info.py"/>
     <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/> -->
     <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_real" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_real.py"/> -->
-    </group>
+    
+    <!-- PositionYawController -->
+    <node pkg="mav_control_interface" name="position_yaw_controller" type="position_yaw_controller"
+      args="$(arg position_yaw_controller_use_degrees)" respawn="true" clear_params="true" output="screen"/>
+  </group>
 </launch>
 
 

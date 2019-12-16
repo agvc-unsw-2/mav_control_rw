@@ -4,7 +4,8 @@
   <arg name="uav_num" default="1"/>
   <arg name="verbose" default="true"/>
   <arg name="thrust_scaling_factor" default="0.0582"/>
-  <arg name="position_yaw_controller_use_degrees" default="true"/>
+  <arg name="delay_time" default="0.1"/>
+  <arg name="command_freq" default="100"/>
   <!-- <param name="use_sim_time" value="true" /> -->
 
   <!-- From sim -->
@@ -48,11 +49,14 @@
       args="$(arg mav_name) $(arg uav_num) $(arg thrust_scaling_factor)"
       output="screen"
       type="attitude_cmd_rescale_auto.py"/> -->
-  <!-- cpp thrust scaler -->
     <node pkg="mav_control_interface" name="attitude_cmd_rescale_cpp" type="thrust_rescaler_node"
-      args="$(arg thrust_scaling_factor)" respawn="true" clear_params="true" output="screen"/>
-    <!-- Allows publishing to /namespace/command/position_yaw instead -->
-    <node pkg="mav_control_interface" name="position_yaw_controller" type="position_yaw_controller"
-      args="$(arg position_yaw_controller_use_degrees)" respawn="true" clear_params="true" output="screen"/>
+      args="$(arg thrust_scaling_factor)" respawn="true" clear_params="true" output="screen">
+      <remap from="/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N" to="/mavros/setpoint_raw/roll_pitch_yawrate_thrust_delayed"/>
+    </node>
+    <node pkg="mav_control_interface" name="rpyt_command_delayer" type="delay_command_node"
+      args="$(arg command_freq) $(arg delay_time)" respawn="true" clear_params="true" output="screen">
+      <remap from="/mavros/setpoint_raw/roll_pitch_yawrate_thrust" to="/mavros/setpoint_raw/roll_pitch_yawrate_thrust_N"/>
+    </node>
   </group>
+  <!-- cpp thrust scaler -->
 </launch>

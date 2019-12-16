@@ -3,7 +3,17 @@ project(mav_control_interface)
 
 find_package(catkin REQUIRED)
 find_package(catkin_simple REQUIRED)
+
+#find_package(catkin REQUIRED COMPONENTS
+#  message_generation
+#)
+
 catkin_simple()
+
+#catkin_package(
+#  CATKIN_DEPENDS message_runtime
+#)
+
 
 add_definitions(-std=c++11)
 set(CMAKE_BUILD_TYPE Release)
@@ -33,6 +43,9 @@ target_link_libraries(thrust_rescaler_node ${PROJECT_NAME})
 
 cs_add_executable(delay_command_node src/delay_command.cpp)
 target_link_libraries(delay_command_node ${PROJECT_NAME})
+
+cs_add_executable(position_yaw_controller src/position_yaw_controller.cpp)
+target_link_libraries(position_yaw_controller ${PROJECT_NAME})
 
 cs_install()
 cs_export()

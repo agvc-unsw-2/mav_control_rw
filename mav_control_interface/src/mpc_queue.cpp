@@ -335,6 +335,19 @@ void MPCQueue::updateQueue()
     while (current_queue_size_ < minimum_queue_size_) {
       pushBackPoint(point);
     }
+    static int counter = 0;
+    if (counter > 100) {
+      counter = 0;
+      if (allPointsSameInQueue()) {
+        // send msg    
+        msg.data = true;
+        this->finished_traj_publisher_.publish(msg);
+        ROS_INFO_STREAM("All points same in queue. Publishing timeout traj_finished");
+      }
+    }
+    else {
+      counter += 1;
+    }
     if (sending_traj_) {
       if (allPointsSameInQueue()) {
         // send msg    

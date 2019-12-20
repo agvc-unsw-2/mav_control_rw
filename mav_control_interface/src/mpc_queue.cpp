@@ -336,7 +336,7 @@ void MPCQueue::updateQueue()
       pushBackPoint(point);
     }
     static int counter = 0;
-    if (counter > 100) {
+    if (counter > 500) {
       counter = 0;
       if (allPointsSameInQueue()) {
         // send msg    

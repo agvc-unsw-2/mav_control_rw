@@ -16,7 +16,7 @@ def exit_handler(signal, frame):
 
 def poseXY(x, y, heading=0):
         point = PoseStamped()
-        point.header.frame_id = "world"
+        point.header.frame_id = "map"
         point.header.stamp = rospy.Time.now()
 
         point.pose.position.x = x
@@ -33,7 +33,7 @@ def poseXY(x, y, heading=0):
 
 def singlePointPath(x, y, heading):
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
 
     point = poseXY(x, y, heading)
@@ -45,7 +45,7 @@ def linePath(length, orientation, size, rotations=0):
     orientation = orientation*180.0 / 3.14159
 
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
     
     start = 0
@@ -62,7 +62,7 @@ def linePath(length, orientation, size, rotations=0):
 
 def squarePath(cx, cy, size):
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
     for i in np.arange(0, 2.0*3.14159, 3.14159/2.0):
         x = cx + math.cos(i)*size / 2.0
@@ -76,7 +76,7 @@ def squarePath(cx, cy, size):
 
 def circlePath(radius, size, revolutions=0):
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
 
     circleTheta = np.linspace(0, 2*3.14159, size)
@@ -94,7 +94,7 @@ def circlePath(radius, size, revolutions=0):
 
 def randPath(limits, numPts):
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
 
     for i in range(0, numPts):
@@ -110,7 +110,7 @@ def randPath(limits, numPts):
 
 def stretchySine(length, amplitude, startFreq, stopFreq, numPts):
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
 
     for i in np.linspace(1.0, 0.0, numPts):
@@ -125,7 +125,7 @@ def stretchySine(length, amplitude, startFreq, stopFreq, numPts):
 
 def starPath(inner, outer, numPts):
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
 
     for n, theta in enumerate(np.linspace(0, 2*3.14159, 2*numPts)):
@@ -144,7 +144,7 @@ def starPath(inner, outer, numPts):
 
 def spiralPath(radius, turns, numPts):
     pathData = Path()
-    pathData.header.frame_id = "world"
+    pathData.header.frame_id = "map"
     pathData.header.stamp = rospy.Time.now()
 
     theta = np.linspace(0, 2.0*2.14159*turns, numPts)

@@ -1,5 +1,5 @@
 <launch>
-  <include file="$(find mav_nonlinear_mpc)/launch/mav_nonlinear_mpc.launch">
+  <include file="$(find mav_nonlinear_mpc)/launch/mav_nonlinear_mpc_sim.launch">
     <arg name="mav_name" value="vrep_quad" />
     <arg name="uav_num" value="1"/>
     <arg name="use_sim_time" value="true"/>

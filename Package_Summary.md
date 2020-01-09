@@ -1,6 +1,6 @@
 This document should be read in conjunction wtih README.md in this folder.
 So far this only describes things mostly off the top of my head and some brief skimming through files.
-If there is any more detailed information regarding files in this repo please let me know.
+If you need more detailed information regarding files in this repo please let me know.
 Regards,
 Hideyoshi
 

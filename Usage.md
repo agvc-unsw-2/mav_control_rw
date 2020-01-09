@@ -5,8 +5,9 @@ roslaunch mav_nonlinear_mpc mav_nonlinear_mpc_f550_auto.launch
 rosrun rqt_reconfigure rqt_reconfigure
 3. Check status of
 - thrust_scaling_factor
-- enable_disturbance_observer
-- enable_integrator
+  - Adjust value accordingly based on mass and motors of drone. To play it safe you can set it arbitrary low and increase slowly.
+- enable_disturbance_observer (enable after testing without disturbance_observer)
+- enable_integrator (generally disabled)
 4. Start sending commands to /nuc2/position_yaw (namespace changeable from launch file). This can be done using various methods including
 - rqt
 - uav_high_level_fsm package

@@ -1,19 +1,51 @@
 <launch>
-  <arg name="mav_name" default="firefly" />
+  <arg name="mav_name" default="vrep" />
   <arg name="namespace" default="$(arg mav_name)"/>
-  <group ns="$(arg namespace)">
-    <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node" respawn="true" clear_params="true" output="screen">
-      <remap from="odometry" to="ground_truth/odometry" />
-      <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml" />
+  <arg name="uav_num" default="1"/>
+  <arg name="use_sim_time" default="false"/>
+  <param name="use_sim_time" value="$(arg use_sim_time)" />
+  <arg name="position_yaw_controller_use_degrees" default="true"/>
+  <arg name="axis_mapping" default="4 3 1 0 4 5 6 7"/>
+
+  <remap from="/$(arg namespace)$(arg uav_num)/rc" to="/$(arg namespace)$(arg uav_num)/joy_remapped" />
+
+  <node pkg="mav_nonlinear_mpc" name="joystick_remapper" output="screen" type="joystick_remapper.py" >
+    <remap from="joy_source" to="/$(arg namespace)$(arg uav_num)/joy" />
+    <remap from="joy_dest" to="/$(arg namespace)$(arg uav_num)/joy_remapped" />
+    <param name="button_mapping" type="str" value="=" />
+    <param name="axis_mapping" type="str" value="$(arg axis_mapping)" />
+  </node>
+  
+  <group ns="$(arg namespace)$(arg uav_num)">
+    <node name="mav_nonlinear_mpc" pkg="mav_nonlinear_mpc" type="nonlinear_mpc_node"  respawn="true" clear_params="true" output="screen">
+      <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
-      <param name="use_rc_teleop" value="false"/>
-      <param name="verbose" value="true" />
-      <param name="reference_frame" value="world"/>
+      <rosparam file="$(find mav_disturbance_observer_first_order)/resources/disturbance_observer_$(arg mav_name).yaml"/>
+      <param name="use_rc_teleop" value="false" />
+
+      <remap from="odometry" to="/$(arg namespace)$(arg uav_num)/ground_truth/mavros/local_position/odom" />
     </node>
+    
+    <node name="joy_node" pkg="joy" type="joy_node" />
 
     <node name="PID_attitude_controller" pkg="mav_lowlevel_attitude_controller" type="mav_pid_attitude_controller_node" respawn="true" clear_params="true" output="screen">
-      <remap from="odometry" to="ground_truth/odometry" />
+      <remap from="odometry" to="/$(arg namespace)$(arg uav_num)/ground_truth/mavros/local_position/odom" />
       <rosparam file="$(find mav_lowlevel_attitude_controller)/resources/PID_attitude_$(arg mav_name).yaml" />
     </node>
+
+    <node pkg="mav_nonlinear_mpc" name="mav_actuators_to_float64" args="$(arg mav_name) $(arg uav_num)" output="screen" type="mav_actuators_to_float64.py"/>
+
+    <!-- <node pkg="mav_nonlinear_mpc" name="odom_delay" args="$(arg mav_name) $(arg uav_num)" output="screen" type="odom_delay.py"/> -->
+
+    <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_sim" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_sim.py"/>
+    <node pkg="mav_nonlinear_mpc" name="vrep_publish_cam_info" args="$(arg mav_name) $(arg uav_num)" output="screen" type="vrep_publish_cam_info.py"/>
+    <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_rescale" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_rescale.py"/> -->
+    <!-- <node pkg="mav_nonlinear_mpc" name="attitude_cmd_echo_real" args="$(arg mav_name) $(arg uav_num)" output="screen" type="attitude_cmd_echo_real.py"/> -->
+    
+    <!-- PositionYawController -->
+    <node pkg="mav_control_interface" name="position_yaw_controller" type="position_yaw_controller"
+      args="$(arg position_yaw_controller_use_degrees)" respawn="true" clear_params="true" output="screen"/>
   </group>
 </launch>
+
+

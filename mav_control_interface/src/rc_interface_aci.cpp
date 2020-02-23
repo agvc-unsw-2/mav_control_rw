@@ -109,11 +109,11 @@ RcData RcInterfaceAci::getRcData() const
 bool RcInterfaceAci::isActive() const
 {
   // DEBUG PURPOSES:
-  return false;
+  // return false;
   // Leave on and determine if manual through axes[5]
   //return true;
 
-  /*
+  
   if (!is_on_)
     return false;
   else if (
@@ -124,7 +124,7 @@ bool RcInterfaceAci::isActive() const
   ) return true;
   // else
   return false;
-  */
+  
 }
 
 bool RcInterfaceAci::isOn() const

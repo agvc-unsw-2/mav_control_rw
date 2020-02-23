@@ -146,7 +146,7 @@ class StateMachineDefinition : public msm_front::state_machine_def<StateMachineD
   struct transition_table : boost::mpl::vector<
       //    Start     Event         Next      Action                     Guard
       //  +---------+-------------+---------+---------------------------+----------------------+
-      msm_front::Row<Inactive, RcUpdate, RemoteControl, NoAction, euml::And_<RcModeManual, RcOn> >,
+      msm_front::Row<Inactive, RcUpdate, RcTeleOp, NoAction, UseRCTeleop >,
       msm_front::Row<Inactive, ReferenceUpdate, PositionHold, SetReferencePosition, NoRCTeleop>,
       msm_front::Row<Inactive, OdometryWatchdog, InternalTransition, PrintOdometryWatchdogWarning, OdometryOutdated >,
       msm_front::Row<Inactive, OdometryUpdate, InternalTransition, SetOdometry, NoGuard >,
@@ -366,6 +366,7 @@ private:
     void ComputeStickToCarrotMapping(const FSM& fsm, const RcData& rc_data, mav_msgs::EigenTrajectoryPoint* carrot)
     {
       assert(carrot != nullptr);
+      ROS_WARN_STREAM_THROTTLE(5.0, "In RC Teleop Mode");
 
       const Parameters& p = fsm.parameters_;
 
@@ -396,6 +397,7 @@ private:
     template<class FSM>
     void operator()(const RcUpdate& evt, FSM& fsm, HaveOdometry& src_state, RcTeleOp&)
     {
+      ROS_WARN("In RC Teleop mode");
       const Parameters& p = fsm.parameters_;
       const RcData& rc_data = evt.rc_data;
       const mav_msgs::EigenOdometry& current_state = fsm.current_state_;
@@ -415,7 +417,7 @@ private:
     void operator()(const RcUpdate& evt, FSM& fsm, RcTeleOp& src_state, RcTeleOp&)
     {
       if (fsm.current_reference_queue_.empty()){
-        ROS_WARN("[RcTeleOp]: current reference queue is empty, not sending commands.");
+        ROS_WARN_STREAM_THROTTLE(0.2, "[RcTeleOp]: current reference queue is empty, not sending commands.");
         return;
       }
 

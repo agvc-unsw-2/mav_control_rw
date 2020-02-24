@@ -28,7 +28,7 @@ class Parameters {
  public:
   static constexpr double kDefaultStickDeadzone = 0.1;
   static constexpr double kDefaultRcTeleopMaxCarrotDistancePosition = 1.0;
-  static constexpr double kDefaultRcTeleopMaxCarrotDistanceYaw = M_PI / 12.0;
+  static constexpr double kDefaultRcTeleopMaxCarrotDistanceYaw = M_PI / 24.0;
   static constexpr double kDefaultRcMaxRollPitchCommand = 0.8 * 45.0 / 180.0 * M_PI;
   static constexpr double kDefaultRcMaxYawRateCommand = 0.8 * 45.0 / 180.0 * M_PI;
   static constexpr double kDefaultTakeoffDistance = 1.0;

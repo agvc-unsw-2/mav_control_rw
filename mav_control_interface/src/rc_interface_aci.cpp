@@ -32,14 +32,15 @@ RcInterfaceAci::RcInterfaceAci(const ros::NodeHandle& nh)
 void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
 {
   is_on_ = isRcOn(msg);
+  ROS_WARN_STREAM_THROTTLE(5.0, "Getting RC Callback");
   last_data_.timestamp = msg->header.stamp;
 
   if (is_on_) {
-    last_data_.right_up_down = -msg->axes[0];
-    last_data_.right_side = msg->axes[1];
+    last_data_.right_up_down = msg->axes[0];
+    last_data_.right_side = -msg->axes[1];
     last_data_.left_up_down = msg->axes[2];
     //last_data_.left_side = -msg->axes[3];
-    last_data_.left_side = msg->axes[3]; // reverse yaw
+    last_data_.left_side = -msg->axes[3]; // reverse yaw
     /*
     if (msg->axes[5] > 0.0)
     {
@@ -58,29 +59,6 @@ void RcInterfaceAci::rcCallback(const sensor_msgs::JoyConstPtr& msg)
       ROS_WARN_STREAM_THROTTLE(5.0, "POSITION OFFBOARD MODE");
     //}
 
-    /*
-    if (msg->axes[4] <= -0.5)
-    {
-      last_data_.control_mode = RcData::ControlMode::MANUAL;
-      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
-      //ROS_WARN_STREAM_THROTTLE(1.0, "POSITION MPC CONTROL");
-    }
-    else if (msg->axes[4] > -0.5 && msg->axes[4] < 0.5)
-    {
-      //last_data_.control_mode = RcData::ControlMode::ALTITUDE_CONTROL;
-      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
-      ROS_WARN_STREAM_THROTTLE(1.0, "POSITION MPC CONTROL");
-
-      //last_data_.control_mode = RcData::ControlMode::MANUAL;
-    }
-    else
-    {
-      last_data_.control_mode = RcData::ControlMode::POSITION_CONTROL;
-      ROS_WARN_STREAM_THROTTLE(1.0, "POSITION MPC CONTROL");
-
-      //last_data_.control_mode = RcData::ControlMode::MANUAL;
-    }
-    */
     last_data_.wheel = msg->axes[6];
   }
   else {  //set to zero if RC is off
@@ -109,22 +87,22 @@ RcData RcInterfaceAci::getRcData() const
 bool RcInterfaceAci::isActive() const
 {
   // DEBUG PURPOSES:
-  return false;
+  // return false;
   // Leave on and determine if manual through axes[5]
   //return true;
 
-  /*
+  
   if (!is_on_)
     return false;
   else if (
     std::abs(last_data_.right_up_down) > STICK_DEADZONE
     || std::abs(last_data_.right_side) > STICK_DEADZONE
-    //|| std::abs(last_data_.left_up_down) > STICK_DEADZONE // ignore thrust
+    || std::abs(last_data_.left_up_down) > STICK_DEADZONE // ignore thrust
     || std::abs(last_data_.left_side) > STICK_DEADZONE
   ) return true;
   // else
   return false;
-  */
+  
 }
 
 bool RcInterfaceAci::isOn() const

@@ -3,9 +3,10 @@
   <arg name="namespace" default="$(arg mav_name)"/>
   <arg name="uav_num" default="1"/>
   <arg name="use_sim_time" default="false"/>
+  <arg name="use_rc_teleop" default="false"/>
   <param name="use_sim_time" value="$(arg use_sim_time)" />
   <arg name="position_yaw_controller_use_degrees" default="true"/>
-  <arg name="axis_mapping" default="1 2 0 3 4 5 6"/>
+  <arg name="axis_mapping" default="="/>
 
   <arg name="thrust_scaling_factor" default="0.0582"/>
   <arg name="verbose" default="true"/>
@@ -29,7 +30,7 @@
       <rosparam file="$(find mav_nonlinear_mpc)/resources/nonlinear_mpc_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer)/resources/disturbance_observer_$(arg mav_name).yaml"/>
       <rosparam file="$(find mav_disturbance_observer_first_order)/resources/disturbance_observer_$(arg mav_name).yaml"/>
-      <param name="use_rc_teleop" value="false" />
+      <param name="use_rc_teleop" value="$(arg use_rc_teleop)" />
       <param name="thrust_scaling_factor" value="$(arg thrust_scaling_factor)"/>
 
       <remap from="odometry" to="/mavros/local_position/odom" />

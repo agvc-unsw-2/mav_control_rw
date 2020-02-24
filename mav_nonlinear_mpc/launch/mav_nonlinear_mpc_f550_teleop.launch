@@ -1,0 +1,18 @@
+<launch>
+  <arg name="mav_name" value="f550" />
+  <arg name="namespace" value="nuc"/>
+  <arg name="uav_num" value="2"/>
+  <include file="$(find mav_nonlinear_mpc)/launch/mav_nonlinear_mpc.launch">
+    <arg name="mav_name" value="$(arg mav_name)" />
+    <arg name="namespace" value="$(arg namespace)"/>
+    <arg name="uav_num" value="$(arg uav_num)"/>
+    <arg name="use_sim_time" value="false"/>
+    <arg name="axis_mapping" value="=" />
+    <arg name="verbose" value="true"/>
+    <arg name="thrust_scaling_factor" value="0.05"/>
+    <arg name="use_rc_teleop" default="false"/>
+  </include>
+  
+  <node pkg="mav_nonlinear_mpc" name="origin_pose_pub_for_teleop" output="screen" type="publish_origin_pose_stamped.py"/>
+
+</launch>
